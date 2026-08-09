@@ -149,11 +149,13 @@ def claims_detail(
         JOIN claim_party plaintiff_cp
             ON plaintiff_cp.claim_id = cl.claim_id AND plaintiff_cp.procedural_role = 'plaintiff'
         JOIN party plaintiff ON plaintiff.party_id = plaintiff_cp.party_id
-        LEFT JOIN latest_enrichment plaintiff_enrichment ON plaintiff_enrichment.party_id = plaintiff.party_id
+        LEFT JOIN latest_enrichment plaintiff_enrichment
+            ON plaintiff_enrichment.party_id = plaintiff.party_id
         JOIN claim_party defendant_cp
             ON defendant_cp.claim_id = cl.claim_id AND defendant_cp.procedural_role = 'defendant'
         JOIN party defendant ON defendant.party_id = defendant_cp.party_id
-        LEFT JOIN latest_enrichment defendant_enrichment ON defendant_enrichment.party_id = defendant.party_id
+        LEFT JOIN latest_enrichment defendant_enrichment
+            ON defendant_enrichment.party_id = defendant.party_id
         LEFT JOIN court co ON co.court_id = cl.court_id
         LEFT JOIN period_court_name cn ON cn.court_id = co.court_id
         WHERE cl.amount_cop > $min_amount_cop 
