@@ -1,0 +1,197 @@
+file,sheet,column,position,dtype,null_rate,distinct_count
+raw/judicial-branch/expiring-deposits/2017-1/CONSULTA DE TITULOS.xlsb,D J EN CONDICION ESPECIAL,NÙMERODEDEPÒSITOJUDICIALENCONDICIÒNESPECIAL,0,String,0.0001,102929
+raw/judicial-branch/expiring-deposits/2017-1/CONSULTA DE TITULOS.xlsb,D J EN CONDICION ESPECIAL,FECHA DE  CONSTITUCION DD/MM/AAAA ,1,String,0.0017,19355
+raw/judicial-branch/expiring-deposits/2017-1/CONSULTA DE TITULOS.xlsb,D J EN CONDICION ESPECIAL,VALOR,2,String,0.0,37649
+raw/judicial-branch/expiring-deposits/2017-1/CONSULTA DE TITULOS.xlsb,D J EN CONDICION ESPECIAL,NUMERO DE RADICADO DEL PROCESO (23 DIGITOS),3,String,0.5435,3179
+raw/judicial-branch/expiring-deposits/2017-1/CONSULTA DE TITULOS.xlsb,D J EN CONDICION ESPECIAL,ID DEMANTANTE,4,String,0.3978,8633
+raw/judicial-branch/expiring-deposits/2017-1/CONSULTA DE TITULOS.xlsb,D J EN CONDICION ESPECIAL,NOMBRE DEMANTANDE,5,String,0.2054,41634
+raw/judicial-branch/expiring-deposits/2017-1/CONSULTA DE TITULOS.xlsb,D J EN CONDICION ESPECIAL,ID DEMANDADO,6,String,0.3657,11530
+raw/judicial-branch/expiring-deposits/2017-1/CONSULTA DE TITULOS.xlsb,D J EN CONDICION ESPECIAL,NOMBRE DEMANDADO,7,String,0.1548,47566
+raw/judicial-branch/expiring-deposits/2017-1/CONSULTA DE TITULOS.xlsb,D J EN CONDICION ESPECIAL,NOMBRE DESPACHO,8,String,0.0063,621
+raw/judicial-branch/expiring-deposits/2017-1/CONSULTA DE TITULOS.xlsb,D J EN CONDICION ESPECIAL,FECHA DE LA ACTUACIÓN QUE DIO FIN AL PROCESO  DD/MM/AAAA,9,String,0.5659,1568
+raw/judicial-branch/expiring-deposits/2017-1/CONSULTA DE TITULOS.xlsb,D J EN CONDICION ESPECIAL,__UNNAMED__10,10,String,0.9267,43
+raw/judicial-branch/expiring-deposits/2017-1/CONSULTA DE TITULOS.xlsb,D J NO RECLAMADOS,NÙMERO DE DEPÒSITO JUDICIAL NO RECLAMADOS,0,String,0.0,101394
+raw/judicial-branch/expiring-deposits/2017-1/CONSULTA DE TITULOS.xlsb,D J NO RECLAMADOS,FECHA DE  CONSTITUCION DD/MM/AAAA ,1,String,0.0641,21132
+raw/judicial-branch/expiring-deposits/2017-1/CONSULTA DE TITULOS.xlsb,D J NO RECLAMADOS,VALOR,2,String,0.0,39378
+raw/judicial-branch/expiring-deposits/2017-1/CONSULTA DE TITULOS.xlsb,D J NO RECLAMADOS,NUMERO DE RADICADO DEL PROCESO (23 DIGITOS),3,String,0.4488,22169
+raw/judicial-branch/expiring-deposits/2017-1/CONSULTA DE TITULOS.xlsb,D J NO RECLAMADOS,ID DEMANTANTE,4,Float64,0.3148,16113
+raw/judicial-branch/expiring-deposits/2017-1/CONSULTA DE TITULOS.xlsb,D J NO RECLAMADOS,NOMBRE DEMANTANDE,5,String,0.1551,29536
+raw/judicial-branch/expiring-deposits/2017-1/CONSULTA DE TITULOS.xlsb,D J NO RECLAMADOS,ID DEMANDADO,6,Float64,0.2895,23984
+raw/judicial-branch/expiring-deposits/2017-1/CONSULTA DE TITULOS.xlsb,D J NO RECLAMADOS,NOMBRE DEMANDADO,7,String,0.1321,38319
+raw/judicial-branch/expiring-deposits/2017-1/CONSULTA DE TITULOS.xlsb,D J NO RECLAMADOS,NOMBRE DESPACHO,8,String,0.001,849
+raw/judicial-branch/expiring-deposits/2017-1/CONSULTA DE TITULOS.xlsb,D J NO RECLAMADOS,FECHA DE LA ACTUACIÓN QUE DIO FIN AL PROCESO  DD/MM/AAAA,9,String,0.5246,6662
+raw/judicial-branch/expiring-deposits/2017-1/CONSULTA DE TITULOS.xlsb,D J NO RECLAMADOS,__UNNAMED__10,10,String,0.976,44
+raw/judicial-branch/expiring-deposits/2017-1/CONSULTA DE TITULOS.xlsb,D J NO RECLAMADOS,__UNNAMED__11,11,String,1.0,2
+raw/judicial-branch/expiring-deposits/2018-1/Depósitos Judiciales Primera Prescripción Año 2018.xlsx,Consolidado Publicar,No. DEPÓSITO,0,Float64,0.0003,261467
+raw/judicial-branch/expiring-deposits/2018-1/Depósitos Judiciales Primera Prescripción Año 2018.xlsx,Consolidado Publicar,NOMBRE JUZGADO,1,String,0.0,960
+raw/judicial-branch/expiring-deposits/2018-1/Depósitos Judiciales Primera Prescripción Año 2018.xlsx,Consolidado Publicar,No. IDENTIFICACIÓN DEMANDANTE,2,String,0.0,38531
+raw/judicial-branch/expiring-deposits/2018-1/Depósitos Judiciales Primera Prescripción Año 2018.xlsx,Consolidado Publicar,No. IDENTIFICACIÓN DEMANDADO,3,String,0.0,56099
+raw/judicial-branch/expiring-deposits/2018-1/Depósitos Judiciales Primera Prescripción Año 2018.xlsx,Consolidado Publicar,VALOR DEPOSITO,4,Float64,0.0,81766
+raw/judicial-branch/expiring-deposits/2018-1/Depósitos Judiciales Primera Prescripción Año 2018.xlsx,Consolidado Publicar,FECHA DE EMISIÓN,5,String,0.0,12535
+raw/judicial-branch/expiring-deposits/2018-1/Depósitos Judiciales Primera Prescripción Año 2018.xlsx,Consolidado Publicar,DIRECCIÓN SECCIONAL,6,String,0.0,21
+raw/judicial-branch/expiring-deposits/2018-1/Depósitos Judiciales Primera Prescripción Año 2018.xlsx,Consolidado Publicar,DEPARTAMENTO,7,String,0.0,25
+raw/judicial-branch/expiring-deposits/2018-1/Depósitos Judiciales Primera Prescripción Año 2018.xlsx,Consolidado Publicar,MUNICIPIO,8,String,0.0,317
+raw/judicial-branch/expiring-deposits/2018-2/Depósitos a Publicar Diario.xlsx,Hoja1,Dirección Seccional,0,String,0.0,23
+raw/judicial-branch/expiring-deposits/2018-2/Depósitos a Publicar Diario.xlsx,Hoja1,No. Depósitos,1,Float64,0.0,23
+raw/judicial-branch/expiring-deposits/2018-2/Depósitos a Publicar Diario.xlsx,Hoja1,Valor Depósitos,2,Float64,0.0,23
+raw/judicial-branch/expiring-deposits/2018-2/Depósitos a Publicar Diario.xlsx,Publicar,No. DEPÓSITO,0,String,0.0,154450
+raw/judicial-branch/expiring-deposits/2018-2/Depósitos a Publicar Diario.xlsx,Publicar,NOMBRE JUZGADO,1,String,0.0,1106
+raw/judicial-branch/expiring-deposits/2018-2/Depósitos a Publicar Diario.xlsx,Publicar,No. IDENTIFICACIÓN DEMANDANTE,2,String,0.0,31426
+raw/judicial-branch/expiring-deposits/2018-2/Depósitos a Publicar Diario.xlsx,Publicar,No. IDENTIFICACIÓN DEMANDADO,3,String,0.0,52256
+raw/judicial-branch/expiring-deposits/2018-2/Depósitos a Publicar Diario.xlsx,Publicar,VALOR DEPOSITO,4,String,0.0,58016
+raw/judicial-branch/expiring-deposits/2018-2/Depósitos a Publicar Diario.xlsx,Publicar,FECHA DE EMISIÓN,5,String,0.0,10028
+raw/judicial-branch/expiring-deposits/2018-2/Depósitos a Publicar Diario.xlsx,Publicar,DIRECCIÓN SECCIONAL,6,String,0.0,23
+raw/judicial-branch/expiring-deposits/2018-2/Depósitos a Publicar Diario.xlsx,Publicar,DEPARTAMENTO,7,String,0.0,37
+raw/judicial-branch/expiring-deposits/2018-2/Depósitos a Publicar Diario.xlsx,Publicar,MUNICIPIO,8,String,0.0,393
+raw/judicial-branch/expiring-deposits/2018-2/Depósitos a Publicar Diario.xlsx,Publicar,__UNNAMED__9,9,String,1.0,2
+raw/judicial-branch/expiring-deposits/2019-1/Listado Depósitos Prescribir - Publicar Diario.xlsx,Listado Publicación,TIPO DEPÓSITO ,0,String,0.0,4
+raw/judicial-branch/expiring-deposits/2019-1/Listado Depósitos Prescribir - Publicar Diario.xlsx,Listado Publicación,No. DEPÓSITO,1,String,0.0,135070
+raw/judicial-branch/expiring-deposits/2019-1/Listado Depósitos Prescribir - Publicar Diario.xlsx,Listado Publicación,CUENTA JUDICIAL,2,Float64,0.0,1052
+raw/judicial-branch/expiring-deposits/2019-1/Listado Depósitos Prescribir - Publicar Diario.xlsx,Listado Publicación,NOMBRE JUZGADO,3,String,0.0,1066
+raw/judicial-branch/expiring-deposits/2019-1/Listado Depósitos Prescribir - Publicar Diario.xlsx,Listado Publicación,No. IDENTIFICACIÓN DEMANDANTE,4,String,0.0,30103
+raw/judicial-branch/expiring-deposits/2019-1/Listado Depósitos Prescribir - Publicar Diario.xlsx,Listado Publicación,No. IDENTIFICACIÓN DEMANDADO,5,String,0.0,45818
+raw/judicial-branch/expiring-deposits/2019-1/Listado Depósitos Prescribir - Publicar Diario.xlsx,Listado Publicación,VALOR DEPOSITO,6,Float64,0.0,55833
+raw/judicial-branch/expiring-deposits/2019-1/Listado Depósitos Prescribir - Publicar Diario.xlsx,Listado Publicación,FECHA DE EMISIÓN,7,String,0.0,10008
+raw/judicial-branch/expiring-deposits/2019-1/Listado Depósitos Prescribir - Publicar Diario.xlsx,Listado Publicación,DIRECCIÓN SECCIONAL,8,String,0.0,23
+raw/judicial-branch/expiring-deposits/2019-1/Listado Depósitos Prescribir - Publicar Diario.xlsx,Listado Publicación,DEPARTAMENTO,9,String,0.0,31
+raw/judicial-branch/expiring-deposits/2019-1/Listado Depósitos Prescribir - Publicar Diario.xlsx,Listado Publicación,MUNICIPIO,10,String,0.0,328
+raw/judicial-branch/expiring-deposits/2020-1/Base datos de consulta.xlsx,Consolidado,Nro. Depósito Judicial,0,String,0.0,105295
+raw/judicial-branch/expiring-deposits/2020-1/Base datos de consulta.xlsx,Consolidado,Tipo Depósito Judicial,1,String,0.0,11
+raw/judicial-branch/expiring-deposits/2020-1/Base datos de consulta.xlsx,Consolidado,No. cuenta judicial,2,Float64,0.0,1234
+raw/judicial-branch/expiring-deposits/2020-1/Base datos de consulta.xlsx,Consolidado,Nombre despacho judicial,3,String,0.0,1070
+raw/judicial-branch/expiring-deposits/2020-1/Base datos de consulta.xlsx,Consolidado,Identificación demandante,4,String,0.0,29216
+raw/judicial-branch/expiring-deposits/2020-1/Base datos de consulta.xlsx,Consolidado,Identificación demandado,5,String,0.0,37581
+raw/judicial-branch/expiring-deposits/2020-1/Base datos de consulta.xlsx,Consolidado,Valor Depósito,6,Float64,0.0,44832
+raw/judicial-branch/expiring-deposits/2020-1/Base datos de consulta.xlsx,Consolidado,Fecha Emisión,7,Float64,0.0038,5085
+raw/judicial-branch/expiring-deposits/2020-1/Base datos de consulta.xlsx,Consolidado,Dirección Seccional,8,String,0.0,22
+raw/judicial-branch/expiring-deposits/2020-1/Base datos de consulta.xlsx,Consolidado,Departamento,9,String,0.0,42
+raw/judicial-branch/expiring-deposits/2020-1/Base datos de consulta.xlsx,Consolidado,Ciudad,10,String,0.0,276
+raw/judicial-branch/expiring-deposits/2020-2/Inventario a publicar.xlsx,Publicación,Nro. Depósito Judicial,0,String,0.0,37251
+raw/judicial-branch/expiring-deposits/2020-2/Inventario a publicar.xlsx,Publicación,Tipo Depósito Judicial,1,String,0.0,2
+raw/judicial-branch/expiring-deposits/2020-2/Inventario a publicar.xlsx,Publicación,No. cuenta judicial,2,Float64,0.0,591
+raw/judicial-branch/expiring-deposits/2020-2/Inventario a publicar.xlsx,Publicación,Nombre despacho judicial,3,String,0.0,584
+raw/judicial-branch/expiring-deposits/2020-2/Inventario a publicar.xlsx,Publicación,Identificación demandante,4,String,0.0,9792
+raw/judicial-branch/expiring-deposits/2020-2/Inventario a publicar.xlsx,Publicación,Identificación demandado,5,String,0.0,13427
+raw/judicial-branch/expiring-deposits/2020-2/Inventario a publicar.xlsx,Publicación,Valor Depósito,6,Float64,0.0,17815
+raw/judicial-branch/expiring-deposits/2020-2/Inventario a publicar.xlsx,Publicación,Fecha Emisión,7,String,0.0,6383
+raw/judicial-branch/expiring-deposits/2020-2/Inventario a publicar.xlsx,Publicación,Dirección Seccional,8,String,0.0,20
+raw/judicial-branch/expiring-deposits/2020-2/Inventario a publicar.xlsx,Publicación,Departamento,9,String,0.0,26
+raw/judicial-branch/expiring-deposits/2020-2/Inventario a publicar.xlsx,Publicación,Ciudad,10,String,0.0,199
+raw/judicial-branch/expiring-deposits/2021-1/BASE DE DATOS CONSOLIDADO PRIMERA PRESCRIPCIÓN 2021.xlsx,Depósitos a Prescribir 2021-1a,Tipo de Depósito,0,String,0.0,8
+raw/judicial-branch/expiring-deposits/2021-1/BASE DE DATOS CONSOLIDADO PRIMERA PRESCRIPCIÓN 2021.xlsx,Depósitos a Prescribir 2021-1a,Número de Depósito,1,Float64,0.0001,58170
+raw/judicial-branch/expiring-deposits/2021-1/BASE DE DATOS CONSOLIDADO PRIMERA PRESCRIPCIÓN 2021.xlsx,Depósitos a Prescribir 2021-1a,Número de Cuenta,2,Float64,0.0001,683
+raw/judicial-branch/expiring-deposits/2021-1/BASE DE DATOS CONSOLIDADO PRIMERA PRESCRIPCIÓN 2021.xlsx,Depósitos a Prescribir 2021-1a,Despacho Judicial,3,String,0.0001,688
+raw/judicial-branch/expiring-deposits/2021-1/BASE DE DATOS CONSOLIDADO PRIMERA PRESCRIPCIÓN 2021.xlsx,Depósitos a Prescribir 2021-1a,Identificación Demandante,4,String,0.0001,15982
+raw/judicial-branch/expiring-deposits/2021-1/BASE DE DATOS CONSOLIDADO PRIMERA PRESCRIPCIÓN 2021.xlsx,Depósitos a Prescribir 2021-1a,Identificación Demandado,5,String,0.0001,20596
+raw/judicial-branch/expiring-deposits/2021-1/BASE DE DATOS CONSOLIDADO PRIMERA PRESCRIPCIÓN 2021.xlsx,Depósitos a Prescribir 2021-1a,Valor del Depósito,6,Float64,0.0001,26358
+raw/judicial-branch/expiring-deposits/2021-1/BASE DE DATOS CONSOLIDADO PRIMERA PRESCRIPCIÓN 2021.xlsx,Depósitos a Prescribir 2021-1a,Fecha de Emisión ,7,"Datetime(time_unit='ms', time_zone=None)",0.0342,5144
+raw/judicial-branch/expiring-deposits/2021-1/BASE DE DATOS CONSOLIDADO PRIMERA PRESCRIPCIÓN 2021.xlsx,Depósitos a Prescribir 2021-1a,Seccional,8,String,0.0001,27
+raw/judicial-branch/expiring-deposits/2021-1/BASE DE DATOS CONSOLIDADO PRIMERA PRESCRIPCIÓN 2021.xlsx,Depósitos a Prescribir 2021-1a,Departamento,9,String,0.0001,30
+raw/judicial-branch/expiring-deposits/2021-1/BASE DE DATOS CONSOLIDADO PRIMERA PRESCRIPCIÓN 2021.xlsx,Depósitos a Prescribir 2021-1a,Ciudad,10,String,0.0001,197
+raw/judicial-branch/expiring-deposits/2021-2/Archivo Final 2 proceso prescripción.xlsx,Detalle,Tipo Depósito,0,String,0.0,2
+raw/judicial-branch/expiring-deposits/2021-2/Archivo Final 2 proceso prescripción.xlsx,Detalle,Número Depósito,1,String,0.0,57702
+raw/judicial-branch/expiring-deposits/2021-2/Archivo Final 2 proceso prescripción.xlsx,Detalle,Cuenta Judicial,2,Float64,0.0,612
+raw/judicial-branch/expiring-deposits/2021-2/Archivo Final 2 proceso prescripción.xlsx,Detalle,Nombre Despacho Judicial,3,String,0.0,640
+raw/judicial-branch/expiring-deposits/2021-2/Archivo Final 2 proceso prescripción.xlsx,Detalle,Identificación Demandante,4,String,0.0,14248
+raw/judicial-branch/expiring-deposits/2021-2/Archivo Final 2 proceso prescripción.xlsx,Detalle,Identificación Demandado,5,String,0.0,18866
+raw/judicial-branch/expiring-deposits/2021-2/Archivo Final 2 proceso prescripción.xlsx,Detalle,Valor Depósito,6,Float64,0.0,25898
+raw/judicial-branch/expiring-deposits/2021-2/Archivo Final 2 proceso prescripción.xlsx,Detalle,Fecha Elaboración,7,String,0.0,7763
+raw/judicial-branch/expiring-deposits/2021-2/Archivo Final 2 proceso prescripción.xlsx,Detalle,Dirección Seccional,8,String,0.0,296
+raw/judicial-branch/expiring-deposits/2021-2/Archivo Final 2 proceso prescripción.xlsx,Detalle,Departamento,9,String,0.0,117
+raw/judicial-branch/expiring-deposits/2021-2/Archivo Final 2 proceso prescripción.xlsx,Detalle,Ciudad,10,String,0.0,231
+raw/judicial-branch/expiring-deposits/2022-1/RELACION DJ INGRESADOS 20220411.xlsx,Base Publicación,Clasificación,0,String,0.0,2
+raw/judicial-branch/expiring-deposits/2022-1/RELACION DJ INGRESADOS 20220411.xlsx,Base Publicación,Depósito Judicial,1,String,0.0,117935
+raw/judicial-branch/expiring-deposits/2022-1/RELACION DJ INGRESADOS 20220411.xlsx,Base Publicación,Cuenta Judicial,2,Float64,0.0,1137
+raw/judicial-branch/expiring-deposits/2022-1/RELACION DJ INGRESADOS 20220411.xlsx,Base Publicación,Nombre Despacho,3,String,0.0,1212
+raw/judicial-branch/expiring-deposits/2022-1/RELACION DJ INGRESADOS 20220411.xlsx,Base Publicación,Demandante,4,String,0.0,31393
+raw/judicial-branch/expiring-deposits/2022-1/RELACION DJ INGRESADOS 20220411.xlsx,Base Publicación,Demandando,5,String,0.0,40422
+raw/judicial-branch/expiring-deposits/2022-1/RELACION DJ INGRESADOS 20220411.xlsx,Base Publicación,Valor,6,Float64,0.0,48690
+raw/judicial-branch/expiring-deposits/2022-1/RELACION DJ INGRESADOS 20220411.xlsx,Base Publicación,Fecha,7,String,0.0,8885
+raw/judicial-branch/expiring-deposits/2022-1/RELACION DJ INGRESADOS 20220411.xlsx,Base Publicación,Dirección Seccional,8,String,0.0,25
+raw/judicial-branch/expiring-deposits/2022-1/RELACION DJ INGRESADOS 20220411.xlsx,Base Publicación,Departamento,9,String,0.0,142
+raw/judicial-branch/expiring-deposits/2022-1/RELACION DJ INGRESADOS 20220411.xlsx,Base Publicación,Ciudad,10,String,0.0,393
+raw/judicial-branch/expiring-deposits/2022-2/Consolidado Publicación.xlsx,Consolidado,Clasificación,0,String,0.0,2
+raw/judicial-branch/expiring-deposits/2022-2/Consolidado Publicación.xlsx,Consolidado,Numero depósito,1,String,0.0,195638
+raw/judicial-branch/expiring-deposits/2022-2/Consolidado Publicación.xlsx,Consolidado,Cuenta judicial,2,Float64,0.0,1652
+raw/judicial-branch/expiring-deposits/2022-2/Consolidado Publicación.xlsx,Consolidado,Nombre Despacho,3,String,0.0,1618
+raw/judicial-branch/expiring-deposits/2022-2/Consolidado Publicación.xlsx,Consolidado,Demandante,4,String,0.0,71770
+raw/judicial-branch/expiring-deposits/2022-2/Consolidado Publicación.xlsx,Consolidado,Demandado,5,String,0.0,59726
+raw/judicial-branch/expiring-deposits/2022-2/Consolidado Publicación.xlsx,Consolidado,Valor Depósito,6,Float64,0.0,84676
+raw/judicial-branch/expiring-deposits/2022-2/Consolidado Publicación.xlsx,Consolidado,Fecha Constitución,7,String,0.0,8702
+raw/judicial-branch/expiring-deposits/2022-2/Consolidado Publicación.xlsx,Consolidado,Dirección Seccional,8,String,0.0,21
+raw/judicial-branch/expiring-deposits/2022-2/Consolidado Publicación.xlsx,Consolidado,Departamento,9,String,0.0,31
+raw/judicial-branch/expiring-deposits/2022-2/Consolidado Publicación.xlsx,Consolidado,Ciudad,10,String,0.0,345
+raw/judicial-branch/expiring-deposits/2023-1/Publicar+Página+web.xlsx,Inventario Publicar,Número Depósito Judicial,0,String,0.0,208603
+raw/judicial-branch/expiring-deposits/2023-1/Publicar+Página+web.xlsx,Inventario Publicar,Nombre Despacho,1,String,0.0,1612
+raw/judicial-branch/expiring-deposits/2023-1/Publicar+Página+web.xlsx,Inventario Publicar,Cuenta Judicial,2,String,0.0,1615
+raw/judicial-branch/expiring-deposits/2023-1/Publicar+Página+web.xlsx,Inventario Publicar,Demandante,3,String,0.0,90542
+raw/judicial-branch/expiring-deposits/2023-1/Publicar+Página+web.xlsx,Inventario Publicar,Demandado,4,Float64,0.0549,53906
+raw/judicial-branch/expiring-deposits/2023-1/Publicar+Página+web.xlsx,Inventario Publicar,Valor Depósito,5,Float64,0.0,96470
+raw/judicial-branch/expiring-deposits/2023-1/Publicar+Página+web.xlsx,Inventario Publicar,Fecha Depósito,6,"Datetime(time_unit='ms', time_zone=None)",0.0,5708
+raw/judicial-branch/expiring-deposits/2023-1/Publicar+Página+web.xlsx,Inventario Publicar,Seccional ,7,String,0.0,23
+raw/judicial-branch/expiring-deposits/2023-1/Publicar+Página+web.xlsx,Inventario Publicar,Departamento,8,String,0.0,34
+raw/judicial-branch/expiring-deposits/2023-1/Publicar+Página+web.xlsx,Inventario Publicar,Ciudad,9,String,0.0,400
+raw/judicial-branch/expiring-deposits/2023-2/Listado+Publicar.xlsm,Busqueda,Depósito,0,String,0.0,245622
+raw/judicial-branch/expiring-deposits/2023-2/Listado+Publicar.xlsm,Busqueda,Despacho Judicial,1,String,0.0,1769
+raw/judicial-branch/expiring-deposits/2023-2/Listado+Publicar.xlsm,Busqueda,Cuenta Judicial,2,String,0.0,1770
+raw/judicial-branch/expiring-deposits/2023-2/Listado+Publicar.xlsm,Busqueda,Tipo Identificación,3,String,0.0,9
+raw/judicial-branch/expiring-deposits/2023-2/Listado+Publicar.xlsm,Busqueda,Identificación Demandante,4,String,0.0,54722
+raw/judicial-branch/expiring-deposits/2023-2/Listado+Publicar.xlsm,Busqueda,Nombre Demandante,5,String,0.0,88489
+raw/judicial-branch/expiring-deposits/2023-2/Listado+Publicar.xlsm,Busqueda,Tipo Identificación2,6,String,0.0,11
+raw/judicial-branch/expiring-deposits/2023-2/Listado+Publicar.xlsm,Busqueda,Identificación Demandado,7,String,0.0,83639
+raw/judicial-branch/expiring-deposits/2023-2/Listado+Publicar.xlsm,Busqueda,Nombre Demandado,8,String,0.0,131577
+raw/judicial-branch/expiring-deposits/2023-2/Listado+Publicar.xlsm,Busqueda,Valor Depósito,9,Float64,0.0,81200
+raw/judicial-branch/expiring-deposits/2023-2/Listado+Publicar.xlsm,Busqueda,Fecha Constitución,10,"Datetime(time_unit='ms', time_zone=None)",0.0009,5873
+raw/judicial-branch/expiring-deposits/2023-2/Listado+Publicar.xlsm,Busqueda,Distrito Judicial,11,String,0.0,24
+raw/judicial-branch/expiring-deposits/2023-2/Listado+Publicar.xlsm,Busqueda,Dpto.,12,String,0.0,39
+raw/judicial-branch/expiring-deposits/2023-2/Listado+Publicar.xlsm,Busqueda,Ciudad,13,String,0.0,428
+raw/judicial-branch/expiring-deposits/2024-1/Listado+Publicar+2024-1.xlsm,Busqueda,No. Depósito,0,String,0.0,220913
+raw/judicial-branch/expiring-deposits/2024-1/Listado+Publicar+2024-1.xlsm,Busqueda,Despacho Judicial,1,String,0.0,2723
+raw/judicial-branch/expiring-deposits/2024-1/Listado+Publicar+2024-1.xlsm,Busqueda,Cuenta Judicial,2,String,0.0,2342
+raw/judicial-branch/expiring-deposits/2024-1/Listado+Publicar+2024-1.xlsm,Busqueda,Identificación Demandante,3,String,0.0,46348
+raw/judicial-branch/expiring-deposits/2024-1/Listado+Publicar+2024-1.xlsm,Busqueda,Identificación Demandado,4,String,0.0,65121
+raw/judicial-branch/expiring-deposits/2024-1/Listado+Publicar+2024-1.xlsm,Busqueda,Valor,5,Float64,0.0,87730
+raw/judicial-branch/expiring-deposits/2024-1/Listado+Publicar+2024-1.xlsm,Busqueda,Fecha Constitución,6,"Datetime(time_unit='ms', time_zone=None)",0.6214,1843
+raw/judicial-branch/expiring-deposits/2024-1/Listado+Publicar+2024-1.xlsm,Busqueda,Seccional,7,String,0.0,27
+raw/judicial-branch/expiring-deposits/2024-1/Listado+Publicar+2024-1.xlsm,Busqueda,Departamento,8,String,0.0,42
+raw/judicial-branch/expiring-deposits/2024-1/Listado+Publicar+2024-1.xlsm,Busqueda,Ciudad,9,String,0.0,630
+raw/judicial-branch/expiring-deposits/2024-2/Listado Publicar 2024-2.xlsm,Busqueda,No. Depósito,0,String,0.0,386055
+raw/judicial-branch/expiring-deposits/2024-2/Listado Publicar 2024-2.xlsm,Busqueda,Despacho Judicial,1,String,0.0,3667
+raw/judicial-branch/expiring-deposits/2024-2/Listado Publicar 2024-2.xlsm,Busqueda,Cuenta Judicial,2,String,0.0,2769
+raw/judicial-branch/expiring-deposits/2024-2/Listado Publicar 2024-2.xlsm,Busqueda,Identificación Demandante,3,String,0.0,92332
+raw/judicial-branch/expiring-deposits/2024-2/Listado Publicar 2024-2.xlsm,Busqueda,Identificación Demandado,4,String,0.0,136346
+raw/judicial-branch/expiring-deposits/2024-2/Listado Publicar 2024-2.xlsm,Busqueda,Valor,5,Float64,0.0,139184
+raw/judicial-branch/expiring-deposits/2024-2/Listado Publicar 2024-2.xlsm,Busqueda,Fecha Constitución,6,"Datetime(time_unit='ms', time_zone=None)",0.001,7980
+raw/judicial-branch/expiring-deposits/2024-2/Listado Publicar 2024-2.xlsm,Busqueda,Seccional,7,String,0.0,25
+raw/judicial-branch/expiring-deposits/2024-2/Listado Publicar 2024-2.xlsm,Busqueda,Departamento,8,String,0.0,74
+raw/judicial-branch/expiring-deposits/2024-2/Listado Publicar 2024-2.xlsm,Busqueda,Ciudad,9,String,0.0,853
+raw/judicial-branch/expiring-deposits/2025-1/Listado Publicar 2025-1.xlsm,Busqueda,No. Depósito,0,String,0.0,313794
+raw/judicial-branch/expiring-deposits/2025-1/Listado Publicar 2025-1.xlsm,Busqueda,Despacho Judicial,1,String,0.0,2763
+raw/judicial-branch/expiring-deposits/2025-1/Listado Publicar 2025-1.xlsm,Busqueda,Cuenta Judicial,2,String,0.0,2749
+raw/judicial-branch/expiring-deposits/2025-1/Listado Publicar 2025-1.xlsm,Busqueda,Identificación Demandante,3,String,0.0,56965
+raw/judicial-branch/expiring-deposits/2025-1/Listado Publicar 2025-1.xlsm,Busqueda,Identificación Demandado,4,String,0.0,100658
+raw/judicial-branch/expiring-deposits/2025-1/Listado Publicar 2025-1.xlsm,Busqueda,Valor,5,Float64,0.0,115248
+raw/judicial-branch/expiring-deposits/2025-1/Listado Publicar 2025-1.xlsm,Busqueda,Fecha Constitución,6,"Datetime(time_unit='ms', time_zone=None)",0.0,4782
+raw/judicial-branch/expiring-deposits/2025-1/Listado Publicar 2025-1.xlsm,Busqueda,Seccional,7,String,0.0,52
+raw/judicial-branch/expiring-deposits/2025-1/Listado Publicar 2025-1.xlsm,Busqueda,Departamento,8,String,0.0,44
+raw/judicial-branch/expiring-deposits/2025-1/Listado Publicar 2025-1.xlsm,Busqueda,Ciudad,9,String,0.0,603
+raw/judicial-branch/expiring-deposits/2025-2/Listado Publicar 2025-2.xlsm,Busqueda,No. Depósito,0,String,0.0,179327
+raw/judicial-branch/expiring-deposits/2025-2/Listado Publicar 2025-2.xlsm,Busqueda,Despacho Judicial,1,String,0.0,3076
+raw/judicial-branch/expiring-deposits/2025-2/Listado Publicar 2025-2.xlsm,Busqueda,Cuenta Judicial,2,String,0.0,3076
+raw/judicial-branch/expiring-deposits/2025-2/Listado Publicar 2025-2.xlsm,Busqueda,Identificación Demandante,3,String,0.0,35689
+raw/judicial-branch/expiring-deposits/2025-2/Listado Publicar 2025-2.xlsm,Busqueda,Identificación Demandado,4,String,0.0,58129
+raw/judicial-branch/expiring-deposits/2025-2/Listado Publicar 2025-2.xlsm,Busqueda,Valor,5,Float64,0.0,74922
+raw/judicial-branch/expiring-deposits/2025-2/Listado Publicar 2025-2.xlsm,Busqueda,Fecha Constitución,6,"Datetime(time_unit='ms', time_zone=None)",0.0031,4913
+raw/judicial-branch/expiring-deposits/2025-2/Listado Publicar 2025-2.xlsm,Busqueda,Seccional,7,String,0.0,25
+raw/judicial-branch/expiring-deposits/2025-2/Listado Publicar 2025-2.xlsm,Busqueda,Departamento,8,String,0.0,69
+raw/judicial-branch/expiring-deposits/2025-2/Listado Publicar 2025-2.xlsm,Busqueda,Ciudad,9,String,0.0,655
+raw/judicial-branch/expiring-deposits/2026-1/Listado Publicar 2026-1.xlsm,Busqueda,No. Depósito,0,String,0.0,193858
+raw/judicial-branch/expiring-deposits/2026-1/Listado Publicar 2026-1.xlsm,Busqueda,Despacho Judicial,1,String,0.0,2979
+raw/judicial-branch/expiring-deposits/2026-1/Listado Publicar 2026-1.xlsm,Busqueda,Cuenta Judicial,2,String,0.0,3090
+raw/judicial-branch/expiring-deposits/2026-1/Listado Publicar 2026-1.xlsm,Busqueda,Identificación Demandante,3,String,0.0,38310
+raw/judicial-branch/expiring-deposits/2026-1/Listado Publicar 2026-1.xlsm,Busqueda,Identificación Demandado,4,String,0.0,58481
+raw/judicial-branch/expiring-deposits/2026-1/Listado Publicar 2026-1.xlsm,Busqueda,Valor,5,Float64,0.0,68149
+raw/judicial-branch/expiring-deposits/2026-1/Listado Publicar 2026-1.xlsm,Busqueda,Fecha Constitución,6,"Datetime(time_unit='ms', time_zone=None)",0.0,4475
+raw/judicial-branch/expiring-deposits/2026-1/Listado Publicar 2026-1.xlsm,Busqueda,Seccional,7,String,0.0,52
+raw/judicial-branch/expiring-deposits/2026-1/Listado Publicar 2026-1.xlsm,Busqueda,Departamento,8,String,0.0,79
+raw/judicial-branch/expiring-deposits/2026-1/Listado Publicar 2026-1.xlsm,Busqueda,Ciudad,9,String,0.0,881

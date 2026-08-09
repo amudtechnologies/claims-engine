@@ -1,0 +1,50 @@
+[project]
+name = "claims-engine"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { email = "joamud@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "boto3>=1.43.63",
+    "cryptography>=50.0.0",
+    "dbt-duckdb>=1.10.1",
+    "duckdb>=1.5.5",
+    "fastexcel>=0.20.2",
+    "httpx>=0.28.1",
+    "pandera>=0.32.1",
+    "polars[calamine]>=1.43.2",
+    "pyarrow>=25.0.0",
+    "pydantic>=2.13.4",
+    "rapidfuzz>=3.14.5",
+    "s3fs>=0.4.2",
+    "tenacity>=9.1.4",
+    "typer>=0.27.1",
+    "unidecode>=1.4.0",
+]
+
+[project.scripts]
+claims-engine = "claims_engine:main"
+
+[build-system]
+requires = ["uv_build>=0.12.1,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[dependency-groups]
+dev = [
+    "moto[s3]>=5.2.2",
+    "pytest>=9.1.1",
+    "ruff>=0.16.1",
+    "xlsxwriter>=3.2.9",
+]
