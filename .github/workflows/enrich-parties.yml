@@ -1,0 +1,51 @@
+name: Enrich Parties
+
+on:
+  schedule:
+    # Daily at 06:00 UTC. Deliberately small/rate-limited per Phase 5 design
+    # (see enrich_parties in cli.py) -- this makes incremental progress
+    # against not-yet-enriched legal_entity parties, not a one-shot backfill.
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+    inputs:
+      bucket:
+        description: "S3 bucket"
+        required: true
+        default: "amud-technologies"
+      limit:
+        description: "Max not-yet-enriched legal_entity parties to query this run"
+        required: true
+        default: "1000"
+      delay_seconds:
+        description: "Pause between RUES requests, in seconds"
+        required: true
+        default: "3.0"
+
+jobs:
+  enrich-parties:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Enrich parties via RUES (Phase 5)
+        run: >
+          uv run claims-engine enrich-parties
+          "${{ github.event.inputs.bucket || 'amud-technologies' }}"
+          --limit ${{ github.event.inputs.limit || '1000' }}
+          --delay-seconds ${{ github.event.inputs.delay_seconds || '3.0' }}

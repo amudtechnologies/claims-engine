@@ -1,0 +1,47 @@
+name: Profile S3 Prefix
+
+on:
+  workflow_dispatch:
+    inputs:
+      bucket:
+        description: "S3 bucket"
+        required: true
+        default: "amud-technologies"
+      prefix:
+        description: "S3 prefix to profile (every file under it, every sheet)"
+        required: true
+        default: "raw/judicial-branch/expiring-deposits/"
+
+jobs:
+  profile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Profile (Phase 0)
+        run: >
+          uv run claims-engine profile-s3-prefix
+          "${{ inputs.bucket }}" "${{ inputs.prefix }}"
+          --out profile.csv
+
+      - name: Upload profile
+        uses: actions/upload-artifact@v4
+        with:
+          name: schema-profile-${{ github.run_id }}
+          path: profile.csv

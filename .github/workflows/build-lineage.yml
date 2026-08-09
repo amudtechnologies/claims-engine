@@ -1,0 +1,51 @@
+name: Build Lineage
+
+on:
+  workflow_dispatch:
+    inputs:
+      bucket:
+        description: "S3 bucket"
+        required: true
+        default: "amud-technologies"
+      raw_prefix:
+        description: "S3 prefix to list raw files under"
+        required: true
+        default: "raw/judicial-branch/expiring-deposits/"
+      staging_prefix:
+        description: "S3 prefix staging Parquet was written under"
+        required: true
+        default: "staging/jd_published_deposit"
+      reject_prefix:
+        description: "S3 prefix reject Parquet was written under"
+        required: true
+        default: "staging/jd_reject"
+
+jobs:
+  build-lineage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Build core/{file,capture}
+        run: >
+          uv run claims-engine build-lineage
+          "${{ inputs.bucket }}"
+          --raw-prefix "${{ inputs.raw_prefix }}"
+          --staging-prefix "${{ inputs.staging_prefix }}"
+          --reject-prefix "${{ inputs.reject_prefix }}"
