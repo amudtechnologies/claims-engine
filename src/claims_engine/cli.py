@@ -299,7 +299,7 @@ def enrich_parties(
     bucket: Annotated[str, typer.Argument(help="S3 bucket, e.g. amud-technologies.")],
     limit: Annotated[
         int, typer.Option(help="Max not-yet-enriched legal_entity parties to query this run.")
-    ] = 50,
+    ] = 1000,
     delay_seconds: Annotated[
         float, typer.Option(help="Pause between RUES requests, in seconds.")
     ] = 3.0,
@@ -352,8 +352,14 @@ def enrich_parties(
             )
 
         typer.echo(f"Querying RUES (limit={limit}, delay={delay_seconds}s)...", err=True)
+
+        def _progress(done: int, total: int) -> None:
+            typer.echo(f"  {done}/{total} queried", err=True)
+
         with httpx.Client(timeout=30.0) as http_client:
-            results = enrichment.enrich_parties(con, http_client, limit, delay_seconds)
+            results = enrichment.enrich_parties(
+                con, http_client, limit, delay_seconds, on_progress=_progress
+            )
 
         if results.height == 0:
             typer.echo("Nothing to enrich — every legal_entity party already has a RUES attempt.")
@@ -378,7 +384,7 @@ def check_document_types(
         typer.Option(
             help="Max unchecked exhausted-signal natural_person parties to query this run."
         ),
-    ] = 50,
+    ] = 1000,
     delay_seconds: Annotated[
         float, typer.Option(help="Pause between RUES requests, in seconds.")
     ] = 3.0,
@@ -419,9 +425,13 @@ def check_document_types(
             )
 
         typer.echo(f"Querying RUES (limit={limit}, delay={delay_seconds}s)...", err=True)
+
+        def _progress(done: int, total: int) -> None:
+            typer.echo(f"  {done}/{total} queried", err=True)
+
         with httpx.Client(timeout=30.0) as http_client:
             results, enrichment_results = document_type_check.check_document_types(
-                con, http_client, limit, delay_seconds
+                con, http_client, limit, delay_seconds, on_progress=_progress
             )
 
         if results.height == 0:

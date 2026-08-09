@@ -61,6 +61,7 @@ from __future__ import annotations
 
 import json
 import time
+from collections.abc import Callable
 from datetime import UTC, datetime
 
 import duckdb
@@ -153,6 +154,8 @@ def check_document_types(
     client: httpx.Client,
     limit: int,
     delay_seconds: float,
+    progress_every: int = 100,
+    on_progress: Callable[[int, int], None] | None = None,
 ) -> tuple[pl.DataFrame, pl.DataFrame]:
     """Query RUES for up to `limit` unchecked exhausted-signal natural_person
     parties. Tries each of a party's candidate NIT forms (see
@@ -167,12 +170,18 @@ def check_document_types(
     paced call for the company detail (see `enrichment.enrich_parties`'s
     docstring) folded into that enrichment row's `attributes`; a failure
     there fails the whole party as a `document_type_check` error row (so it
-    stays a target next run) rather than writing a detail-less match."""
+    stays a target next run) rather than writing a detail-less match.
+
+    `on_progress`, if given, is called with (done, total) every
+    `progress_every` parties and once more on the final one -- same reason
+    as `enrichment.enrich_parties`: a large `limit` at a paced
+    `delay_seconds` can run long with no other visible output."""
     targets = parties_needing_check(con, limit)
+    total = targets.height
     check_rows = []
     enrichment_rows = []
     made_a_call = False
-    for party_id, document_number in targets.iter_rows():
+    for i, (party_id, document_number) in enumerate(targets.iter_rows(), start=1):
         queried_at = datetime.now(UTC)
         try:
             response: dict = {}
@@ -194,6 +203,8 @@ def check_document_types(
                 )
         except Exception as e:
             check_rows.append(_error_row(party_id, queried_at, f"{type(e).__name__}: {e}"))
+        if on_progress is not None and (i % progress_every == 0 or i == total):
+            on_progress(i, total)
     return (
         pl.DataFrame(check_rows, schema=_RESULT_SCHEMA),
         pl.DataFrame(enrichment_rows, schema=_ENRICHMENT_SCHEMA),

@@ -203,3 +203,29 @@ def test_enrich_parties_records_error_row_on_failure_instead_of_crashing():
     assert row["name"] is None
     assert row["status"] == "error"
     assert "404" in row["result"]
+
+
+def test_enrich_parties_reports_progress_every_n_and_on_the_last_one():
+    con = _connect(
+        [
+            {"party_id": f"p{i}", "document_number": "900000000", "document_type": "legal_entity"}
+            for i in range(5)
+        ]
+    )
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"registros": [], "cant_registros": 0})
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    calls: list[tuple[int, int]] = []
+    result = enrich_parties(
+        con,
+        client,
+        limit=10,
+        delay_seconds=0,
+        progress_every=2,
+        on_progress=lambda done, total: calls.append((done, total)),
+    )
+
+    assert result.height == 5
+    assert calls == [(2, 5), (4, 5), (5, 5)]

@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import json
 import time
+from collections.abc import Callable
 from datetime import UTC, datetime
 
 import duckdb
@@ -132,6 +133,8 @@ def enrich_parties(
     client: httpx.Client,
     limit: int,
     delay_seconds: float,
+    progress_every: int = 100,
+    on_progress: Callable[[int, int], None] | None = None,
 ) -> pl.DataFrame:
     """Query RUES for up to `limit` not-yet-enriched legal_entity parties,
     pacing requests `delay_seconds` apart — a fixed, honest rate limit, not
@@ -146,11 +149,18 @@ def enrich_parties(
     failure at that second call fails the whole party as `status='error'`
     rather than keeping a detail-less `found` row, so a re-run retries the
     full pair instead of leaving the richer data permanently missing (the
-    search itself is cheap to repeat)."""
+    search itself is cheap to repeat).
+
+    `on_progress`, if given, is called with (done, total) every
+    `progress_every` parties and once more on the final one -- e.g. a limit
+    of 1000 at delay_seconds=3 takes ~50+ minutes end to end, so a caller
+    (the CLI) needs a way to report progress instead of going silent until
+    the very end."""
     targets = parties_to_enrich(con, limit)
+    total = targets.height
     rows = []
     made_a_call = False
-    for party_id, document_number in targets.iter_rows():
+    for i, (party_id, document_number) in enumerate(targets.iter_rows(), start=1):
         queried_at = datetime.now(UTC)
         try:
             if made_a_call:
@@ -165,4 +175,6 @@ def enrich_parties(
             rows.append(_result_row(party_id, queried_at, response, detail))
         except Exception as e:
             rows.append(_error_row(party_id, queried_at, f"{type(e).__name__}: {e}"))
+        if on_progress is not None and (i % progress_every == 0 or i == total):
+            on_progress(i, total)
     return pl.DataFrame(rows, schema=_ENRICHMENT_SCHEMA)

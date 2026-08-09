@@ -271,3 +271,34 @@ def test_check_document_types_returns_empty_frames_with_correct_schema():
         "attributes",
         "status",
     ]
+
+
+def test_check_document_types_reports_progress_every_n_and_on_the_last_one():
+    con = _connect(
+        [
+            {
+                "party_id": f"p{i}",
+                "document_number": f"80000000{i}",
+                "document_type": "natural_person",
+                "document_type_rule_id": "nit_check_digit_invalid",
+            }
+            for i in range(5)
+        ]
+    )
+    client = httpx.Client(
+        transport=httpx.MockTransport(
+            lambda r: httpx.Response(200, json={"registros": [], "cant_registros": 0})
+        )
+    )
+    calls: list[tuple[int, int]] = []
+    result, _ = check_document_types(
+        con,
+        client,
+        limit=10,
+        delay_seconds=0,
+        progress_every=2,
+        on_progress=lambda done, total: calls.append((done, total)),
+    )
+
+    assert result.height == 5
+    assert calls == [(2, 5), (4, 5), (5, 5)]
