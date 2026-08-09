@@ -1,7 +1,7 @@
 # Claims engine — project context
 
 Background, definitions and decision log. Referenced from `CLAUDE.md`.
-Last updated: 2026-08-04.
+Last updated: 2026-08-09.
 
 ---
 
@@ -206,6 +206,19 @@ deposits; we verify which ones are yours," never "this money is yours."
   exempt it from Law 1581 once enriched and commercially exploited.
 - **D24.** If natural persons are ever served, the model is self-lookup — the person
   enters their own ID and sees only their own record — never outbound.
+
+### Automation
+
+- **D25.** GitHub Actions runs the pipeline commands, one workflow per phase
+  (`.github/workflows/`: `profile-s3-prefix`, `normalize-s3-prefix`, `build-lineage`,
+  `build-identity`, `build-lifecycle`, `enrich-parties`, `check-document-types`),
+  triggered manually except `enrich-parties` (daily cron, `--limit 1000`) and
+  `check-document-types` (chained via `workflow_run` right after `enrich-parties`
+  succeeds). This is the "one can be added later" from D13, not a reversal of D14 —
+  cron plus one `workflow_run` chain has no DAG engine, no backfill UI, and no
+  cross-run state, unlike Airflow/Dagster. AWS auth is static access keys
+  (`AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` repo secrets) for now, not OIDC role
+  assumption — acceptable to revisit once the pipeline is more than one person's tool.
 
 ---
 

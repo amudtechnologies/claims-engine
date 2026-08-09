@@ -66,6 +66,12 @@ Deliberately excluded as oversized for this data volume: Spark, EMR, Glue jobs,
 Redshift, Snowflake, Airflow, Dagster, Kafka, Iceberg. Do not introduce them.
 Total data volume across all radars is measured in tens of millions of rows.
 
+GitHub Actions runs the pipeline commands — one workflow per phase under
+`.github/workflows/`, manually triggered except `enrich-parties` (daily cron) and
+`check-document-types` (chained after it). This is not an exception to the Airflow/
+Dagster exclusion above: no DAG engine, no backfill UI, just cron plus one
+`workflow_run` chain. See `docs/project-context.md` decision D25.
+
 ## Layer conventions
 
 | Layer | Directory | Contains | May do |
@@ -120,13 +126,15 @@ Adding a radar should mean writing an adapter, not modifying the core.
 
 ## Commands
 
-<!-- TODO: fill in as the project takes shape -->
-
 ```bash
 uv sync
 ruff check .
 pytest
 ```
+
+Pipeline phases are `claims-engine` subcommands (`src/claims_engine/cli.py`) — see
+`README.md` for the full table. Each has a matching GitHub Actions workflow under
+`.github/workflows/` for running it against S3 directly, without a local checkout.
 
 ## When in doubt
 
