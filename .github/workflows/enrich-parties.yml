@@ -5,7 +5,7 @@ on:
     # Daily at 06:00 UTC. Deliberately small/rate-limited per Phase 5 design
     # (see enrich_parties in cli.py) -- this makes incremental progress
     # against not-yet-enriched legal_entity parties, not a one-shot backfill.
-    - cron: "0 6 * * *"
+    - cron: "0 5 * * *"
   workflow_dispatch:
     inputs:
       bucket:
@@ -15,7 +15,7 @@ on:
       limit:
         description: "Max not-yet-enriched legal_entity parties to query this run"
         required: true
-        default: "1000"
+        default: "3000"
       delay_seconds:
         description: "Pause between RUES requests, in seconds"
         required: true
