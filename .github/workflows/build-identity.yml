@@ -1,6 +1,13 @@
 name: Build Identity
 
 on:
+  workflow_run:
+    # Runs after Enrich Parties so newly-learned document_type
+    # classifications (D26 -- sourced from RUES, not inferred here) get
+    # folded back onto core/party instead of sitting unused in
+    # core/enrichment/ until someone remembers to trigger this manually.
+    workflows: ["Enrich Parties"]
+    types: [completed]
   workflow_dispatch:
     inputs:
       bucket:
@@ -15,6 +22,11 @@ on:
 jobs:
   build-identity:
     runs-on: ubuntu-latest
+    # Only proceed on the manual trigger, or when the Enrich Parties run
+    # it's chained to actually succeeded -- never chain onto a failed run.
+    if: >
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success'
     steps:
       - uses: actions/checkout@v4
 
@@ -37,5 +49,5 @@ jobs:
       - name: Build core/{party,court,court_name} (Phase 3)
         run: >
           uv run claims-engine build-identity
-          "${{ inputs.bucket }}"
-          --staging-prefix "${{ inputs.staging_prefix }}"
+          "${{ github.event.inputs.bucket || 'amud-technologies' }}"
+          --staging-prefix "${{ github.event.inputs.staging_prefix || 'staging/jd_published_deposit' }}"

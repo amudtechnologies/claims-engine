@@ -67,9 +67,12 @@ class StagingRejectSchema(pa.DataFrameModel):
 class PartySchema(pa.DataFrameModel):
     party_id: str
     document_number: str
-    document_type: str = pa.Field(isin=["legal_entity", "natural_person"])
-    document_type_confidence: float = pa.Field(ge=0, le=1)
-    document_type_rule_id: str
+    # Nullable per D26: document_type is sourced from RUES's own Categoria
+    # field, not inferred at build-identity time -- null until a party has
+    # actually been queried (see identity.apply_rues_classification).
+    document_type: str | None = pa.Field(isin=["legal_entity", "natural_person"], nullable=True)
+    document_type_confidence: float | None = pa.Field(ge=0, le=1, nullable=True)
+    document_type_rule_id: str | None = pa.Field(nullable=True)
 
     class Config:
         strict = True
@@ -146,15 +149,18 @@ class EnrichmentSchema(pa.DataFrameModel):
     active: bool | None = pa.Field(nullable=True)
     attributes: str | None = pa.Field(nullable=True)
     status: str = pa.Field(isin=["found", "not_found", "error"])
-
-
-class DocumentTypeCheckSchema(pa.DataFrameModel):
-    party_id: str
-    source: str
-    queried_at: datetime
-    result: str
-    name: str | None = pa.Field(nullable=True)
-    status: str = pa.Field(isin=["found", "not_found", "error"])
+    # D26: every RUES match is queried and enriched with no discrimination by
+    # document type. `categoria` is the verbatim value RUES returned (no
+    # isin restriction -- it's a fact, not this project's classification),
+    # stored even when document_type below can't map it to legal_entity/
+    # natural_person, so nothing RUES actually told us is ever lost.
+    categoria: str | None = pa.Field(nullable=True)
+    # These three carry the classification RUES's own Categoria field gives
+    # us for this attempt -- null on an 'error' row,
+    # since a failed attempt yields no classification signal.
+    document_type: str | None = pa.Field(isin=["legal_entity", "natural_person"], nullable=True)
+    document_type_confidence: float | None = pa.Field(ge=0, le=1, nullable=True)
+    document_type_rule_id: str | None = pa.Field(nullable=True)
 
 
 class FileSchema(pa.DataFrameModel):

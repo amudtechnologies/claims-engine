@@ -4,8 +4,11 @@ on:
   schedule:
     # Daily at 06:00 UTC. Deliberately small/rate-limited per Phase 5 design
     # (see enrich_parties in cli.py) -- this makes incremental progress
-    # against not-yet-enriched legal_entity parties, not a one-shot backfill.
-    - cron: "0 5 * * *"
+    # against not-yet-enriched parties, not a one-shot backfill. Per D26,
+    # every party is a target regardless of document_type -- this single
+    # workflow now does both RUES classification and enrichment; the old
+    # separate "Check Document Types" workflow is retired.
+    - cron: "0 3 * * *"
   workflow_dispatch:
     inputs:
       bucket:
@@ -13,9 +16,9 @@ on:
         required: true
         default: "amud-technologies"
       limit:
-        description: "Max not-yet-enriched legal_entity parties to query this run"
+        description: "Max not-yet-enriched parties to query this run"
         required: true
-        default: "3000"
+        default: "5000"
       delay_seconds:
         description: "Pause between RUES requests, in seconds"
         required: true
@@ -47,5 +50,5 @@ jobs:
         run: >
           uv run claims-engine enrich-parties
           "${{ github.event.inputs.bucket || 'amud-technologies' }}"
-          --limit ${{ github.event.inputs.limit || '1000' }}
+          --limit ${{ github.event.inputs.limit || '5000' }}
           --delay-seconds ${{ github.event.inputs.delay_seconds || '3.0' }}

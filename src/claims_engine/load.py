@@ -24,14 +24,6 @@ def enrichment_key(source: str, batch_id: str) -> str:
     return f"core/enrichment/source={source}/{batch_id}.parquet"
 
 
-def document_type_check_key(source: str, batch_id: str) -> str:
-    """Same append-only/dated pattern as enrichment_key, but its own table —
-    keeps `enrichment`'s legal_entity-only invariant airtight, since this one
-    queries the population enrichment.py must never touch (see
-    document_type_check.py's module docstring)."""
-    return f"core/document_type_check/source={source}/{batch_id}.parquet"
-
-
 def write_frame_to_s3(client, df: pl.DataFrame, bucket: str, key: str) -> None:
     """Write via a local temp file + boto3 upload, not polars' native cloud writer
     — keeps one consistent credential path (boto3 + AWS_PROFILE) everywhere in this

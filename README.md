@@ -62,10 +62,9 @@ All commands are exposed under the `claims-engine` entry point
 | `profile-s3-prefix` | Phase 0 — profile every sheet of every file under an S3 prefix, degrading unreadable sheets to `<READ_ERROR>` rows instead of aborting |
 | `normalize-s3-prefix` | Phase 2 — normalize raw files into `stg_jd_published_deposit` / `stg_jd_reject` Parquet on S3, enforcing `rows_ok + rows_rejected == rows_read` |
 | `build-lineage` | Builds `core/{file,capture}` from the raw listing and already-written staging output |
-| `build-identity` | Phase 3 — builds canonical `core/{party,court,court_name}` from staging |
+| `build-identity` | Phase 3 — builds canonical `core/{party,court,court_name}` from staging; backfills `document_type` from RUES lookup history in `core/enrichment/` |
 | `build-lifecycle` | Phase 4 — builds canonical `core/{claim,observation,claim_party}` from staging |
-| `enrich-parties` | Phase 5 — queries RUES for not-yet-enriched `legal_entity` parties, writes a dated batch to `core/enrichment/` |
-| `check-document-types` | Queries RUES to resolve `natural_person` parties with no internal document-type evidence either way |
+| `enrich-parties` | Phase 5 — queries RUES for not-yet-enriched parties of any document type (D26 — no `legal_entity` pre-filter), writes a dated batch to `core/enrichment/`. RUES's own `Categoria` field is the source of `document_type` |
 
 Run `claims-engine <command> --help` for arguments; every command takes the
 S3 bucket as its first argument.

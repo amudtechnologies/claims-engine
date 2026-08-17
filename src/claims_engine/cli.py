@@ -13,7 +13,6 @@ from claims_engine import (
     capture,
     contracts,
     discover,
-    document_type_check,
     enrichment,
     health,
     identity,
@@ -204,7 +203,14 @@ def build_identity(
     """Phase 3: build canonical party/court/court_name tables from every
     staging file under staging_prefix, and write them to core/ on S3. Core
     is a single rebuilt-in-full snapshot per table (D07), not partitioned
-    by period like staging."""
+    by period like staging.
+
+    Per D26, document_type isn't computed from staging anymore -- it comes
+    from RUES (Phase 5). Since this command rebuilds core/party from
+    scratch every run, it backfills document_type/confidence/rule_id from
+    whatever core/enrichment/ history already exists before writing, so a
+    party enrich-parties already classified doesn't lose that classification
+    just because build-identity ran again."""
     keys = discover.list_keys(bucket, staging_prefix)
     if not keys:
         typer.echo(f"No staging objects found under s3://{bucket}/{staging_prefix}", err=True)
@@ -220,7 +226,29 @@ def build_identity(
         con.execute(f"CREATE VIEW dep AS SELECT * FROM read_parquet('{tmpdir}/*.parquet')")
 
         typer.echo("Building parties...", err=True)
-        parties = contracts.PartySchema.validate(identity.build_parties(con))
+        parties = identity.build_parties(con)
+
+        enrichment_keys = discover.list_keys(bucket, "core/enrichment/")
+        if enrichment_keys:
+            typer.echo(
+                f"fetching {len(enrichment_keys)} existing enrichment batch(es) "
+                "for document_type backfill...",
+                err=True,
+            )
+            for i, key in enumerate(enrichment_keys):
+                client.download_file(bucket, key, f"{tmpdir}/enrichment_{i}.parquet")
+            # union_by_name: batches written before document_type existed on
+            # `enrichment` (pre-D26) lack the column entirely and correctly
+            # contribute no classification signal once unioned in as NULL.
+            con.execute(
+                "CREATE VIEW enrichment AS SELECT * FROM read_parquet("
+                f"'{tmpdir}/enrichment_*.parquet', union_by_name=true)"
+            )
+            classification = identity.latest_rues_classification(con)
+            parties = identity.apply_rues_classification(parties, classification)
+
+        parties = contracts.PartySchema.validate(parties)
+
         typer.echo("Building courts...", err=True)
         courts, court_names = identity.build_courts_and_names(con)
         courts = contracts.CourtSchema.validate(courts)
@@ -234,9 +262,12 @@ def build_identity(
             load.write_frame_to_s3(client, df, bucket, load.core_key(label))
 
     legal_count = parties.filter(pl.col("document_type") == "legal_entity").height
+    natural_count = parties.filter(pl.col("document_type") == "natural_person").height
+    unclassified = parties.height - legal_count - natural_count
     typer.echo(
         f"parties: {parties.height} total "
-        f"({legal_count} legal_entity, {parties.height - legal_count} natural_person)"
+        f"({legal_count} legal_entity, {natural_count} natural_person, "
+        f"{unclassified} not yet classified)"
     )
     typer.echo(f"courts: {courts.height}")
     typer.echo(f"staging rows with no usable court_account: {null_court_rows}")
@@ -298,17 +329,19 @@ def build_lifecycle(
 def enrich_parties(
     bucket: Annotated[str, typer.Argument(help="S3 bucket, e.g. amud-technologies.")],
     limit: Annotated[
-        int, typer.Option(help="Max not-yet-enriched legal_entity parties to query this run.")
+        int, typer.Option(help="Max not-yet-enriched parties to query this run.")
     ] = 1000,
     delay_seconds: Annotated[
         float, typer.Option(help="Pause between RUES requests, in seconds.")
     ] = 3.0,
 ) -> None:
-    """Phase 5: query RUES for up to `limit` not-yet-enriched legal_entity
-    parties from core/party, and write the results as a new dated batch
-    under core/enrichment/ on S3. Deliberately small and rate-limited by
-    default — rerun to make more progress rather than enriching everything
-    in one sitting."""
+    """Phase 5: query RUES for up to `limit` not-yet-enriched parties from
+    core/party -- every document_type, no discrimination (D26) -- and write
+    the results as a new dated batch under core/enrichment/ on S3.
+    Deliberately small and rate-limited by default — rerun to make more
+    progress rather than enriching everything in one sitting. This is also
+    now the only source of party.document_type; run build-identity again
+    afterward to fold newly-learned classifications back onto core/party."""
     client = boto3.client("s3")
     with tempfile.TemporaryDirectory() as tmpdir:
         typer.echo("fetching core/party...", err=True)
@@ -325,14 +358,14 @@ def enrich_parties(
             for i, key in enumerate(enrichment_keys):
                 client.download_file(bucket, key, f"{tmpdir}/enrichment_{i}.parquet")
             glob = f"{tmpdir}/enrichment_*.parquet"
-            # union_by_name: batches written before the `status` column existed
-            # lack it entirely -- they read back with status NULL, which
-            # parties_to_enrich treats as retryable (those batches predate the
-            # column and were, in fact, all infra errors, never a real answer).
-            # If *no* existing batch has `status` yet (true the first time this
-            # runs after the column was introduced), union_by_name has nothing
-            # to pull it from and the view genuinely lacks the column -- add it
-            # explicitly rather than let every batch stay permanently error-only.
+            # union_by_name: batches written before the `status` (or, since
+            # D26, `document_type`) columns existed lack them entirely -- they
+            # read back NULL, which parties_to_enrich/build_identity treat
+            # correctly (retryable / no classification signal respectively).
+            # If *no* existing batch has `status` yet, union_by_name has
+            # nothing to pull it from and the view genuinely lacks the column
+            # -- add it explicitly rather than let every batch stay
+            # permanently error-only.
             con.execute(
                 "CREATE VIEW enrichment_raw AS "
                 f"SELECT * FROM read_parquet('{glob}', union_by_name=true)"
@@ -346,7 +379,8 @@ def enrich_parties(
                 CREATE TABLE enrichment (
                     party_id VARCHAR, source VARCHAR, queried_at TIMESTAMP,
                     result VARCHAR, name VARCHAR, active BOOLEAN, attributes VARCHAR,
-                    status VARCHAR
+                    status VARCHAR, categoria VARCHAR, document_type VARCHAR,
+                    document_type_confidence DOUBLE, document_type_rule_id VARCHAR
                 )
                 """
             )
@@ -362,7 +396,7 @@ def enrich_parties(
             )
 
         if results.height == 0:
-            typer.echo("Nothing to enrich — every legal_entity party already has a RUES attempt.")
+            typer.echo("Nothing to enrich — every party already has a RUES attempt.")
             raise typer.Exit(code=0)
 
         results = contracts.EnrichmentSchema.validate(results)
@@ -371,89 +405,13 @@ def enrich_parties(
         load.write_frame_to_s3(client, results, bucket, key)
 
     found = results.filter(pl.col("name").is_not_null()).height
-    not_found = results.height - found
-    typer.echo(f"queried: {results.height}  found: {found}  not_found_or_error: {not_found}")
+    not_found_or_error = results.height - found
+    legal_count = results.filter(pl.col("document_type") == "legal_entity").height
+    natural_count = results.filter(pl.col("document_type") == "natural_person").height
+    typer.echo(
+        f"queried: {results.height}  found: {found}  not_found_or_error: {not_found_or_error}  "
+        f"(classified: {legal_count} legal_entity, {natural_count} natural_person)"
+    )
     typer.echo(f"written to s3://{bucket}/{key}")
 
 
-@app.command()
-def check_document_types(
-    bucket: Annotated[str, typer.Argument(help="S3 bucket, e.g. amud-technologies.")],
-    limit: Annotated[
-        int,
-        typer.Option(
-            help="Max unchecked exhausted-signal natural_person parties to query this run."
-        ),
-    ] = 1000,
-    delay_seconds: Annotated[
-        float, typer.Option(help="Pause between RUES requests, in seconds.")
-    ] = 3.0,
-) -> None:
-    """Query RUES for up to `limit` natural_person parties whose
-    document_type has no internal evidence either way (see
-    document_type_check.py), and write the results as a new dated batch
-    under core/document_type_check/ on S3. A 'found' result is definitive
-    evidence the party is actually a legal_entity — party.document_type in
-    core/party is never rewritten by this command; instead a matching
-    core/enrichment/ row is written too (same RUES response, no second
-    query), so enrich-parties never needs a separate run for these."""
-    client = boto3.client("s3")
-    with tempfile.TemporaryDirectory() as tmpdir:
-        typer.echo("fetching core/party...", err=True)
-        client.download_file(bucket, load.core_key("party"), f"{tmpdir}/party.parquet")
-
-        con = duckdb.connect()
-        con.execute(f"CREATE VIEW party AS SELECT * FROM read_parquet('{tmpdir}/party.parquet')")
-
-        check_keys = discover.list_keys(bucket, "core/document_type_check/")
-        if check_keys:
-            typer.echo(f"fetching {len(check_keys)} existing check batch(es)...", err=True)
-            for i, key in enumerate(check_keys):
-                client.download_file(bucket, key, f"{tmpdir}/check_{i}.parquet")
-            con.execute(
-                "CREATE VIEW document_type_check AS "
-                f"SELECT * FROM read_parquet('{tmpdir}/check_*.parquet')"
-            )
-        else:
-            con.execute(
-                """
-                CREATE TABLE document_type_check (
-                    party_id VARCHAR, source VARCHAR, queried_at TIMESTAMP,
-                    result VARCHAR, name VARCHAR, status VARCHAR
-                )
-                """
-            )
-
-        typer.echo(f"Querying RUES (limit={limit}, delay={delay_seconds}s)...", err=True)
-
-        def _progress(done: int, total: int) -> None:
-            typer.echo(f"  {done}/{total} queried", err=True)
-
-        with httpx.Client(timeout=30.0) as http_client:
-            results, enrichment_results = document_type_check.check_document_types(
-                con, http_client, limit, delay_seconds, on_progress=_progress
-            )
-
-        if results.height == 0:
-            typer.echo(
-                "Nothing to check — every exhausted-signal natural_person party "
-                "already has an attempt."
-            )
-            raise typer.Exit(code=0)
-
-        results = contracts.DocumentTypeCheckSchema.validate(results)
-        batch_id = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
-        check_key = load.document_type_check_key(document_type_check.SOURCE, batch_id)
-        load.write_frame_to_s3(client, results, bucket, check_key)
-
-        enrichment_batch_key = None
-        if enrichment_results.height > 0:
-            enrichment_results = contracts.EnrichmentSchema.validate(enrichment_results)
-            enrichment_batch_key = load.enrichment_key(document_type_check.SOURCE, batch_id)
-            load.write_frame_to_s3(client, enrichment_results, bucket, enrichment_batch_key)
-
-    found = results.filter(pl.col("status") == "found").height
-    typer.echo(f"queried: {results.height}  confirmed_legal_entity: {found}")
-    typer.echo(f"written to s3://{bucket}/{check_key}")
-    if enrichment_batch_key:
-        typer.echo(f"enrichment written to s3://{bucket}/{enrichment_batch_key}")

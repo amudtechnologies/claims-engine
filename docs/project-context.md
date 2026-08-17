@@ -1,7 +1,7 @@
 # Claims engine — project context
 
 Background, definitions and decision log. Referenced from `CLAUDE.md`.
-Last updated: 2026-08-09.
+Last updated: 2026-08-17.
 
 ---
 
@@ -140,6 +140,7 @@ deposits; we verify which ones are yours," never "this money is yours."
 | **Despacho** | The court office. Identified by `cuenta judicial`, not by name |
 | **Cuenta judicial** | The Banco Agrario account number belonging to a court office. Numeric and stable across publications |
 | **Radicado** | The case number. Present only in the 2017-1 publication for this source — every file since omits it. Modeled as `claim.case_number`, nullable |
+| **RUES** | Registro Único Empresarial y Social — Colombia's business registry, queried by `document_number`. Its `Categoria` field (persona natural / persona jurídica) is the authoritative source for `party.document_type` (D26), replacing the earlier DIAN check-digit guess |
 
 ---
 
@@ -200,25 +201,57 @@ deposits; we verify which ones are yours," never "this money is yours."
 
 ### Privacy
 
-- **D23.** Records keyed by cédula are stored unenriched, in separate storage with
-  restricted access. An indexed database of national IDs with amounts and cities is in
-  practice a wealth profile of natural persons; the source being public does not
-  exempt it from Law 1581 once enriched and commercially exploited.
+- **D23.** *(Amended by D26, 2026-08-17 — see below.)* Records keyed by cédula are
+  enriched the same as any other match, in separate storage with restricted access.
+  An indexed database of national IDs with amounts, names and cities is in practice a
+  wealth profile of natural persons; the source being public does not exempt it from
+  Law 1581 once enriched and commercially exploited. The restricted-access storage
+  requirement is the part of this decision that survives D26 unchanged — only the
+  "stored unenriched" framing was wrong.
 - **D24.** If natural persons are ever served, the model is self-lookup — the person
-  enters their own ID and sees only their own record — never outbound.
+  enters their own ID and sees only their own record — never outbound. Unaffected by
+  D26: it governs the serving layer, not whether ingestion enriches.
+- **D26.** (2026-08-17) The working assumption behind D23 — "only NITs appear in
+  RUES, so enrichment is legal-entity-only" — is wrong. A natural person registered
+  as a *comerciante* obtains a NIT derived from their cédula and has a RUES record
+  like any company. Consequence: `document_type` is no longer inferred from the DIAN
+  check-digit algorithm before deciding whether to query RUES (old rule 8). Every
+  `document_number` is queried against RUES with no pre-filter, RUES's own
+  `Categoria` field becomes the authoritative source for `document_type`, and every
+  match is enriched — name, status, `attributes` — with no discrimination by
+  category. This does not relax the privacy posture: D23's restricted-access storage
+  requirement for cédula-keyed records still applies, now to a larger set of records
+  than before (every enriched natural person, not zero of them), and D24's
+  self-lookup-only serving constraint is untouched. Supersedes the "check-digit
+  below 85% join rate" framing in the Phase 5 row of §7 and the `document_type`
+  discussion in §6 and the Phase 3 findings in §7 — both predate this decision and
+  describe the mechanism it replaces.
 
 ### Automation
 
 - **D25.** GitHub Actions runs the pipeline commands, one workflow per phase
   (`.github/workflows/`: `profile-s3-prefix`, `normalize-s3-prefix`, `build-lineage`,
-  `build-identity`, `build-lifecycle`, `enrich-parties`, `check-document-types`),
-  triggered manually except `enrich-parties` (daily cron, `--limit 1000`) and
-  `check-document-types` (chained via `workflow_run` right after `enrich-parties`
-  succeeds). This is the "one can be added later" from D13, not a reversal of D14 —
-  cron plus one `workflow_run` chain has no DAG engine, no backfill UI, and no
-  cross-run state, unlike Airflow/Dagster. AWS auth is static access keys
-  (`AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` repo secrets) for now, not OIDC role
-  assumption — acceptable to revisit once the pipeline is more than one person's tool.
+  `build-identity`, `build-lifecycle`, `enrich-parties`), triggered manually except
+  `enrich-parties` (daily cron, `--limit 1000`) and `build-identity`, which chains
+  via `workflow_run` right after (see D27). *(Originally also chained a second
+  `check-document-types` workflow via `workflow_run` right after `enrich-parties` —
+  retired by D26, folded into the single `enrich-parties` workflow.)* This is the
+  "one can be added later" from D13, not a reversal of D14 — cron plus a
+  `workflow_run` chain has no DAG engine, no backfill UI, and no cross-run state,
+  unlike Airflow/Dagster. AWS auth is static access keys (`AWS_ACCESS_KEY_ID` /
+  `AWS_SECRET_ACCESS_KEY` repo secrets) for now, not OIDC role assumption —
+  acceptable to revisit once the pipeline is more than one person's tool.
+- **D27.** (2026-08-17) `build-identity` now runs automatically via `workflow_run`
+  right after `enrich-parties` succeeds (gated the same way the old
+  `check-document-types` chain was — `github.event.workflow_run.conclusion ==
+  'success'`, never chaining onto a failed run). Since D26, `document_type` on
+  `core/party` only ever gets updated by re-running `build-identity` after
+  enrichment makes progress (`identity.apply_rues_classification`) — without this
+  chain, newly-learned classifications would sit in `core/enrichment/` doing
+  nothing until someone remembered to trigger `build-identity` by hand.
+  `build-identity` is a full rebuild from staging + accumulated enrichment history,
+  not a live RUES call, so chaining it daily costs no rate-limit budget, unlike
+  chaining another RUES-calling workflow would.
 
 ---
 
@@ -268,8 +301,8 @@ silently drop everything in it.
 | `claim` | A claim with stable identity: `type`, `amount_cop`, `origin_date`, `legal_basis`, `claim_route`, `court_id`, `case_number` (nullable — see below), `attributes` (JSONB) |
 | `observation` | A claim in a capture. Append-only. Grain `(capture_id, sheet, source_row)` |
 | `claim_party` | N:M bridge with `procedural_role` (fact as declared by the source). `attributes` (JSONB) can carry a source-declared party name when the source gives one (2017-1 only — see below) |
-| `party` | `document_type` (binary: `legal_entity` \| `natural_person`), `document_number`, `document_type_confidence`, `document_type_rule_id`. The system's core asset |
-| `enrichment` | `party_id`, `source`, `queried_at`, `result`, `name`, `active`, `attributes` (JSONB) |
+| `party` | `document_type` (binary: `legal_entity` \| `natural_person`), `document_number`, `document_type_confidence`, `document_type_rule_id`. Sourced from RUES's `Categoria` field (D26), not inferred — see below. The system's core asset |
+| `enrichment` | `party_id`, `source`, `queried_at`, `result`, `name`, `active`, `attributes` (JSONB), `categoria`. Written for every RUES match, any `document_type` (D26) |
 | `court` | Key derived from `cuenta_judicial`; specialty, city, judicial district |
 | `court_name` | Name history with validity ranges |
 
@@ -279,10 +312,12 @@ column (D18: "would the insolvency radar want this?" — yes, every legal claim 
 case number).
 
 **Source-declared party names go in `claim_party.attributes`, never through
-`enrichment`.** Rule 8 (no enrichment for natural persons) protects against
-*actively looking up* a natural person; recording a name the public file already
-states isn't a lookup, so the rule doesn't apply — but the same privacy tier as
-everything else keyed by cédula (D23) still does.
+`enrichment`.** The distinction is no longer about *who* the party is (rule 8 pre-D26
+protected natural persons specifically); it's about provenance. `claim_party.attributes`
+holds a name the public file already states — recording it isn't a lookup. `enrichment`
+holds the result of an active RUES query, now taken for every party regardless of
+`document_type` (D26). Cédula-keyed records in either table still sit in the
+restricted-access storage tier D23 requires.
 
 **Full lineage chain:** `observation → capture → file` yields the period, URI, sheet
 and exact source row behind any value in the model.
@@ -292,10 +327,40 @@ and exact source row behind any value in the model.
 is identity resolution, which the layer table explicitly permits `core` to do (unlike
 economic role or deadline, which are business conclusions rule 5/6 reserve for
 marts). The `rule_id` column keeps rule 5's "inferences stored with a probability and
-a rule_id" intact even though the table itself stays in `core`.
+a rule_id" intact even though the table itself stays in `core`. As of D26, the values
+populating these columns come from RUES's `Categoria` field on a match
+(`rule_id = rues_categoria`, `confidence = 1.0`) — never from the DIAN check-digit
+algorithm described in the Phase 3 findings (§7), which this decision retires as the
+classification mechanism. A clean RUES miss (`rule_id = rues_not_found`) is
+deliberately *not* treated as evidence of `natural_person`: only two candidate
+numbers are ever tried per party (the stored form and, for NIT-candidate lengths, the
+check-digit-stripped base — see `enrichment._candidate_document_numbers`), so a real
+legal entity can miss for reasons unrelated to what it actually is, and there's no
+measured error rate to calibrate a confident guess either way — the same
+unfalsifiable-confidence problem D26 retired the check-digit heuristic for in the
+first place. `document_type`/`confidence` stay null on a miss; the party remains
+unclassified, the same permanent-valid-state D21 already gives a party with no
+enrichment at all.
+
+**`enrichment.categoria` stores whatever RUES's `Categoria` field actually says,
+verbatim, on every match** — not filtered through the `document_type` mapping.
+Classification is a substring match on the normalized value (`JURIDICA` /
+`NATURAL`), not a closed whitelist of two exact strings, so real variants
+("PERSONA JURIDICA EXTRANJERA", "PERSONA NATURAL COMERCIANTE", ...) still resolve
+correctly without needing to be enumerated in advance. A `categoria` this doesn't
+recognize as either shape (e.g. a RUES record that isn't a persona classification
+at all) still gets fully enriched — `name`/`active`/`attributes` never depend on
+whether `document_type` could be derived — and the raw value is never dropped,
+only the derived binary classification stays honestly null
+(`rule_id = rues_categoria_unrecognized`). Same principle for the company-detail
+call: `attributes.detail` holds the entire detail response RUES returns, not a
+cherry-picked sub-key — an earlier version of this code kept only `detail`'s
+`registros` key and silently dropped the rest.
 
 Note on `enrichment`: fields like registration status are RUES-specific and live in
-`attributes`, not as columns. Only `name` and `active` are cross-source.
+`attributes`, not as columns. Only `name` and `active` are cross-source. Per D26,
+`enrichment` rows are written for every RUES match — `document_type` no longer gates
+which parties get queried or enriched.
 
 ### Marts — inferences and serving
 
@@ -340,7 +405,7 @@ and `sheet` sits at the row level so a single-sheet insolvency file costs nothin
 | **2. Ingestion** | 20 heterogeneous spreadsheets → one table | Reconciliation: ok + rejected = read, on every file |
 | **3. Identity** | Canonical court offices and parties | Done: 4,574 canonical courts, 1,249,652 canonical parties (82,472 legal-entity, 6.6% of parties but ~34% of plaintiff-side deposit value) |
 | **4. Lifecycle** | From semiannual snapshots to a time series | Done: cross-period persistence is near zero (0.0–1.5% per half-year step, measured across all 15 consecutive period pairs) — the expected answer, not a bug (see findings below). 2,818,890 claims, 2,878,335 observations (1.02/claim), 4,471,404 claim_party links |
-| **5. Enrichment** | NIT → company with name, status, contact | Measured join rate; below 85% on NITs is almost certainly the check digit |
+| **5. Enrichment** | `document_number` → RUES record with name, status, contact, for any `Categoria` (D26) | Measured join rate across all parties, not just NIT-shaped numbers |
 
 Phases 0–4 depend only on data already in hand: they are the critical path.
 
@@ -374,11 +439,15 @@ of the same real account) and outright exclusion for 2020-1's corrupted values
 end up with `court_id = NULL` rather than a bogus court, same as the 2017-1/2018-1/
 2018-2 rows that never had a `court_account` column at all. `document_type`
 (legal-entity vs natural-person) is source-declared in exactly 1 of 17 periods
-(2023-2), and even there is inconsistent (9 raw label variants). For every other
-period it's inferred via Colombia's public DIAN mod-11 NIT check-digit algorithm — a
-plain length cutoff wasn't viable, since real NIT and cédula lengths overlap heavily
-(10 digits is the single largest length bucket in the whole dataset, for both).
-Tooling: `claims-engine build-identity` (`src/claims_engine/identity.py`), writing
+(2023-2), and even there is inconsistent (9 raw label variants). At the time of this
+finding, every other period was classified via Colombia's public DIAN mod-11 NIT
+check-digit algorithm — a plain length cutoff wasn't viable, since real NIT and
+cédula lengths overlap heavily (10 digits is the single largest length bucket in the
+whole dataset, for both). **Superseded by D26 (2026-08-17):** the check-digit
+heuristic assumed only legal entities hold NITs, which is false for comerciante
+natural persons; `document_type` is now sourced from RUES's own `Categoria` field
+in Phase 5 rather than guessed in Phase 3, per §6. Tooling: `claims-engine
+build-identity` (`src/claims_engine/identity.py`), writing
 `core/{party,court,court_name}/current.parquet` — a full rebuilt-in-place snapshot,
 not period-partitioned like staging.
 

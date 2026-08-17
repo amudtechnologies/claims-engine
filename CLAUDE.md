@@ -42,10 +42,16 @@ and raise it instead of working around it.
 7. **Before adding a column to a `core` table, ask whether it would make sense for
    the insolvency radar.** If not, it belongs in the `attributes` JSONB field.
    Source-specific fields never become canonical columns.
-8. **Never write enrichment for natural persons.** Enrichment is for legal entities
-   (NIT → RUES) only. A party with no enrichment is a valid, permanent state — not a
-   TODO. See the privacy section in the context doc before touching anything that
-   joins a national ID to money.
+8. **RUES is the classifier, and enrichment has no document-type discrimination.**
+   Every `document_number` is queried against RUES — never pre-filtered by a guessed
+   `legal_entity`/`natural_person` split. RUES's own `Categoria` field is the sole
+   source of truth for `party.document_type`; it is never inferred from the NIT
+   check-digit algorithm. Every RUES match is enriched (name, status, `attributes`),
+   regardless of category. A party with no RUES match is a valid, permanent
+   unenriched state — not a TODO. This still touches Law 1581 the moment a national
+   ID is joined to money and enriched with a name — see D23/D24 and the privacy
+   section in the context doc (D26 records why the old NIT-only assumption was
+   wrong).
 
 ## Stack
 
@@ -67,10 +73,15 @@ Redshift, Snowflake, Airflow, Dagster, Kafka, Iceberg. Do not introduce them.
 Total data volume across all radars is measured in tens of millions of rows.
 
 GitHub Actions runs the pipeline commands — one workflow per phase under
-`.github/workflows/`, manually triggered except `enrich-parties` (daily cron) and
-`check-document-types` (chained after it). This is not an exception to the Airflow/
-Dagster exclusion above: no DAG engine, no backfill UI, just cron plus one
-`workflow_run` chain. See `docs/project-context.md` decision D25.
+`.github/workflows/`, manually triggered except `enrich-parties` (daily cron), which
+now does both the RUES lookup/classification and the enrichment write in one pass —
+`check-document-types` no longer exists as a separate workflow, folded into
+`enrich-parties` per D26. `build-identity` runs automatically right after
+`enrich-parties` succeeds (`workflow_run`), so newly-learned `document_type`
+classifications land on `core/party` without a manual trigger. This is not an
+exception to the Airflow/Dagster exclusion above: no DAG engine, no backfill UI,
+just cron plus one `workflow_run` chain. See `docs/project-context.md` decisions
+D25/D26/D27.
 
 ## Layer conventions
 
