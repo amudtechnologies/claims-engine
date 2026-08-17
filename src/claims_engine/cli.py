@@ -218,12 +218,22 @@ def build_identity(
 
     client = boto3.client("s3")
     with tempfile.TemporaryDirectory() as tmpdir:
+        # Staging and enrichment downloads live in separate subdirectories,
+        # each with its own dedicated glob -- `dep`'s view definition
+        # re-evaluates its read_parquet(glob) on every query, not just at
+        # CREATE VIEW time, so if enrichment files ever landed in the same
+        # directory as staging files, a later query against `dep` (e.g.
+        # build_courts_and_names, which runs after the enrichment fetch
+        # below) would silently pick them up too and blow up looking for
+        # staging columns in an enrichment file.
+        staging_dir = f"{tmpdir}/staging"
+        Path(staging_dir).mkdir()
         for i, key in enumerate(keys, start=1):
             typer.echo(f"[{i}/{len(keys)}] fetching {key}", err=True)
-            client.download_file(bucket, key, f"{tmpdir}/{key.replace('/', '_')}")
+            client.download_file(bucket, key, f"{staging_dir}/{key.replace('/', '_')}")
 
         con = duckdb.connect()
-        con.execute(f"CREATE VIEW dep AS SELECT * FROM read_parquet('{tmpdir}/*.parquet')")
+        con.execute(f"CREATE VIEW dep AS SELECT * FROM read_parquet('{staging_dir}/*.parquet')")
 
         typer.echo("Building parties...", err=True)
         parties = identity.build_parties(con)
@@ -235,14 +245,16 @@ def build_identity(
                 "for document_type backfill...",
                 err=True,
             )
+            enrichment_dir = f"{tmpdir}/enrichment"
+            Path(enrichment_dir).mkdir()
             for i, key in enumerate(enrichment_keys):
-                client.download_file(bucket, key, f"{tmpdir}/enrichment_{i}.parquet")
+                client.download_file(bucket, key, f"{enrichment_dir}/{i}.parquet")
             # union_by_name: batches written before document_type existed on
             # `enrichment` (pre-D26) lack the column entirely and correctly
             # contribute no classification signal once unioned in as NULL.
             con.execute(
                 "CREATE VIEW enrichment AS SELECT * FROM read_parquet("
-                f"'{tmpdir}/enrichment_*.parquet', union_by_name=true)"
+                f"'{enrichment_dir}/*.parquet', union_by_name=true)"
             )
             classification = identity.latest_rues_classification(con)
             parties = identity.apply_rues_classification(parties, classification)
