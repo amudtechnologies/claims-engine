@@ -16,7 +16,7 @@
 
   <div class="masthead">
     <div class="wrap masthead-inner mono">
-      <span>INTELIGENCIA DE DATOS · COLOMBIA</span>
+      <span>COLOMBIA</span>
     </div>
   </div>
 
@@ -30,10 +30,15 @@
         </svg>
         <span class="wordmark-text"><span>amud</span><span>technologies</span></span>
       </a>
+      <input type="checkbox" id="nav-toggle" class="nav-toggle-input">
       <nav class="nav-links">
         <a href="{% url 'home:index' %}" class="{% if active_nav == 'home' %}is-active{% endif %}">Inicio</a>
       </nav>
-      <a href="{% url 'home:index' %}#contacto" class="btn btn-primary">Hablemos</a>
+      <div class="nav-right">
+        <label for="nav-toggle" class="nav-toggle" aria-label="Abrir menú">
+          <span></span><span></span><span></span>
+        </label>
+      </div>
     </div>
   </header>
 
@@ -52,7 +57,6 @@
         <span class="wordmark-text"><span>amud</span><span>technologies</span></span>
       </div>
       <div class="footer-meta">
-        <span>Medellín, Colombia</span>
         <span>info@amudtech.com</span>
       </div>
       <div class="footer-copy">© 2026 Amud Technologies</div>
