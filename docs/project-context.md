@@ -493,8 +493,14 @@ excluded from claim identity altogether — its rows are case actions, not depos
    hidden column, it's two separate sheets (`D J EN CONDICION ESPECIAL` vs
    `D J NO RECLAMADOS`). Every file from 2018 onward has only one sheet and no column
    carries the distinction either — for those periods the classification is genuinely
-   not present in the source, not just hidden. Still open how (or whether) it can be
-   recovered for 2018+.
+   not present in the source, not just hidden. **Closed for the data ingested so
+   far (2026-08-20):** every period captured by this radar to date is unclaimed-type
+   only — special-condition deposits aren't part of the current dataset. This is what
+   makes a uniform per-period 20-business-day claim window (`ClaimWindow` model,
+   `web/judicial_deposits/models.py`) legally sound to apply corpus-wide without
+   per-row classification. Revisit if a future capture ever ingests a special-condition
+   sheet (as 2017-1 had) — the window logic would need to exclude those rows or gain a
+   second, constitution-date-based rule.
 5. **Currency of the 2026-1 publication.** If live, a 20-business-day clock is running.
    Determines whether the history is a museum or includes still-claimable money.
 6. **Maintenance as the real scaling limit.** Each radar is a permanent liability:

@@ -11,6 +11,27 @@ Full background, legal context, glossary and decision log: @docs/project-context
 Storage and enrichment only. Commercial exploitation is explicitly out of scope —
 do not build outreach, scoring-for-sales, or contact workflows yet.
 
+Exception: `web/` (see below) includes a NIT search — a search bar in the home
+hero, submitting to a consolidated `/resultados/` page — rather than behind a
+separate nav destination — it's the only working feature so far and should be
+visible on arrival, not one click away. This is an informational self-lookup —
+someone enters a NIT and sees only what's on record for it — the same D24
+self-lookup pattern, for legal entities instead of natural persons, not outbound
+outreach or sales scoring. `/resultados/` renders one row per radar (today, only
+Depósitos judiciales has real data; other radars are listed as "En desarrollo"
+with no numbers — never fabricated placeholder figures). It deliberately omits
+any probability/validation scoring split: that's the inference layer (Phase 6),
+explicitly out of the active plan (§7), and any "which finding is worth acting on"
+signal is a scoring-for-sales judgment this phase doesn't build. It queries
+`core/*` directly (`judicial_deposits/party_search.py`), recomputing a
+`marts.party_summary`-shaped aggregation at request time — there is no
+materialized marts table yet (marts/Phase 6 is still deferred, per §7). It reads
+from a local Parquet cache (`judicial_deposits/core_cache.py`, synced from S3 by
+`python manage.py sync_core_cache`, decoupled from the request path) rather than
+live S3: `core/` Parquet isn't partitioned by `party_id`, so a filtered read
+against the real bucket range-scans most of the file over HTTP (15-50s per
+query, measured); the same query against a local copy is sub-100ms.
+
 Phases 0–4 (profiling → canonical model → ingestion → identity → lifecycle) are
 done. Phase 5 (external enrichment) is in progress. Phase 6 (role inference) is
 removed from the active plan for now — see `docs/project-context.md` §7 for why.
@@ -115,6 +136,34 @@ identity, inference, serving — is shared infrastructure the radar does not tou
 4. `health()` — freshness, volume delta, rejection rate
 
 Adding a radar should mean writing an adapter, not modifying the core.
+
+## Web
+
+`web/` is a Django project — the public-facing site, separate from the pipeline
+layers above (it consumes what the pipeline produces; it never writes to
+`raw/`/`staging/`/`core/`/`marts/`). Two apps so far:
+
+- `home` — the Amud Technologies company page. Amud is the claims engine in
+  general; judicial deposits is one radar under it, not the whole product. Its
+  hero has the NIT search bar (`home/_search_form.html`, shared with the
+  results page's own compact search bar), and its `results` view
+  (`/resultados/`, `home/views.py`) renders the consolidated, cross-radar
+  results page — the search's actual destination. `results` calls straight
+  into `judicial_deposits.party_search`/`core_cache` for data; it's cross-radar
+  by nature, so it lives here rather than inside one radar's app.
+- `judicial_deposits` — owns the radar's query logic (`party_search.py`,
+  `core_cache.py`), consumed by `home.views.results` above. Its own
+  `/depositos-judiciales/` page is now an info-only landing page for the radar
+  (what it is, aggregate stats) with a link back to the home hero search — it
+  no longer renders a search box or results itself, to avoid two competing
+  places search could happen. Queries `core/*` live via a local Parquet cache
+  (see above) until a real marts aggregation exists to query instead.
+
+Code (apps, views, templates, static files, variables, URL names) is named in
+English like everything else in this repo. The exception is template *copy* —
+the text a visitor actually reads — which is Spanish, since the site serves
+Colombian visitors. URL slugs (e.g. `/depositos-judiciales/`) follow the copy,
+not the code, and are Spanish too.
 
 ## Conventions
 
