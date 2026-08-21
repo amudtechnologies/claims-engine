@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load static jd_extras %}
+
+{% block title %}Resultados de la búsqueda — Amud Technologies{% endblock %}
+{% block meta_description %}Resultados de la búsqueda por número de identificación a través de los radares activos de Amud Technologies.{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/results.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="results-bar">
+  <div class="wrap results-bar-inner">
+    <a href="{% url 'home:index' %}" class="results-back">&larr; Volver</a>
+    {% include "home/_search_form.html" with compact=True %}
+  </div>
+</section>
+
+{% if cache_unavailable %}
+  <section class="results-empty">
+    <div class="wrap">
+      <p><strong>La consulta no está disponible en este momento.</strong></p>
+      <p>El caché local de datos aún no se ha sincronizado. Inténtelo de nuevo en unos minutos.</p>
+    </div>
+  </section>
+{% elif result %}
+  <section class="results-head">
+    <div class="wrap">
+      <h1 class="serif">Resultados para {{ result.party_name|default:result.document_number }}</h1>
+      <p class="results-meta">
+        NIT {{ result.document_number }} · {{ result.document_type|document_type_label }}{% if result.rues_active is not None %} · {% if result.rues_active %}Activo en RUES{% else %}Inactivo en RUES{% endif %}{% endif %}
+        <br>Búsqueda realizada el {{ searched_at|date:"j \d\e F \d\e Y" }}
+      </p>
+
+      <div class="results-summary">
+        <div class="results-card">
+          <div class="results-card-value mono">{{ result.total_amount_cop|cop }}</div>
+          <div class="results-card-label">Valor total identificado</div>
+        </div>
+        <div class="results-card">
+          <div class="results-card-value mono">{{ result.deposit_count }}</div>
+          <div class="results-card-label">Total de hallazgos</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="results-table-section">
+    <div class="wrap">
+      <div class="results-table-title">Resumen por radar</div>
+      <div class="results-table-wrap">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th>Radar</th>
+              <th>Hallazgos</th>
+              <th>Valor estimado</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="results-row results-row--link" data-row-href="{% url 'judicial_deposits:index' %}?nit={{ result.document_number|urlencode }}">
+              <td class="results-table-radar">
+                <a href="{% url 'judicial_deposits:index' %}?nit={{ result.document_number|urlencode }}">Depósitos judiciales</a>
+                <span class="results-row-caret" aria-hidden="true">&rsaquo;</span>
+              </td>
+              <td class="mono">{{ result.deposit_count }}</td>
+              <td class="mono">{{ result.total_amount_cop|cop }}</td>
+              <td>
+                <span class="results-status results-status--active"><span class="dot"></span>Activo</span>
+              </td>
+            </tr>
+            <tr class="results-table-row--pending">
+              <td class="results-table-radar">Más radares</td>
+              <td>—</td>
+              <td>—</td>
+              <td><span class="results-status results-status--pending"><span class="dot"></span>En desarrollo</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+{% else %}
+  <section class="results-empty">
+    <div class="wrap">
+      <p><strong>No encontramos información pública</strong> asociada al número {{ normalized_nit }} en los radares activos.</p>
+      <p>Esto no descarta que exista — solo que no aparece en las fuentes que hemos procesado hasta ahora.</p>
+    </div>
+  </section>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/row_link.js' %}" defer></script>
+{% endblock %}

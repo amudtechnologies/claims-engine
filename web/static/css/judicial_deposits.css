@@ -1,0 +1,78 @@
+.jd-intro { padding-top: clamp(56px, 8vw, 100px); padding-bottom: clamp(16px, 2vw, 32px); }
+.jd-intro h1 {
+  margin: 0 0 20px 0;
+  font-size: clamp(2.1rem, 3.4vw + 0.6rem, 3.2rem);
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.jd-intro .lede { margin-bottom: 28px; }
+.jd-intro .btn { margin-bottom: 8px; }
+
+.jd-terms { display: flex; flex-wrap: wrap; margin: 0 0 24px 0; padding: 0 22px; background: var(--surface); border: 1px solid var(--hair); border-radius: 10px; }
+.jd-term {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  flex: 1 1 280px;
+  padding: 13px 0;
+  font-size: 0.84rem;
+  color: var(--ink-softer);
+  border-top: 1px solid var(--hair);
+}
+.jd-term:nth-child(-n+3) { border-top: none; }
+.jd-term .dot { width: 6px; height: 6px; flex: none; background: var(--accent); position: relative; top: -1px; }
+.jd-term-num { font-weight: 700; color: var(--ink); flex: none; }
+
+@media (max-width: 640px) {
+  .jd-term { flex-basis: 100%; }
+  .jd-term:nth-child(-n+3) { border-top: 1px solid var(--hair); }
+  .jd-term:first-child { border-top: none; }
+}
+
+.jd-stats-block { margin-top: 36px; padding-top: 36px; border-top: 1px solid var(--hair); }
+.jd-stats-title { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 20px; }
+
+/* PARTY RESULT */
+.jd-party { margin-top: 28px; }
+.jd-party-name { margin: 0 0 8px 0; font-size: clamp(1.5rem, 1.8vw + 1rem, 2rem); font-weight: 600; letter-spacing: -0.015em; color: var(--ink); }
+.jd-party-meta { margin: 0 0 28px 0; font-size: 0.92rem; color: var(--ink-softer); }
+
+.jd-summary-panel { margin-bottom: 20px; padding: 22px 24px; background: var(--ground); border: 1px solid var(--hair); border-radius: 10px; }
+.jd-panel-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 18px; }
+
+.jd-tag { display: inline-flex; align-items: center; flex: none; padding: 3px 10px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.02em; text-transform: none; border-radius: 999px; }
+.jd-tag--open { color: var(--on-accent); background: var(--accent-deep); }
+.jd-tag--closed { color: var(--ink-softer); background: var(--hair); }
+
+.jd-window-range { display: flex; align-items: baseline; gap: 8px; margin: -10px 0 18px 0; font-size: 0.82rem; }
+.jd-window-label { color: var(--ink-softer); }
+.jd-window-dates { color: var(--ink-soft); letter-spacing: 0.01em; }
+
+.jd-party-summary { display: flex; gap: 32px; flex-wrap: wrap; margin-bottom: 20px; }
+.jd-summary-item { border-left: 2px solid var(--accent); padding-left: 16px; }
+.jd-summary-num { font-size: 1.6rem; font-weight: 600; color: var(--ink); }
+.jd-summary-label { font-size: 0.82rem; color: var(--ink-softer); margin-top: 2px; }
+
+.jd-role-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 20px; }
+.jd-role-card { padding: 14px 16px; background: var(--surface); border: 1px solid var(--hair); border-radius: 8px; }
+.jd-role-label { font-size: 0.78rem; font-weight: 600; color: var(--ink-soft); margin-bottom: 6px; }
+.jd-role-nums { font-size: 0.92rem; color: var(--ink); }
+
+.jd-panel-footnote { display: flex; gap: 24px; flex-wrap: wrap; font-size: 0.84rem; color: var(--ink-softer); }
+
+.jd-party-note { margin: -8px 0 20px 0; font-size: 0.84rem; color: var(--ink-softer); }
+
+.jd-disclaimer {
+  margin-top: 4px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--hair-strong);
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: var(--ink-softer);
+}
+
+@media (max-width: 700px) {
+  .jd-role-grid { grid-template-columns: 1fr; }
+}

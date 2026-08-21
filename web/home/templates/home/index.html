@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Amud Technologies — Motor de acreencias{% endblock %}
+{% block meta_description %}Amud Technologies cruza fuentes públicas colombianas para identificar acreencias líquidas: dinero con dueño, monto y fundamento legal.{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="wrap hero-inner">
+    <div class="hero-copy">
+      <div class="eyebrow mono"><span class="dot"></span>MOTOR DE ACREENCIAS — COLOMBIA</div>
+      <h1 class="serif">Hay <span class="accent-word">dinero</span> que ya<br>tiene dueño. Lo<br>encontramos primero.</h1>
+      <p class="lede">Analizamos datos públicos para encontrar dinero y otros derechos económicos, pero que pueden pasar desapercibidos o perderse si no se reclaman a tiempo.</p>
+      <div class="hero-search" id="buscar">{% include "home/_search_form.html" %}</div>
+      <div class="hero-radars">
+        <div class="hero-radars-label mono"><span class="dot"></span>RADARES ACTIVOS</div>
+        <div class="hero-radars-list">
+          <a href="{% url 'judicial_deposits:index' %}" class="radar-chip">Depósitos judiciales</a>
+        </div>
+      </div>
+    </div>
+    <div class="hero-graphic">
+      <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Una red de registros con una coincidencia identificada resaltada">
+        <line x1="70" y1="120" x2="150" y2="90" stroke="#1C1A17" stroke-opacity="0.14" stroke-width="1.5"/>
+        <line x1="150" y1="90" x2="230" y2="150" stroke="#1C1A17" stroke-opacity="0.14" stroke-width="1.5"/>
+        <line x1="230" y1="150" x2="200" y2="230" stroke="#1C1A17" stroke-opacity="0.14" stroke-width="1.5"/>
+        <line x1="200" y1="230" x2="120" y2="260" stroke="#1C1A17" stroke-opacity="0.14" stroke-width="1.5"/>
+        <line x1="120" y1="260" x2="70" y2="120" stroke="#1C1A17" stroke-opacity="0.14" stroke-width="1.5"/>
+        <line x1="230" y1="150" x2="300" y2="110" stroke="#1C1A17" stroke-opacity="0.14" stroke-width="1.5"/>
+        <line x1="200" y1="230" x2="290" y2="270" stroke="#1C1A17" stroke-opacity="0.14" stroke-width="1.5"/>
+        <line x1="120" y1="260" x2="90" y2="330" stroke="#1C1A17" stroke-opacity="0.14" stroke-width="1.5"/>
+
+        <circle cx="70" cy="120" r="5" fill="#1C1A17" fill-opacity="0.3"/>
+        <circle cx="150" cy="90" r="4" fill="#1C1A17" fill-opacity="0.3"/>
+        <circle cx="300" cy="110" r="5" fill="#1C1A17" fill-opacity="0.3"/>
+        <circle cx="290" cy="270" r="4" fill="#1C1A17" fill-opacity="0.3"/>
+        <circle cx="120" cy="260" r="5" fill="#1C1A17" fill-opacity="0.3"/>
+        <circle cx="90" cy="330" r="4" fill="#1C1A17" fill-opacity="0.3"/>
+        <circle cx="200" cy="230" r="5" fill="#1C1A17" fill-opacity="0.3"/>
+
+        <circle class="pulse-ring" cx="230" cy="150" r="14" fill="none" stroke="#CCCC4B" stroke-width="2"/>
+        <circle cx="230" cy="150" r="11" fill="#CCCC4B"/>
+        <path d="M225 150 L229 154 L237 145" stroke="#FAF6EF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

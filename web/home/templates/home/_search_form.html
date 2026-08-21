@@ -1,0 +1,13 @@
+<form class="search-form{% if compact %} search-form--compact{% endif %}" method="get" action="{% url 'home:results' %}">
+  <input
+    class="search-form-input"
+    type="text"
+    name="nit"
+    value="{{ raw_nit }}"
+    placeholder="Buscar por NIT, ej. 900123456"
+    inputmode="numeric"
+    autocomplete="off"
+    aria-label="Número de identificación (NIT)"
+  >
+  <button type="submit" class="btn btn-primary search-form-btn">Consultar</button>
+</form>

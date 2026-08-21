@@ -1,0 +1,43 @@
+{% load jd_extras %}
+<div class="jd-summary-panel">
+  <div class="jd-panel-title">
+    {{ title }}
+    {% if status == "reclamable" %}<span class="jd-tag jd-tag--open">Reclamable</span>
+    {% elif status == "no_reclamable" %}<span class="jd-tag jd-tag--closed">No reclamable</span>
+    {% endif %}
+  </div>
+
+  {% if window %}
+    <p class="jd-window-range">
+      <span class="jd-window-label">{% if status == "reclamable" %}Plazo vigente:{% else %}Plazo vencido:{% endif %}</span>
+      <span class="jd-window-dates mono">{% if window.opens_on %}{{ window.opens_on|date:"d/m/Y" }}–{% endif %}{{ window.closes_on|date:"d/m/Y" }}</span>
+    </p>
+  {% endif %}
+
+  <div class="jd-party-summary">
+    <div class="jd-summary-item">
+      <div class="jd-summary-num mono">{{ summary.deposit_count|default:0 }}</div>
+      <div class="jd-summary-label">Hallazgos totales</div>
+    </div>
+    <div class="jd-summary-item">
+      <div class="jd-summary-num mono">{{ summary.total_amount_cop|default:0|cop }}</div>
+      <div class="jd-summary-label">Valor total</div>
+    </div>
+  </div>
+
+  <div class="jd-role-grid">
+    <div class="jd-role-card">
+      <div class="jd-role-label">Como demandante</div>
+      <div class="jd-role-nums mono">{{ summary.plaintiff_count|default:0 }} hallazgos · {{ summary.plaintiff_amount_cop|default:0|cop }}</div>
+    </div>
+    <div class="jd-role-card">
+      <div class="jd-role-label">Como demandado</div>
+      <div class="jd-role-nums mono">{{ summary.defendant_count|default:0 }} hallazgos · {{ summary.defendant_amount_cop|default:0|cop }}</div>
+    </div>
+  </div>
+
+  <div class="jd-panel-footnote">
+    <span>{{ summary.court_office_count|default:0 }} despacho{{ summary.court_office_count|default:0|pluralize }} judicial{{ summary.court_office_count|default:0|pluralize:"es" }}</span>
+    {% if show_last_period %}<span>Último periodo en el que aparece: {{ summary.last_period }}</span>{% endif %}
+  </div>
+</div>

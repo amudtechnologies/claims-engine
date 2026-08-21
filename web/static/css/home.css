@@ -1,0 +1,14 @@
+.spotlight { padding-top: clamp(56px, 8vw, 96px); padding-bottom: clamp(56px, 8vw, 96px); }
+.spotlight-body { margin-bottom: 32px; max-width: 62ch; }
+.spotlight-body h2 {
+  margin: 0 0 12px 0;
+  font-family: "Piazzolla Var", "Piazzolla", Georgia, serif;
+  font-size: clamp(1.5rem, 1.6vw + 1rem, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.spotlight-body p { margin: 0 0 22px 0; font-size: 1rem; line-height: 1.58; color: var(--ink-soft); max-width: 58ch; }
+.spotlight-facts { display: flex; gap: 32px; flex-wrap: wrap; }
+.spotlight-fact-num { font-size: 1.15rem; font-weight: 600; color: var(--ink); }
+.spotlight-fact-label { font-size: 0.78rem; color: var(--ink-softer); margin-top: 2px; }

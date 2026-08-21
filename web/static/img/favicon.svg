@@ -1,0 +1,8 @@
+<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+  <mask id="favicon-knockout">
+    <rect width="48" height="48" fill="#ffffff"/>
+    <circle cx="35" cy="15" r="7.5" fill="#000000"/>
+  </mask>
+  <circle cx="24" cy="24" r="15" fill="none" stroke="#1C1A17" stroke-width="2.8" mask="url(#favicon-knockout)"/>
+  <circle cx="35" cy="15" r="6" fill="#CCCC4B"/>
+</svg>
