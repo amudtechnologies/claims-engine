@@ -13,9 +13,18 @@ import tempfile
 from pathlib import Path
 
 import boto3
+from botocore.config import Config
 from django.conf import settings
 
 from claims_engine.load import core_key
+
+# The container entrypoint runs a blocking sync before starting gunicorn (so
+# the app never serves "not synced" on a cold start) — bounded timeouts keep
+# that startup delay predictable even if S3 is unreachable (e.g. a container
+# network misconfiguration), instead of botocore's default ~60s connect/read
+# timeouts times several retries blocking gunicorn for minutes and failing
+# every deploy's health check.
+_CLIENT_CONFIG = Config(connect_timeout=5, read_timeout=30, retries={"max_attempts": 3})
 
 # Tables read whole; each is small enough (<100MB) to keep a full local copy.
 CORE_TABLES = [
@@ -54,7 +63,7 @@ def sync(bucket: str | None = None) -> None:
     search running mid-sync never sees a half-written Parquet file.
     """
     bucket = bucket or settings.CLAIMS_ENGINE_BUCKET
-    client = boto3.client("s3")
+    client = boto3.client("s3", config=_CLIENT_CONFIG)
     target_dir = cache_dir()
     target_dir.mkdir(parents=True, exist_ok=True)
     enrichment_dir = target_dir / "enrichment"

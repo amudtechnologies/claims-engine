@@ -1,0 +1,15 @@
+.git
+.github
+.venv
+.claude
+.pytest_cache
+.ruff_cache
+__pycache__
+*.pyc
+docs
+tests
+README.md
+CLAUDE.md
+web/db.sqlite3
+web/staticfiles
+web/var
