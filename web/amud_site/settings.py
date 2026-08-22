@@ -41,12 +41,13 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 if not DEBUG:
-    # App Runner (and most PaaS load balancers) terminate TLS in front of the
-    # container and forward the original scheme in this header — without it
-    # Django thinks every request is plain HTTP and either loops on
-    # SECURE_SSL_REDIRECT or never marks cookies secure.
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = True
+    # The HTTP->HTTPS redirect happens at the load balancer, not here:
+    # Elastic Beanstalk's per-instance nginx sits between the ALB and this
+    # app and isn't guaranteed to forward the ALB's real X-Forwarded-Proto
+    # untouched (a known EB quirk) — if it overwrites it to "http", Django
+    # doing its own SECURE_SSL_REDIRECT would 301-loop forever on every
+    # request. Secure cookies don't have that failure mode (they just mark
+    # the cookie, they don't redirect), so those stay on unconditionally.
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
