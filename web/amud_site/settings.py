@@ -40,7 +40,37 @@ CSRF_TRUSTED_ORIGINS = [
     o for o in os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',') if o
 ]
 
+
+def _ec2_private_ip() -> str | None:
+    """The ALB's health check hits the instance directly using its private
+    IP as the Host header, not one of the real domains — without this,
+    every health check 400s on ALLOWED_HOSTS and the environment reports
+    permanently unhealthy even though real traffic works fine. IMDSv2 only
+    (this account's instances require the token). Times out fast and
+    returns None off-EC2 (local dev, Docker build) rather than hanging.
+    """
+    try:
+        import httpx
+
+        token = httpx.put(
+            'http://169.254.169.254/latest/api/token',
+            headers={'X-aws-ec2-metadata-token-ttl-seconds': '21600'},
+            timeout=0.5,
+        ).text
+        return httpx.get(
+            'http://169.254.169.254/latest/meta-data/local-ipv4',
+            headers={'X-aws-ec2-metadata-token': token},
+            timeout=0.5,
+        ).text.strip()
+    except Exception:
+        return None
+
+
 if not DEBUG:
+    ec2_private_ip = _ec2_private_ip()
+    if ec2_private_ip:
+        ALLOWED_HOSTS.append(ec2_private_ip)
+
     # The HTTP->HTTPS redirect happens at the load balancer, not here:
     # Elastic Beanstalk's per-instance nginx sits between the ALB and this
     # app and isn't guaranteed to forward the ALB's real X-Forwarded-Proto
