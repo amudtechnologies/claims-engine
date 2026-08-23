@@ -9,3 +9,8 @@ dist/
 web/db.sqlite3
 web/staticfiles/
 web/var/
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

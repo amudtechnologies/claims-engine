@@ -11,15 +11,16 @@ Full background, legal context, glossary and decision log: @docs/project-context
 Storage and enrichment only. Commercial exploitation is explicitly out of scope —
 do not build outreach, scoring-for-sales, or contact workflows yet.
 
-Exception: `web/` (see below) includes a NIT search — a search bar in the home
-hero, submitting to a consolidated `/resultados/` page — rather than behind a
-separate nav destination — it's the only working feature so far and should be
-visible on arrival, not one click away. This is an informational self-lookup —
-someone enters a NIT and sees only what's on record for it — the same D24
-self-lookup pattern, for legal entities instead of natural persons, not outbound
-outreach or sales scoring. `/resultados/` renders one row per radar (today, only
-Depósitos judiciales has real data; other radars are listed as "En desarrollo"
-with no numbers — never fabricated placeholder figures). It deliberately omits
+Exception: `web/` (see below) includes a document-number search — a search bar
+in the home hero, submitting to a consolidated `/resultados/` page — rather than
+behind a separate nav destination — it's the only working feature so far and
+should be visible on arrival, not one click away. This is an informational
+self-lookup — someone enters a NIT or cédula and sees only what's on record for
+it — the D24 self-lookup pattern, serving natural persons as well as legal
+entities per D28, not outbound outreach or sales scoring. `/resultados/` renders
+one row per radar (today, only Depósitos judiciales has real data; other radars
+are listed as "En desarrollo" with no numbers — never fabricated placeholder
+figures). It deliberately omits
 any probability/validation scoring split: that's the inference layer (Phase 6),
 explicitly out of the active plan (§7), and any "which finding is worth acting on"
 signal is a scoring-for-sales judgment this phase doesn't build. It queries
@@ -145,8 +146,9 @@ layers above (it consumes what the pipeline produces; it never writes to
 
 - `home` — the Amud Technologies company page. Amud is the claims engine in
   general; judicial deposits is one radar under it, not the whole product. Its
-  hero has the NIT search bar (`home/_search_form.html`, shared with the
-  results page's own compact search bar), and its `results` view
+  hero has the document-number search bar (NIT or cédula —
+  `home/_search_form.html`, shared with the results page's own compact search
+  bar), and its `results` view
   (`/resultados/`, `home/views.py`) renders the consolidated, cross-radar
   results page — the search's actual destination. `results` calls straight
   into `judicial_deposits.party_search`/`core_cache` for data; it's cross-radar

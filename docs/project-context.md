@@ -1,7 +1,7 @@
 # Claims engine — project context
 
 Background, definitions and decision log. Referenced from `CLAUDE.md`.
-Last updated: 2026-08-17.
+Last updated: 2026-08-22.
 
 ---
 
@@ -208,9 +208,10 @@ deposits; we verify which ones are yours," never "this money is yours."
   Law 1581 once enriched and commercially exploited. The restricted-access storage
   requirement is the part of this decision that survives D26 unchanged — only the
   "stored unenriched" framing was wrong.
-- **D24.** If natural persons are ever served, the model is self-lookup — the person
-  enters their own ID and sees only their own record — never outbound. Unaffected by
-  D26: it governs the serving layer, not whether ingestion enriches.
+- **D24.** *(Activated by D28, 2026-08-22 — see below.)* If natural persons are
+  ever served, the model is self-lookup — the person enters their own ID and
+  sees only their own record — never outbound. Unaffected by D26: it governs
+  the serving layer, not whether ingestion enriches.
 - **D26.** (2026-08-17) The working assumption behind D23 — "only NITs appear in
   RUES, so enrichment is legal-entity-only" — is wrong. A natural person registered
   as a *comerciante* obtains a NIT derived from their cédula and has a RUES record
@@ -226,6 +227,22 @@ deposits; we verify which ones are yours," never "this money is yours."
   below 85% join rate" framing in the Phase 5 row of §7 and the `document_type`
   discussion in §6 and the Phase 3 findings in §7 — both predate this decision and
   describe the mechanism it replaces.
+- **D28.** (2026-08-22) The web document-number search now serves natural
+  persons as well as legal entities — activating what D24 described as a
+  future possibility ("if natural persons are ever served"). Nothing changes
+  underneath it: the search already had no document-type pre-filter
+  (consistent with D26 — the UI never knows in advance what kind of party
+  it's looking at), the interaction is still one document number in, one
+  record out (D24's self-lookup pattern, unchanged), and cédula-keyed data
+  still sits in the restricted-access storage tier D23 requires. What
+  actually changed is web-layer copy and labeling: the search placeholder,
+  hint text, and hero/landing copy now say "NIT o cédula" instead of assuming
+  a company, and `/resultados/` and the radar detail page show "Cédula"
+  rather than "NIT" as the field label when `party.document_type` is
+  `natural_person` — falling back to "Identificación" when `document_type`
+  is unclassified, since (per D26) a RUES miss is a permanent-valid unknown
+  state, not evidence of either category. No pipeline, storage, or model
+  change — this is a `web/`-only decision.
 
 ### Automation
 
