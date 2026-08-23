@@ -81,6 +81,14 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
+    # Trusting X-Forwarded-Proto here carries none of the SECURE_SSL_REDIRECT
+    # loop risk above — it only affects request.scheme/is_secure(), which
+    # canonical/og:url/og:image/schema.org URLs in base.html read. Without
+    # this, Django sees the plain-HTTP ALB->instance hop and every one of
+    # those URLs renders as http:// even though the site is HTTPS-only,
+    # splitting the indexing signal between two schemes.
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 
 # Application definition
 
