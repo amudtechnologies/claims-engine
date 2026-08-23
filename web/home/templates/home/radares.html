@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load static jd_extras %}
+
+{% block content %}
+
+<section class="radars-index">
+  <div class="wrap">
+    <div class="eyebrow mono"><span class="dot"></span>Radar de Acreencias</div>
+    <h1 class="serif">Los radares disponibles</h1>
+    <p class="lede">Monitoreamos múltiples fuentes para identificar dinero, derechos económicos, oportunidades o activos que podrían corresponderle. Cada radar está diseñado para encontrar oportunidades diferentes y responder a necesidades específicas. Mostramos oportunidades sobre las que ya es posible actuar, cobrar o reclamar para que pueda conocerlas y aprovecharlas.</p>
+
+    <div class="radar-list">
+      <a href="{% url 'judicial_deposits:index' %}" class="radar-list-item">
+        <div class="radar-list-item-main">
+          <span class="radar-list-item-name">Depósitos judiciales</span>
+          <span class="results-status results-status--active"><span class="dot"></span>Activo</span>
+        </div>
+        <p class="radar-list-item-desc">Dinero constituido en procesos judiciales que prescribe a favor de la Nación si no se reclama dentro del plazo legal.</p>
+        {% if jd_observation_count %}
+        <div class="radar-list-item-stats">
+          <div>
+            <div class="radar-list-item-stat-num mono">{{ jd_total_amount_cop|cop }}</div>
+            <div class="radar-list-item-stat-label">Valor total en el histórico 2017–2026</div>
+          </div>
+          <div>
+            <div class="radar-list-item-stat-num mono">{{ jd_observation_count }}</div>
+            <div class="radar-list-item-stat-label">Observaciones registradas</div>
+          </div>
+        </div>
+        {% endif %}
+      </a>
+
+      <div class="radar-list-item radar-list-item--soon">
+        <div class="radar-list-item-main">
+          <span class="radar-list-item-name">Próximo radar</span>
+          <span class="results-status results-status--pending"><span class="dot"></span>En desarrollo</span>
+        </div>
+        <p class="radar-list-item-desc">Estamos construyendo nuevos radares sobre otras fuentes de posibles acreencias.</p>
+      </div>
+    </div>
+
+    <a href="{% url 'home:index' %}#buscar" class="btn btn-primary">Buscar</a>
+  </div>
+</section>
+
+{% endblock %}

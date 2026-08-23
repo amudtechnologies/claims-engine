@@ -1,10 +1,16 @@
-"""The NIT search, run live against the local `core/` cache (see
-`core_cache.py`). Recomputes a `marts.party_summary`-shaped aggregation at
-query time straight off `core` facts — there is no materialized marts table
-yet (Phase 6/marts is still deferred, project-context.md §7).
+"""The document-number search (NIT or cédula — D28), run live against the
+local `core/` cache (see `core_cache.py`). Recomputes a
+`marts.party_summary`-shaped aggregation at query time straight off `core`
+facts — there is no materialized marts table yet (Phase 6/marts is still
+deferred, project-context.md §7).
 
 `document_number` here follows the pipeline's own convention: digits only,
-NIT stored without its check digit (see CLAUDE.md "Conventions").
+NIT stored without its check digit (see CLAUDE.md "Conventions"). A cédula
+has no check digit to strip, so `_candidate_document_numbers` below only ever
+generates a stripped-digit candidate for NIT-length inputs (9-10 digits) — it
+has no way to know in advance which kind of number it's holding (D26), so a
+9-10 digit cédula harmlessly tries one extra, unmatched candidate before
+falling through.
 """
 
 from __future__ import annotations
@@ -14,8 +20,10 @@ from datetime import date
 from typing import Literal
 
 import duckdb
+from django.utils import timezone
 
 from . import core_cache
+from .models import ClaimWindow
 
 ProceduralRole = Literal["plaintiff", "defendant"]
 DocumentType = Literal["legal_entity", "natural_person"]
@@ -93,6 +101,23 @@ class PartySearchResult:
             rues_active=self.rues_active,
             deposits=deposits,
         )
+
+
+def claim_window(period: str | None) -> ClaimWindow | None:
+    """The configured 20-business-day claim window for a publication period,
+    or None when no window has been entered yet — a permanent, valid unset
+    state (see `ClaimWindow`'s docstring), not an error."""
+    if not period:
+        return None
+    return ClaimWindow.objects.filter(period=period).first()
+
+
+def claim_status(window: ClaimWindow | None) -> str | None:
+    """"reclamable" / "no_reclamable" for a configured claim window, or None
+    when no window has been configured for the period."""
+    if not window:
+        return None
+    return "reclamable" if timezone.localdate() <= window.closes_on else "no_reclamable"
 
 
 def normalize_document_number(raw_value: str) -> str:

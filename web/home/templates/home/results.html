@@ -1,8 +1,7 @@
 {% extends "base.html" %}
 {% load static jd_extras %}
 
-{% block title %}Resultados de la búsqueda — Amud Technologies{% endblock %}
-{% block meta_description %}Resultados de la búsqueda por número de identificación a través de los radares activos de Amud Technologies.{% endblock %}
+{% block robots_meta %}<meta name="robots" content="noindex,follow">{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/results.css' %}">
@@ -24,25 +23,31 @@
       <p>El caché local de datos aún no se ha sincronizado. Inténtelo de nuevo en unos minutos.</p>
     </div>
   </section>
+{% elif document_number_looks_invalid %}
+  <section class="results-empty">
+    <div class="wrap">
+      <p><strong>Revise el número ingresado.</strong></p>
+      <p>«{{ raw_document_number }}» no tiene el formato de un número de identificación válido. Ingrese un NIT o una cédula.</p>
+    </div>
+  </section>
 {% elif result %}
   <section class="results-head">
     <div class="wrap">
-      <h1 class="serif">Resultados para {{ result.party_name|default:result.document_number }}</h1>
+      {% if result.party_name %}
+        <h1 class="serif">Resultados para {{ result.party_name }}</h1>
+      {% else %}
+        <h1 class="serif">Resultados de la búsqueda</h1>
+      {% endif %}
       <p class="results-meta">
-        NIT {{ result.document_number }} · {{ result.document_type|document_type_label }}{% if result.rues_active is not None %} · {% if result.rues_active %}Activo en RUES{% else %}Inactivo en RUES{% endif %}{% endif %}
+        {{ result.document_type|document_number_label }} {{ result.document_number }}{% if result.document_type %} · {{ result.document_type|document_type_label }}{% endif %}{% if result.rues_active is not None %} · {% if result.rues_active %}Activo en RUES{% else %}Inactivo en RUES{% endif %}{% endif %}
         <br>Búsqueda realizada el {{ searched_at|date:"j \d\e F \d\e Y" }}
       </p>
-
-      <div class="results-summary">
-        <div class="results-card">
-          <div class="results-card-value mono">{{ result.total_amount_cop|cop }}</div>
-          <div class="results-card-label">Valor total identificado</div>
-        </div>
-        <div class="results-card">
-          <div class="results-card-value mono">{{ result.deposit_count }}</div>
-          <div class="results-card-label">Total de hallazgos</div>
-        </div>
-      </div>
+      {% if not result.party_name %}
+        <p class="results-privacy-note">Este número aparece en nuestros registros. Todavía no verificamos el nombre asociado. Eso no significa que el resultado sea incorrecto, solo que la verificación está en curso.</p>
+      {% endif %}
+      {% if result.document_type == "natural_person" %}
+        <p class="results-privacy-note">Esta consulta está pensada para que usted verifique su propia información pública — no la use para consultar a terceros sin su autorización.</p>
+      {% endif %}
     </div>
   </section>
 
@@ -65,27 +70,32 @@
                 <a href="{% url 'judicial_deposits:index' %}?nit={{ result.document_number|urlencode }}">Depósitos judiciales</a>
                 <span class="results-row-caret" aria-hidden="true">&rsaquo;</span>
               </td>
-              <td class="mono">{{ result.deposit_count }}</td>
-              <td class="mono">{{ result.total_amount_cop|cop }}</td>
-              <td>
-                <span class="results-status results-status--active"><span class="dot"></span>Activo</span>
+              <td class="mono" data-label="Hallazgos">{{ result.deposit_count }}</td>
+              <td class="mono" data-label="Valor estimado">{{ result.total_amount_cop|cop }}</td>
+              <td data-label="Estado">
+                <span class="results-table-status-cell">
+                  <span class="results-status results-status--active"><span class="dot"></span>Activo</span>
+                  {% if claim_status == "reclamable" %}<span class="jd-tag jd-tag--open">Reclamable</span>
+                  {% elif claim_status == "no_reclamable" %}<span class="jd-tag jd-tag--closed">No reclamable</span>{% endif %}
+                </span>
               </td>
             </tr>
             <tr class="results-table-row--pending">
               <td class="results-table-radar">Más radares</td>
-              <td>—</td>
-              <td>—</td>
-              <td><span class="results-status results-status--pending"><span class="dot"></span>En desarrollo</span></td>
+              <td data-label="Hallazgos">—</td>
+              <td data-label="Valor estimado">—</td>
+              <td data-label="Estado"><span class="results-status results-status--pending"><span class="dot"></span>En desarrollo</span></td>
             </tr>
           </tbody>
         </table>
       </div>
+      <p class="results-more-radars">Estamos construyendo nuevos radares sobre otras fuentes. Vuelva a consultar este número más adelante. <a href="{% url 'home:radares' %}">Conozca los radares en desarrollo</a></p>
     </div>
   </section>
 {% else %}
   <section class="results-empty">
     <div class="wrap">
-      <p><strong>No encontramos información pública</strong> asociada al número {{ normalized_nit }} en los radares activos.</p>
+      <p><strong>No encontramos información pública</strong> asociada al número {{ normalized_document_number }} en los radares activos.</p>
       <p>Esto no descarta que exista — solo que no aparece en las fuentes que hemos procesado hasta ahora.</p>
     </div>
   </section>

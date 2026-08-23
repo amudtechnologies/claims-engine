@@ -204,7 +204,7 @@ STORAGES = {
 }
 
 
-# judicial_deposits NIT search — local read cache of core/ Parquet, synced
+# judicial_deposits document-number search — local read cache of core/ Parquet, synced
 # from S3 by `python manage.py sync_core_cache`. Not a marts table (Phase
 # 6/marts is still deferred, see project-context.md §7): this recomputes the
 # same per-party aggregation at query time straight off `core`, just against

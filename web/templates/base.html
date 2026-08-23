@@ -3,12 +3,39 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Amud Technologies{% endblock %}</title>
-  <meta name="description" content="{% block meta_description %}Amud Technologies detecta dinero que ya tiene dueño en fuentes públicas colombianas.{% endblock %}">
+  {# page_title / page_description are set per-view (see home/views.py) — the single source for <title>, the meta description, and the OG/Twitter tags below, so the three never drift apart. #}
+  <title>{{ page_title|default:"Amud Technologies" }}</title>
+  <meta name="description" content="{{ page_description|default:'Amud Technologies detecta dinero que ya tiene dueño en fuentes públicas colombianas.' }}">
+  {% block robots_meta %}{% endblock %}
+  <link rel="canonical" href="{% block canonical %}{{ request.scheme }}://{{ request.get_host }}{{ request.path }}{% endblock %}">
   <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
   <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon-32.png' %}">
   <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon-16.png' %}">
   <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
+
+  <meta property="og:site_name" content="Amud Technologies">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_CO">
+  <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+  <meta property="og:title" content="{{ page_title|default:'Amud Technologies' }}">
+  <meta property="og:description" content="{{ page_description|default:'Amud Technologies detecta dinero que ya tiene dueño en fuentes públicas colombianas.' }}">
+  <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/apple-touch-icon.png' %}">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="{{ page_title|default:'Amud Technologies' }}">
+  <meta name="twitter:description" content="{{ page_description|default:'Amud Technologies detecta dinero que ya tiene dueño en fuentes públicas colombianas.' }}">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Amud Technologies",
+    "url": "{{ request.scheme }}://{{ request.get_host }}/",
+    "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'img/apple-touch-icon.png' %}",
+    "description": "Amud Technologies cruza fuentes públicas colombianas para identificar dinero, derechos económicos y activos que ya tienen un beneficiario identificable.",
+    "areaServed": "CO"
+  }
+  </script>
+
   <link rel="stylesheet" href="{% static 'css/site.css' %}">
   {% block extra_css %}{% endblock %}
 </head>
@@ -16,7 +43,7 @@
 
   <div class="masthead">
     <div class="wrap masthead-inner mono">
-      <span>COLOMBIA</span>
+      <span>DATOS CON PROPÓSITO • COLOMBIA</span>
     </div>
   </div>
 
@@ -33,6 +60,7 @@
       <input type="checkbox" id="nav-toggle" class="nav-toggle-input">
       <nav class="nav-links">
         <a href="{% url 'home:index' %}" class="{% if active_nav == 'home' %}is-active{% endif %}">Inicio</a>
+        <a href="{% url 'home:radares' %}" class="{% if active_nav == 'radares' or active_nav == 'judicial_deposits' %}is-active{% endif %}">Radares</a>
       </nav>
       <div class="nav-right">
         <label for="nav-toggle" class="nav-toggle" aria-label="Abrir menú">
@@ -56,6 +84,10 @@
         </svg>
         <span class="wordmark-text"><span>amud</span><span>technologies</span></span>
       </div>
+      <nav class="footer-links">
+        <a href="{% url 'home:index' %}">Inicio</a>
+        <a href="{% url 'home:radares' %}">Radares</a>
+      </nav>
       <div class="footer-meta">
         <span>info@amudtech.com</span>
       </div>

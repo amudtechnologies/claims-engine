@@ -1,6 +1,7 @@
 # web
 
-The public-facing Django site — `home` (company page, NIT search hero) and
+The public-facing Django site — `home` (company page, document-number search
+hero — NIT or cédula) and
 `judicial_deposits` (radar landing page, search logic). See `CLAUDE.md` at
 the repo root for the app split and why `results` lives in `home`.
 
@@ -10,7 +11,7 @@ the repo root for the app split and why `results` lives in `home`.
 uv sync
 cd web
 uv run python manage.py migrate
-uv run python manage.py sync_core_cache   # needs AWS creds; populates the NIT search cache
+uv run python manage.py sync_core_cache   # needs AWS creds; populates the document-number search cache
 uv run python manage.py runserver
 ```
 

@@ -32,17 +32,24 @@
   --surface: #ffffff;
   --ink: #1c1a17;
   --ink-soft: rgba(28, 26, 23, 0.66);
-  --ink-softer: rgba(28, 26, 23, 0.5);
+  --ink-softer: rgba(28, 26, 23, 0.62);
   --hair: rgba(28, 26, 23, 0.13);
   --hair-strong: rgba(28, 26, 23, 0.22);
   --accent: #cccc4b;
   --accent-deep: #cccc4b;
+  --accent-text: #6b5e0e;
   --on-accent: #faf6ef;
 }
 
 * { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  /* Offsets any #anchor jump (e.g. "Buscar" buttons linking to #buscar) by
+     the sticky nav's own height (~70px) plus breathing room, so the target
+     lands below the pinned header instead of behind it. */
+  scroll-padding-top: 88px;
+}
 
 body {
   margin: 0;
@@ -54,9 +61,9 @@ body {
 }
 
 a { color: var(--ink); text-decoration: none; }
-a:hover { color: var(--accent-deep); }
+a:hover { color: var(--accent-text); }
 a:focus-visible, button:focus-visible, input:focus-visible {
-  outline: 2px solid var(--accent-deep);
+  outline: 2px solid var(--accent-text);
   outline-offset: 3px;
   border-radius: 2px;
 }
@@ -132,10 +139,18 @@ h1, h2, h3 { text-wrap: balance; }
 }
 .wordmark-mark { width: 24px; height: 24px; flex: none; }
 .wordmark-text { display: flex; flex-direction: column; line-height: 1.15; }
-.nav .wordmark { font-size: 1.05rem; gap: 8px; }
+/* The nav logo is a compact horizontal lockup — the vertical, icon-over-text
+   badge treatment (the default .wordmark) belongs in spacious contexts like
+   the footer, not a sticky header that's pinned on screen through the whole
+   session. On mobile this alone is the difference between the header eating
+   ~108px or ~70px of a phone viewport, permanently. */
+.nav .wordmark { flex-direction: row; align-items: center; gap: 10px; font-size: 1.05rem; }
+.nav .wordmark-text { flex-direction: row; gap: 5px; line-height: 1; }
 .nav .wordmark-mark { width: 34px; height: 34px; }
-.footer .wordmark { font-size: 0.98rem; gap: 8px; }
+.footer .wordmark { flex-direction: row; align-items: center; gap: 8px; font-size: 0.98rem; }
+.footer .wordmark-text { flex-direction: row; gap: 5px; line-height: 1; }
 .footer .wordmark-mark { width: 30px; height: 30px; }
+
 .nav-links { display: flex; align-items: center; gap: 28px; flex: 1; justify-content: center; }
 .nav-links a { font-size: 0.92rem; font-weight: 500; color: var(--ink-soft); }
 .nav-links a:hover { color: var(--ink); }
@@ -172,8 +187,8 @@ h1, h2, h3 { text-wrap: balance; }
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.btn-primary { background: var(--accent-deep); color: var(--on-accent); }
-.btn-primary:hover { color: var(--on-accent); transform: translateY(-1px); box-shadow: 0 10px 24px rgba(14, 122, 84, 0.32); }
+.btn-primary { background: var(--accent-deep); color: var(--ink); }
+.btn-primary:hover { color: var(--ink); transform: translateY(-1px); box-shadow: 0 10px 24px rgba(107, 94, 14, 0.28); }
 .btn-lg { height: 52px; padding: 0 26px; font-size: 1rem; }
 .btn-link {
   display: inline-flex;
@@ -185,7 +200,7 @@ h1, h2, h3 { text-wrap: balance; }
   color: var(--ink);
   border-bottom: 1.5px solid var(--hair-strong);
 }
-.btn-link:hover { border-color: var(--accent-deep); color: var(--ink); }
+.btn-link:hover { border-color: var(--accent-text); color: var(--ink); }
 
 /* HERO */
 .hero { position: relative; padding-top: clamp(56px, 8vw, 104px); padding-bottom: clamp(52px, 7vw, 92px); overflow: hidden; }
@@ -195,7 +210,7 @@ h1, h2, h3 { text-wrap: balance; }
   right: -180px;
   width: 640px;
   height: 640px;
-  background: radial-gradient(circle, rgba(29, 175, 122, 0.13) 0%, rgba(29, 175, 122, 0) 68%);
+  background: radial-gradient(circle, rgba(204, 204, 75, 0.18) 0%, rgba(204, 204, 75, 0) 68%);
   pointer-events: none;
   z-index: 0;
 }
@@ -208,7 +223,7 @@ h1, h2, h3 { text-wrap: balance; }
   letter-spacing: -0.02em;
   color: var(--ink);
 }
-.hero h1 .accent-word { color: var(--accent-deep); }
+.hero h1 .accent-word { color: var(--accent-text); }
 .lede { margin: 0 0 34px 0; font-size: 1.12rem; line-height: 1.56; color: var(--ink-soft); max-width: 46ch; }
 /* SEARCH FORM (shared: hero + results bar) */
 .hero-search { margin-bottom: 40px; }
@@ -226,32 +241,14 @@ h1, h2, h3 { text-wrap: balance; }
   border-radius: 6px;
 }
 .search-form-input::placeholder { color: var(--ink-softer); font-family: "Public Sans Var", sans-serif; letter-spacing: normal; }
-.search-form-input:focus-visible { outline: 2px solid var(--accent-deep); outline-offset: 2px; }
+.search-form-input:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 2px; }
 .search-form-btn { flex: none; height: 52px; }
+.search-form-hint { margin: 10px 0 0; font-size: 0.82rem; color: var(--ink-softer); }
+.search-form-trust { margin: 8px 0 0; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent-text); }
 .search-form--compact { max-width: 380px; }
 .search-form--compact .search-form-input,
-.search-form--compact .search-form-btn { height: 42px; font-size: 0.92rem; }
+.search-form--compact .search-form-btn { height: 44px; font-size: 0.92rem; }
 
-.hero-radars { margin-bottom: 48px; }
-.hero-radars-label { display: flex; align-items: center; gap: 10px; font-size: 0.74rem; font-weight: 600; letter-spacing: 0.1em; color: var(--ink-softer); margin-bottom: 14px; }
-.hero-radars-label .dot { width: 7px; height: 7px; background: var(--accent); flex: none; }
-.hero-radars-list { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.radar-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 38px;
-  padding: 0 18px;
-  font-size: 0.86rem;
-  font-weight: 600;
-  border-radius: 999px;
-  border: 1px solid var(--hair-strong);
-  background: var(--surface);
-  color: var(--ink);
-  white-space: nowrap;
-  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
-}
-.radar-chip:hover { border-color: var(--accent-deep); color: var(--accent-deep); background: rgba(29, 175, 122, 0.08); }
 .hero-stats { display: flex; gap: 40px; flex-wrap: wrap; }
 .stat-num { font-size: 1.4rem; font-weight: 600; color: var(--ink); }
 .stat-label { font-size: 0.8rem; color: var(--ink-softer); margin-top: 4px; }
@@ -267,6 +264,83 @@ h1, h2, h3 { text-wrap: balance; }
 @media (prefers-reduced-motion: reduce) {
   .pulse-ring { animation: none; }
 }
+
+/* STATUS PILL (shared: radar-list cards, results table, radar index) */
+.results-status { display: inline-flex; align-items: center; gap: 8px; font-size: 0.86rem; flex: none; }
+.results-status .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+.results-status--active .dot { background: var(--accent-deep); }
+.results-status--active { color: var(--ink); }
+.results-status--pending .dot { background: var(--ink-softer); }
+.results-status--pending { color: var(--ink-softer); }
+
+/* RADAR LIST (shared: homepage preview + /radares/ index — the platform's
+   family of radars, presented as a list of siblings rather than one radar
+   standing in for the whole product). Cards, not a table: works unshrunk
+   on a phone, and reads the same at any width. */
+.radar-list { display: flex; flex-direction: column; gap: 12px; margin: 28px 0; }
+.radar-list-item {
+  display: block;
+  padding: 18px 20px;
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: 10px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+a.radar-list-item:hover { border-color: var(--accent-text); }
+.radar-list-item--soon { background: var(--ground); }
+.radar-list-item-main { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 12px; margin-bottom: 6px; }
+.radar-list-item-name { font-family: "Piazzolla Var", "Piazzolla", Georgia, serif; font-size: 1.04rem; font-weight: 600; color: var(--ink); }
+.radar-list-item-desc { margin: 0; font-size: 0.88rem; line-height: 1.56; color: var(--ink-soft); max-width: 60ch; }
+.radar-list-item-stats { display: flex; gap: 10px 24px; flex-wrap: wrap; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--hair); }
+.radar-list-item-stat-num { font-size: 0.98rem; font-weight: 600; color: var(--ink); word-break: break-word; }
+.radar-list-item-stat-label { font-size: 0.76rem; color: var(--ink-softer); margin-top: 1px; }
+
+/* RADAR BREADCRUMB (radar detail pages) — keeps the parent product visible
+   even when a radar page is reached directly, e.g. a shared link. */
+.radar-breadcrumb { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 7px; font-size: 0.78rem; color: var(--ink-softer); margin-bottom: 16px; }
+.radar-breadcrumb a { color: var(--ink-softer); }
+.radar-breadcrumb a:hover { color: var(--accent-text); }
+
+/* FOOTER NAV */
+.footer-links { display: flex; gap: 22px; flex-wrap: wrap; font-size: 0.84rem; }
+.footer-links a { color: var(--ink-softer); }
+.footer-links a:hover { color: var(--accent-text); }
+
+/* TAG (shared: claim-window status — radar page panels + results table) */
+.jd-tag { display: inline-flex; align-items: center; flex: none; padding: 3px 10px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.02em; text-transform: none; border-radius: 999px; }
+.jd-tag--open { color: var(--ink); background: var(--accent-deep); }
+.jd-tag--closed { color: var(--ink-softer); background: var(--hair); }
+
+/* FACT STRIP (shared: home methodology strip + radar page legal terms) */
+.fact-strip { display: flex; flex-wrap: wrap; margin: 0 0 24px 0; padding: 0 22px; background: var(--surface); border: 1px solid var(--hair); border-radius: 10px; }
+.fact-item {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  flex: 1 1 280px;
+  padding: 13px 0;
+  font-size: 0.84rem;
+  color: var(--ink-softer);
+  border-top: 1px solid var(--hair);
+}
+.fact-item:nth-child(-n+3) { border-top: none; }
+.fact-item .dot { width: 6px; height: 6px; flex: none; background: var(--accent); position: relative; top: -1px; }
+.fact-num { font-weight: 700; color: var(--ink); flex: none; }
+
+@media (max-width: 640px) {
+  .fact-item { flex-basis: 100%; }
+  .fact-item:nth-child(-n+3) { border-top: 1px solid var(--hair); }
+  .fact-item:first-child { border-top: none; }
+}
+
+/* METHOD (homepage — proof/methodology strip below the hero) */
+.method { padding-top: clamp(8px, 1.5vw, 16px); padding-bottom: clamp(48px, 7vw, 84px); }
+.method-lede { margin: 0 0 24px 0; font-size: 1rem; line-height: 1.6; color: var(--ink-soft); max-width: 64ch; }
+
+/* RADARS INDEX (/radares/) */
+.radars-index { padding-top: clamp(56px, 8vw, 100px); padding-bottom: clamp(56px, 8vw, 100px); }
+.radars-index h1 { margin: 0 0 18px 0; font-size: clamp(2rem, 3vw + 0.6rem, 2.8rem); line-height: 1.1; font-weight: 600; letter-spacing: -0.02em; }
+.radars-index .lede { margin-bottom: 8px; max-width: 62ch; }
 
 .section-head { max-width: 60ch; margin-bottom: 52px; }
 .section-head h2 {
@@ -311,8 +385,8 @@ h1, h2, h3 { text-wrap: balance; }
 /* PROOF */
 .proof { background: var(--accent-deep); padding-top: clamp(64px, 8vw, 100px); padding-bottom: clamp(64px, 8vw, 100px); }
 .proof-inner { text-align: center; max-width: 720px; margin: 0 auto; }
-.proof-num { font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 600; letter-spacing: -0.01em; color: var(--on-accent); line-height: 1; margin-bottom: 18px; }
-.proof-text { margin: 0; font-size: 1.05rem; line-height: 1.55; color: rgba(250, 246, 239, 0.82); }
+.proof-num { font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 600; letter-spacing: -0.01em; color: var(--ink); line-height: 1; margin-bottom: 18px; }
+.proof-text { margin: 0; font-size: 1.05rem; line-height: 1.55; color: rgba(28, 26, 23, 0.72); }
 
 /* CTA */
 .cta { padding-top: clamp(84px, 10vw, 132px); padding-bottom: clamp(84px, 10vw, 132px); text-align: center; }
@@ -343,15 +417,23 @@ h1, h2, h3 { text-wrap: balance; }
   .step { border-left: none; padding-left: 0; border-top: 1px solid var(--hair); padding-top: 30px; }
   .step:first-child { border-top: none; padding-top: 0; }
 
-  .search-form { flex-direction: column; max-width: none; }
-  .search-form-input, .search-form-btn { width: 100%; }
+  /* The hero's full-width stacked search stays; the compact bar used on
+     every results/radar page keeps its single-row layout on mobile too —
+     stacking it here would turn a slim utility bar into two full rows at
+     the very top of a page whose entire point is the content below it. */
+  .search-form:not(.search-form--compact) { flex-direction: column; max-width: none; }
+  .search-form:not(.search-form--compact) .search-form-input,
+  .search-form:not(.search-form--compact) .search-form-btn { width: 100%; }
 
-  .nav-toggle { display: flex; }
+  /* Secondary, low-value chrome — reclaim the vertical space on a phone. */
+  .masthead { display: none; }
+
+  .nav-toggle { display: flex; width: 44px; height: 44px; }
   .nav-links {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
+    align-items: stretch;
+    gap: 2px;
     position: absolute;
     top: 100%;
     left: 0;
@@ -364,9 +446,8 @@ h1, h2, h3 { text-wrap: balance; }
     opacity: 0;
     transition: max-height 0.25s ease, opacity 0.2s ease;
   }
-  .nav-links a { padding: 10px 0; font-size: 1rem; }
+  .nav-links a { padding: 13px 2px; font-size: 1rem; }
   .nav-toggle-input:checked ~ .nav-links { max-height: 220px; opacity: 1; }
 
   .footer-inner { flex-direction: column; align-items: flex-start; }
-  .masthead-inner span:last-child { display: none; }
 }

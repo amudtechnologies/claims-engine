@@ -3,11 +3,15 @@
     class="search-form-input"
     type="text"
     name="nit"
-    value="{{ raw_nit }}"
-    placeholder="Consulta una empresa por NIT"
+    value="{{ raw_document_number }}"
+    placeholder="Número de identificación"
     inputmode="numeric"
     autocomplete="off"
-    aria-label="Número de identificación (NIT)"
+    aria-label="Número de identificación"
   >
-  <button type="submit" class="btn btn-primary search-form-btn">Consultar</button>
+  <button type="submit" class="btn btn-primary search-form-btn">Buscar</button>
 </form>
+{% if not compact %}
+  <p class="search-form-hint">NIT (con o sin dígito de verificación) o cédula.</p>
+  <p class="search-form-trust mono">Gratis · sin registro</p>
+{% endif %}

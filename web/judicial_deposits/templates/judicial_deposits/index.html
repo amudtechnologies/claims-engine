@@ -1,9 +1,6 @@
 {% extends "base.html" %}
 {% load static jd_extras %}
 
-{% block title %}Depósitos judiciales en extinción — Amud Technologies{% endblock %}
-{% block meta_description %}Consulte cuántos depósitos judiciales en extinción y qué valor aparece asociado a un NIT en Colombia.{% endblock %}
-
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/judicial_deposits.css' %}">
 {% endblock %}
@@ -12,25 +9,34 @@
 
 <section class="jd-intro">
   <div class="wrap">
-    <div class="eyebrow mono"><span class="dot"></span>RADAR ACTIVO — DEPÓSITOS JUDICIALES</div>
+    <nav class="radar-breadcrumb mono">
+      <a href="{% url 'home:radares' %}">Acreencias Radar</a> <span aria-hidden="true">/</span> Depósitos judiciales
+    </nav>
+    <div class="eyebrow mono"><span class="dot"></span>RADAR ACTIVO</div>
     <h1 class="serif">Dinero olvidado en procesos judiciales</h1>
     <p class="lede">Existen depósitos judiciales que permanecen sin ser reclamados durante años. La ley establece un plazo para que sus beneficiarios los reclamen y, una vez vencido, los recursos prescriben de pleno derecho a favor de la Nación.</p>
 
-    <div class="jd-terms">
-      <div class="jd-term"><span class="dot"></span><span class="jd-term-num mono">2 años</span> tras la terminación del proceso</div>
-      <div class="jd-term"><span class="dot"></span><span class="jd-term-num mono">3 años</span> para procesos laborales</div>
-      <div class="jd-term"><span class="dot"></span><span class="jd-term-num mono">20 días hábiles</span> desde la publicación</div>
-    </div>
+    {% include "_legal_facts.html" %}
 
-    <a href="{% url 'home:index' %}#buscar" class="btn btn-primary">Buscar un NIT</a>
+    <a href="{% url 'home:index' %}#buscar" class="btn btn-primary">Buscar</a>
 
     {% if party_result %}
     <div class="jd-party">
       <div class="eyebrow mono"><span class="dot"></span>RESULTADO PARA ESTA BÚSQUEDA</div>
-      <h2 class="jd-party-name serif">{{ party_result.party_name|default:party_result.document_number }}</h2>
+      {% if party_result.party_name %}
+        <h2 class="jd-party-name serif">{{ party_result.party_name }}</h2>
+      {% else %}
+        <h2 class="jd-party-name serif">Resultados de la búsqueda</h2>
+      {% endif %}
       <p class="jd-party-meta">
-        NIT {{ party_result.document_number }} · {{ party_result.document_type|document_type_label }}{% if party_result.rues_active is not None %} · {% if party_result.rues_active %}Activo en RUES{% else %}Inactivo en RUES{% endif %}{% endif %}
+        {{ party_result.document_type|document_number_label }} {{ party_result.document_number }}{% if party_result.document_type %} · {{ party_result.document_type|document_type_label }}{% endif %}{% if party_result.rues_active is not None %} · {% if party_result.rues_active %}Activo en RUES{% else %}Inactivo en RUES{% endif %}{% endif %}
       </p>
+      {% if not party_result.party_name %}
+        <p class="jd-party-note">Este número aparece en nuestros registros. Todavía no verificamos el nombre asociado. Eso no significa que el resultado sea incorrecto, solo que la verificación está en curso.</p>
+      {% endif %}
+      {% if party_result.document_type == "natural_person" %}
+        <p class="jd-party-note">Esta consulta está pensada para que usted verifique su propia información pública — no la use para consultar a terceros sin su autorización.</p>
+      {% endif %}
 
       {% include "judicial_deposits/_party_summary.html" with summary=party_result title="Histórico completo (Todos los periodos)" show_last_period=True %}
 
@@ -68,7 +74,7 @@
     {% else %}
       <div class="proof-num mono">—</div>
     {% endif %}
-    <p class="proof-text">Observaciones de dinero olvidado en procesos judiciales desde 2017</p>
+    <p class="proof-text">Observaciones de dinero olvidado en procesos judiciales</p>
   </div>
 </section>
 

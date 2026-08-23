@@ -1,5 +1,6 @@
-"""Syncs the `core/` tables the NIT search needs from S3 to a local Parquet
-cache, and resolves paths into that cache for `party_search` to query.
+"""Syncs the `core/` tables the document-number search needs from S3 to a
+local Parquet cache, and resolves paths into that cache for `party_search`
+to query.
 
 Decoupled from the request path on purpose: a live point query against S3
 takes 15-50s (see `settings.CORE_CACHE_DIR`), so the sync runs on its own

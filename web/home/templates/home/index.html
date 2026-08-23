@@ -1,9 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Amud Technologies — Radar de acreencias{% endblock %}
-{% block meta_description %}Amud Technologies cruza fuentes públicas colombianas para identificar acreencias líquidas: dinero con dueño, monto y fundamento legal.{% endblock %}
-
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/home.css' %}">
 {% endblock %}
@@ -14,16 +11,10 @@
   <div class="hero-glow"></div>
   <div class="wrap hero-inner">
     <div class="hero-copy">
-      <div class="eyebrow mono"><span class="dot"></span>RADAR DE ACREENCIAS — COLOMBIA</div>
-      <h1 class="serif">Hay <span class="accent-word">dinero</span> que ya<br>tiene dueño. Lo<br>encontramos primero.</h1>
-      <p class="lede">Rastreamos datos públicos para encontrar dinero y derechos económicos que su empresa podría estar dejando pasar.</p>
+      <div class="eyebrow mono"><span class="dot"></span>RADAR DE ACREENCIAS</div>
+      <h1 class="serif">Hay <span class="accent-word">dinero</span> que ya tiene dueño. Lo encontramos primero.</h1>
+      <p class="lede">Identificamos dinero, derechos económicos, oportunidades o activos que podrían corresponderle.</p>
       <div class="hero-search" id="buscar">{% include "home/_search_form.html" %}</div>
-      <div class="hero-radars">
-        <div class="hero-radars-label mono"><span class="dot"></span>RADARES ACTIVOS</div>
-        <div class="hero-radars-list">
-          <a href="{% url 'judicial_deposits:index' %}" class="radar-chip">Depósitos judiciales</a>
-        </div>
-      </div>
     </div>
     <div class="hero-graphic">
       <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Una red de registros con una coincidencia identificada resaltada">
@@ -46,9 +37,35 @@
 
         <circle class="pulse-ring" cx="230" cy="150" r="14" fill="none" stroke="#CCCC4B" stroke-width="2"/>
         <circle cx="230" cy="150" r="11" fill="#CCCC4B"/>
-        <path d="M225 150 L229 154 L237 145" stroke="#FAF6EF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M225 150 L229 154 L237 145" stroke="#1C1A17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       </svg>
     </div>
+  </div>
+</section>
+
+<section class="method">
+  <div class="wrap">
+    <div class="eyebrow mono"><span class="dot"></span>CÓMO FUNCIONA EL RADAR DE ACREENCIAS</div>
+    <p class="method-lede">Monitoreamos múltiples fuentes para identificar dinero, derechos económicos, oportunidades o activos que podrían corresponderle. Cada radar está diseñado para encontrar oportunidades diferentes y responder a necesidades específicas. Mostramos oportunidades sobre las que ya es posible actuar, cobrar o reclamar para que pueda conocerlas y aprovecharlas.</p>
+
+    <div class="radar-list">
+      <a href="{% url 'judicial_deposits:index' %}" class="radar-list-item">
+        <div class="radar-list-item-main">
+          <span class="radar-list-item-name">Depósitos judiciales</span>
+          <span class="results-status results-status--active"><span class="dot"></span>Activo</span>
+        </div>
+        <p class="radar-list-item-desc">Dinero constituido en procesos judiciales que prescribe a favor de la Nación si no se reclama dentro del plazo legal.</p>
+      </a>
+      <div class="radar-list-item radar-list-item--soon">
+        <div class="radar-list-item-main">
+          <span class="radar-list-item-name">Próximo radar</span>
+          <span class="results-status results-status--pending"><span class="dot"></span>En desarrollo</span>
+        </div>
+        <p class="radar-list-item-desc">Estamos construyendo nuevos radares sobre otras fuentes de posibles acreencias.</p>
+      </div>
+    </div>
+
+    <a href="{% url 'home:radares' %}" class="btn-link">Ver todos los radares &rarr;</a>
   </div>
 </section>
 
