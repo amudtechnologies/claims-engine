@@ -79,20 +79,25 @@
 
   <footer class="footer">
     <div class="wrap footer-inner">
-      <div class="wordmark">
-        <svg class="wordmark-mark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <circle cx="24" cy="24" r="15" fill="none" stroke="#1C1A17" stroke-width="2.8"/>
-          <circle cx="35" cy="15" r="7.5" fill="#FAF6EF"/>
-          <circle cx="35" cy="15" r="6" fill="#CCCC4B"/>
-        </svg>
-        <span class="wordmark-text"><span>amud</span><span>technologies</span></span>
+      <div class="footer-brand">
+        <div class="wordmark">
+          <svg class="wordmark-mark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="24" cy="24" r="15" fill="none" stroke="#1C1A17" stroke-width="2.8"/>
+            <circle cx="35" cy="15" r="7.5" fill="#FAF6EF"/>
+            <circle cx="35" cy="15" r="6" fill="#CCCC4B"/>
+          </svg>
+          <span class="wordmark-text"><span>amud</span><span>technologies</span></span>
+        </div>
+        {% if company_profile.description %}
+          <p class="footer-desc">{{ company_profile.description }}</p>
+        {% endif %}
       </div>
       <nav class="footer-links">
         <a href="{% url 'home:index' %}">Inicio</a>
         <a href="{% url 'home:radares' %}">Radares</a>
       </nav>
       <div class="footer-meta">
-        <span>info@amudtech.com</span>
+        <span>{{ company_profile.email }}</span>
       </div>
       <div class="footer-copy">© 2026 Amud Technologies</div>
     </div>
