@@ -20,6 +20,12 @@
     el.dataset.animated = "true";
     var decimals = parseInt(el.dataset.decimals, 10) || 0;
 
+    // Server-rendered content is the real value (so it's what a crawler or a
+    // no-JS visitor sees — see the SEO report this fixes). The count-up is a
+    // purely cosmetic enhancement, so only reset to zero once JS is actually
+    // about to animate it.
+    el.textContent = formatNumber(0, decimals);
+
     var start = null;
     function step(timestamp) {
       if (start === null) start = timestamp;

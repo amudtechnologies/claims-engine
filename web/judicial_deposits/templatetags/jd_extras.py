@@ -9,6 +9,17 @@ def cop(amount: int) -> str:
     return f"$ {amount:,}".replace(",", ".")
 
 
+@register.filter
+def es_co_number(value, decimals: int = 0) -> str:
+    """Formats a number the same way counter.js's `toLocaleString("es-CO", ...)`
+    does — "." as the thousands separator, "," as the decimal separator — so the
+    server-rendered stat (what a crawler or no-JS visitor sees) matches the
+    animated value counter.js counts up to, instead of the placeholder "0" the
+    animation used to start from (see the SEO report this fixes)."""
+    formatted = f"{float(value):,.{int(decimals)}f}"
+    return formatted.translate(str.maketrans(",.", ".,"))
+
+
 _DOCUMENT_TYPE_LABELS = {
     "legal_entity": "Persona jurídica",
     "natural_person": "Persona natural",

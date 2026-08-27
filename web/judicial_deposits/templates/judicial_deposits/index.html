@@ -59,9 +59,9 @@
       <div class="jd-stats-title">EL RADAR DE DEPÓSITOS JUDICIALES EN CIFRAS</div>
       <div class="hero-stats jd-stats">
         <div class="stat"><div class="stat-num mono">2017–{{ latest_year|default:"2026" }}</div><div class="stat-label">Historial de datos públicos</div></div>
-        <div class="stat"><div class="stat-num mono">{% if court_count %}<span class="js-counter" data-target="{{ court_count }}">0</span>{% else %}—{% endif %}</div><div class="stat-label">Despachos judiciales analizados</div></div>
-        <div class="stat"><div class="stat-num mono">{% if party_count_millions %}<span class="js-counter" data-target="{{ party_count_millions|stringformat:'.3f' }}" data-decimals="2">0</span>M+{% else %}—{% endif %}</div><div class="stat-label">Personas y empresas identificadas</div></div>
-        <div class="stat"><div class="stat-num mono">{% if total_amount_cop %}$ <span class="js-counter" data-target="{{ total_amount_cop }}">0</span>{% else %}—{% endif %}</div><div class="stat-label">Valor total de los depósitos encontrados a la fecha</div></div>
+        <div class="stat"><div class="stat-num mono">{% if court_count %}<span class="js-counter" data-target="{{ court_count }}">{{ court_count|es_co_number }}</span>{% else %}—{% endif %}</div><div class="stat-label">Despachos judiciales analizados</div></div>
+        <div class="stat"><div class="stat-num mono">{% if party_count_millions %}<span class="js-counter" data-target="{{ party_count_millions|stringformat:'.3f' }}" data-decimals="2">{{ party_count_millions|es_co_number:2 }}</span>M+{% else %}—{% endif %}</div><div class="stat-label">Personas y empresas identificadas</div></div>
+        <div class="stat"><div class="stat-num mono">{% if total_amount_cop %}$ <span class="js-counter" data-target="{{ total_amount_cop }}">{{ total_amount_cop|es_co_number }}</span>{% else %}—{% endif %}</div><div class="stat-label">Valor total de los depósitos encontrados a la fecha</div></div>
       </div>
     </div>
   </div>
@@ -70,7 +70,7 @@
 <section class="proof">
   <div class="wrap proof-inner">
     {% if observation_count %}
-      <div class="proof-num mono js-counter" data-target="{{ observation_count }}">0</div>
+      <div class="proof-num mono js-counter" data-target="{{ observation_count }}">{{ observation_count|es_co_number }}</div>
     {% else %}
       <div class="proof-num mono">—</div>
     {% endif %}
