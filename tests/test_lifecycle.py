@@ -1,3 +1,5 @@
+import json
+
 import duckdb
 
 from claims_engine.lifecycle import (
@@ -18,12 +20,15 @@ _COLUMNS = [
     "deposit_type",
     "amount_cop",
     "origin_date",
+    "case_number",
     "classification",
     "source_extra",
     "plaintiff_id",
     "plaintiff_id_type",
+    "plaintiff_name",
     "defendant_id",
     "defendant_id_type",
+    "defendant_name",
 ]
 
 
@@ -34,9 +39,10 @@ def _connect_with_dep(rows: list[dict]) -> duckdb.DuckDBPyConnection:
         CREATE TABLE dep (
             capture_id VARCHAR, sheet VARCHAR, source_row INTEGER, period VARCHAR,
             court_account VARCHAR, deposit_no VARCHAR, deposit_type VARCHAR,
-            amount_cop BIGINT, origin_date DATE, classification VARCHAR, source_extra VARCHAR,
-            plaintiff_id VARCHAR, plaintiff_id_type VARCHAR,
-            defendant_id VARCHAR, defendant_id_type VARCHAR
+            amount_cop BIGINT, origin_date DATE, case_number VARCHAR,
+            classification VARCHAR, source_extra VARCHAR,
+            plaintiff_id VARCHAR, plaintiff_id_type VARCHAR, plaintiff_name VARCHAR,
+            defendant_id VARCHAR, defendant_id_type VARCHAR, defendant_name VARCHAR
         )
         """
     )
@@ -146,6 +152,98 @@ def test_build_claim_parties_links_plaintiff_and_defendant():
     )
     claim_parties = build_claim_parties(con)
     assert set(claim_parties["procedural_role"].to_list()) == {"plaintiff", "defendant"}
+
+
+def test_build_claims_carries_case_number_from_most_recent_observation():
+    # case_number reaches staging but historically never reached core/claim
+    # (build_claims hardcoded it null) -- active-deposits is the first
+    # non-2017-1 source to actually populate it.
+    con = _connect_with_dep(
+        [
+            {
+                "period": "2026-08-30",
+                "court_account": "157592033001",
+                "deposit_no": "415160000319173",
+                "case_number": "15759318400120230004500",
+            }
+        ]
+    )
+    claims = build_claims(con)
+    assert claims.row(0, named=True)["case_number"] == "15759318400120230004500"
+
+
+def test_build_claims_case_number_null_when_source_never_states_it():
+    con = _connect_with_dep(
+        [{"period": "2020-1", "court_account": "058092044001", "deposit_no": "1"}]
+    )
+    claims = build_claims(con)
+    assert claims.row(0, named=True)["case_number"] is None
+
+
+def test_build_claim_parties_carries_source_declared_name_into_attributes():
+    con = _connect_with_dep(
+        [
+            {
+                "period": "2026-08-30",
+                "court_account": "157592033001",
+                "deposit_no": "1",
+                "plaintiff_id": "53154380",
+                "plaintiff_name": "Claudia Isabel Gomez Fuquene",
+            }
+        ]
+    )
+    claim_parties = build_claim_parties(con)
+    row = claim_parties.filter(claim_parties["procedural_role"] == "plaintiff").row(named=True)
+    assert json.loads(row["attributes"]) == {"name": "Claudia Isabel Gomez Fuquene"}
+
+
+def test_build_claim_parties_attributes_null_when_source_has_no_name():
+    con = _connect_with_dep(
+        [
+            {
+                "period": "2020-1",
+                "court_account": "058092044001",
+                "deposit_no": "1",
+                "plaintiff_id": "900123456",
+            }
+        ]
+    )
+    claim_parties = build_claim_parties(con)
+    assert claim_parties.row(0, named=True)["attributes"] is None
+
+
+def test_build_claim_parties_does_not_duplicate_row_when_name_added_later():
+    # Same claim/party/role seen in two observations (e.g. the same deposit
+    # later republished with a name filled in): must collapse to one
+    # claim_party row, using the most recent observation's name -- not one
+    # row per distinct (claim_id, party_id, role, name) combination, which
+    # would double-count the deposit wherever claim_party is joined back to
+    # claim.
+    con = _connect_with_dep(
+        [
+            {
+                "period": "2020-1",
+                "court_account": "058092044001",
+                "deposit_no": "1",
+                "plaintiff_id": "900123456",
+                "plaintiff_name": None,
+                "source_row": 0,
+            },
+            {
+                "period": "2020-2",
+                "court_account": "058092044001",
+                "deposit_no": "1",
+                "plaintiff_id": "900123456",
+                "plaintiff_name": "Empresa Real SAS",
+                "source_row": 0,
+            },
+        ]
+    )
+    claim_parties = build_claim_parties(con)
+    assert claim_parties.height == 1
+    assert json.loads(claim_parties.row(0, named=True)["attributes"]) == {
+        "name": "Empresa Real SAS"
+    }
 
 
 def test_measure_persistence_reports_overlap_between_consecutive_periods():

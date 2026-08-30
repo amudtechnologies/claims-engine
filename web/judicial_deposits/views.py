@@ -39,7 +39,10 @@ def index(request):
                     party_result.last_period
                 )
                 window = party_search.claim_window(party_result.last_period)
+                source = party_result.source_for_period(party_result.last_period)
                 context["party_last_active_period_window"] = window
-                context["party_last_active_period_status"] = party_search.claim_status(window)
+                context["party_last_active_period_status"] = party_search.claim_status(
+                    window, source
+                )
                 context["party_is_current_publication"] = party_result.last_period == latest_period
     return render(request, "judicial_deposits/index.html", context)

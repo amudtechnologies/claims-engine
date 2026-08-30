@@ -8,7 +8,11 @@ on:
         required: true
         default: "amud-technologies"
       prefix:
-        description: "S3 prefix to normalize (every raw file under it)"
+        description: >-
+          S3 prefix to normalize (every raw file under it). Default is the
+          semiannual expiring-deposits radar; override for an irregular
+          active-deposits batch, e.g.
+          raw/judicial-branch/active-deposits/2026-08-30/
         required: true
         default: "raw/judicial-branch/expiring-deposits/"
       staging_prefix:

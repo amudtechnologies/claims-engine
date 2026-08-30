@@ -35,6 +35,8 @@
     <div class="wrap">
       {% if result.party_name %}
         <h1 class="serif">Resultados para {{ result.party_name }}</h1>
+      {% elif result.source_declared_name %}
+        <h1 class="serif">Resultados para {{ result.source_declared_name }}</h1>
       {% else %}
         <h1 class="serif">Resultados de la búsqueda</h1>
       {% endif %}
@@ -42,7 +44,9 @@
         {{ result.document_type|document_number_label }} {{ result.document_number }}{% if result.document_type %} · {{ result.document_type|document_type_label }}{% endif %}{% if result.rues_active is not None %} · {% if result.rues_active %}Activo en RUES{% else %}Inactivo en RUES{% endif %}{% endif %}
         <br>Búsqueda realizada el {{ searched_at|date:"j \d\e F \d\e Y" }}
       </p>
-      {% if not result.party_name %}
+      {% if not result.party_name and result.source_declared_name %}
+        <p class="results-privacy-note">Este nombre proviene del registro judicial que reportó el depósito. Todavía no lo verificamos contra el RUES.</p>
+      {% elif not result.party_name %}
         <p class="results-privacy-note">Este número aparece en nuestros registros. Todavía no verificamos el nombre asociado. Eso no significa que el resultado sea incorrecto, solo que la verificación está en curso.</p>
       {% endif %}
       {% if result.document_type == "natural_person" %}
@@ -76,7 +80,8 @@
                 <span class="results-table-status-cell">
                   <span class="results-status results-status--active"><span class="dot"></span>Activo</span>
                   {% if claim_status == "reclamable" %}<span class="jd-tag jd-tag--open">Reclamable</span>
-                  {% elif claim_status == "no_reclamable" %}<span class="jd-tag jd-tag--closed">No reclamable</span>{% endif %}
+                  {% elif claim_status == "no_reclamable" %}<span class="jd-tag jd-tag--closed">No reclamable</span>
+                  {% elif claim_status == "activo" %}<span class="jd-tag jd-tag--pending">Vigente</span>{% endif %}
                 </span>
               </td>
             </tr>

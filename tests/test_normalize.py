@@ -5,7 +5,9 @@ import polars as pl
 import xlsxwriter
 from moto import mock_aws
 
+from claims_engine.column_mapping import SheetMapping
 from claims_engine.normalize import (
+    _build_row,
     _stringify_datetime_columns,
     capture_id_for_key,
     normalize_file,
@@ -51,6 +53,13 @@ def upload(client, local_path: Path, key: str) -> None:
 def test_period_from_key():
     key = "raw/judicial-branch/expiring-deposits/2026-1/deposits.xlsx"
     assert period_from_key(key) == "2026-1"
+
+
+def test_period_from_key_accepts_iso_batch_date():
+    # Active-deposits' irregular cadence uses an as-of/capture date as its
+    # "period" instead of a semester (docs/project-context.md §4).
+    key = "raw/judicial-branch/active-deposits/2026-08-30/sogamoso-familia.xlsx"
+    assert period_from_key(key) == "2026-08-30"
 
 
 def test_capture_id_is_deterministic():
@@ -153,6 +162,38 @@ def test_normalize_file_unknown_sheet_rejects_wholesale(tmp_path: Path):
     assert result.rows_ok == 0
     assert result.rows_rejected == result.rows_read == 1
     assert "no column mapping" in result.reject_rows[0]["reason"]
+
+
+def test_build_row_combines_split_name_columns():
+    # Active-deposits splits a party's name across NOMBRES/APELLIDOS instead
+    # of one whole-name column -- `combine` joins them into the single
+    # canonical plaintiff_name/defendant_name field every other period fills
+    # directly via column_map.
+    mapping = SheetMapping(
+        period="2026-08-30",
+        sheet="Hoja2",
+        column_map={"No. Depósito": "deposit_no"},
+        combine={"plaintiff_name": ["NOMBRES", "APELLIDOS"]},
+    )
+    raw_row = {"No. Depósito": 1, "NOMBRES": "Juan Carlos", "APELLIDOS": "Perez Gomez"}
+
+    row = _build_row(raw_row, mapping, "cap-1", "2026-08-30", "Hoja2", 0)
+
+    assert row["plaintiff_name"] == "Juan Carlos Perez Gomez"
+
+
+def test_build_row_combine_with_no_parts_present_is_null_not_empty_string():
+    mapping = SheetMapping(
+        period="2026-08-30",
+        sheet="Hoja2",
+        column_map={"No. Depósito": "deposit_no"},
+        combine={"plaintiff_name": ["NOMBRES", "APELLIDOS"]},
+    )
+    raw_row = {"No. Depósito": 1, "NOMBRES": None, "APELLIDOS": None}
+
+    row = _build_row(raw_row, mapping, "cap-1", "2026-08-30", "Hoja2", 0)
+
+    assert row["plaintiff_name"] is None
 
 
 def test_stringify_datetime_columns_survives_out_of_range_year():

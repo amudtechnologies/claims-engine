@@ -22,8 +22,28 @@ import polars as pl
 from claims_engine import capture as capture_module
 from claims_engine.normalize import period_from_key
 
-SOURCE = "judicial_deposits"
+# Two radars share this one raw/judicial-branch/ tree today (see
+# docs/project-context.md's active-deposits design): the semiannual
+# CSJ-published "eviction notice" and the irregular, per-despacho
+# active-deposits extracts. `file.source` is what lets the web layer tell
+# them apart -- e.g. never looking up a `ClaimWindow` for an active-deposits
+# claim, since it was never part of a 20-business-day-countdown publication
+# in the first place.
+SOURCE_EXPIRING_DEPOSITS = "judicial_deposits"
+SOURCE_ACTIVE_DEPOSITS = "judicial_deposits_active"
 BACKFILL_CODE_VERSION = "backfill"
+
+
+def source_for_key(key: str) -> str:
+    """Classifies a raw key by which raw/ subtree it lives under. A new
+    radar sharing this raw/judicial-branch/ tree adds one more branch here,
+    same as column_mapping.py grows by one more pinned entry per file --
+    this is the adapter, core stays untouched."""
+    if "/active-deposits/" in key:
+        return SOURCE_ACTIVE_DEPOSITS
+    if "/expiring-deposits/" in key:
+        return SOURCE_EXPIRING_DEPOSITS
+    raise ValueError(f"Cannot determine source for key: {key!r}")
 
 # Bare pl.Datetime (no explicit time_zone) silently strips tzinfo from the
 # tz-aware datetimes fed in below (S3's LastModified, datetime.now(UTC)) --
@@ -74,7 +94,7 @@ def build_files(bucket: str, keys_with_last_modified: list[tuple[str, datetime]]
         rows.append(
             {
                 "file_id": file_id(key),
-                "source": SOURCE,
+                "source": source_for_key(key),
                 "period": period_from_key(key),
                 "uri": f"s3://{bucket}/{key}",
                 "content_hash": content_hash,

@@ -45,6 +45,24 @@ deliberately excluded.
 uv sync
 ```
 
+### Local AWS credentials
+
+Pipeline commands call `boto3.client("s3")` with no explicit profile, so they
+rely on whichever profile resolves as default. If your `~/.aws/credentials`
+has multiple profiles (e.g. an MFA/role-assumption setup for other AWS
+accounts under `[default]`), point this project at the `amud-technologies`
+profile without touching your global shell config:
+
+```bash
+echo "AWS_PROFILE=amud-technologies" > .env   # already gitignored
+uv run --env-file .env claims-engine <command> ...
+```
+
+`uv run` doesn't read `.env` automatically — `--env-file .env` (or an
+`AWS_PROFILE=amud-technologies` export scoped to your session) is required
+each time. `pytest`/`ruff` need no AWS access at all (S3 is mocked via
+`moto` in the test suite).
+
 ## Commands
 
 ```bash
@@ -67,7 +85,10 @@ All commands are exposed under the `claims-engine` entry point
 | `enrich-parties` | Phase 5 — queries RUES for not-yet-enriched parties of any document type (D26 — no `legal_entity` pre-filter), writes a dated batch to `core/enrichment/`. RUES's own `Categoria` field is the source of `document_type` |
 
 Run `claims-engine <command> --help` for arguments; every command takes the
-S3 bucket as its first argument.
+S3 bucket as its first argument. `normalize-s3-prefix`/`build-lineage` also
+take an explicit S3 prefix — default is the semiannual expiring-deposits
+radar; pass e.g. `raw/judicial-branch/active-deposits/2026-08-30/` for an
+irregular active-deposits batch (see `docs/project-context.md`).
 
 ## Non-negotiable rules
 

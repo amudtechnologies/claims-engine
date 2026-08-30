@@ -9,7 +9,14 @@ from test_normalize import write_fixture as write_normalize_fixture
 from typer.testing import CliRunner
 
 from claims_engine.cli import app
-from claims_engine.lineage import build_captures, build_files, file_id
+from claims_engine.lineage import (
+    SOURCE_ACTIVE_DEPOSITS,
+    SOURCE_EXPIRING_DEPOSITS,
+    build_captures,
+    build_files,
+    file_id,
+    source_for_key,
+)
 
 runner = CliRunner()
 BUCKET = "amud-technologies"
@@ -24,6 +31,26 @@ def _connect_with_dep_rej(dep_rows: list[dict], rej_rows: list[dict]) -> duckdb.
     for row in rej_rows:
         con.execute("INSERT INTO rej VALUES ($key, $reason)", row)
     return con
+
+
+def test_source_for_key_distinguishes_the_two_radars_sharing_raw_judicial_branch():
+    assert (
+        source_for_key("raw/judicial-branch/expiring-deposits/2026-1/deposits.xlsx")
+        == SOURCE_EXPIRING_DEPOSITS
+    )
+    assert (
+        source_for_key("raw/judicial-branch/active-deposits/2026-08-30/sogamoso-familia.xlsx")
+        == SOURCE_ACTIVE_DEPOSITS
+    )
+
+
+def test_source_for_key_raises_for_an_unrecognized_subtree():
+    try:
+        source_for_key("raw/some-other-source/file.xlsx")
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("expected ValueError for an unrecognized raw subtree")
 
 
 def test_file_id_is_deterministic():
@@ -55,6 +82,24 @@ def test_build_files_computes_real_content_hash(tmp_path: Path):
     # naive on the way out -- polars/pandera store datetimes without tzinfo
     # (see lineage._FILE_SCHEMA); the instant is still the same UTC moment.
     assert row["detected_at"] == last_modified.replace(tzinfo=None)
+
+
+@mock_aws
+def test_build_files_tags_active_deposits_source(tmp_path: Path):
+    local_path = tmp_path / "sogamoso-familia.xlsx"
+    local_path.write_bytes(b"some fake xlsx bytes")
+
+    client = boto3.client("s3", region_name="us-east-1")
+    client.create_bucket(Bucket=BUCKET)
+    key = "raw/judicial-branch/active-deposits/2026-08-30/sogamoso-familia.xlsx"
+    client.upload_file(str(local_path), BUCKET, key)
+
+    df = build_files(BUCKET, [(key, datetime(2026, 8, 30, tzinfo=UTC))])
+
+    assert df.height == 1
+    row = df.row(0, named=True)
+    assert row["source"] == SOURCE_ACTIVE_DEPOSITS
+    assert row["period"] == "2026-08-30"
 
 
 def test_build_captures_counts_ok_and_rejected_rows():

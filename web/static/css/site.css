@@ -332,6 +332,7 @@ a.radar-list-item:hover::after {
 .jd-tag { display: inline-flex; align-items: center; flex: none; padding: 3px 10px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.02em; text-transform: none; border-radius: 999px; }
 .jd-tag--open { color: var(--ink); background: var(--accent-deep); }
 .jd-tag--closed { color: var(--ink-softer); background: var(--hair); }
+.jd-tag--pending { color: var(--ink-soft); background: transparent; border: 1px solid var(--hair-strong); }
 
 /* FACT STRIP (shared: home methodology strip + radar page legal terms) */
 .fact-strip { display: flex; flex-wrap: wrap; margin: 0 0 24px 0; padding: 0 22px; background: var(--surface); border: 1px solid var(--hair); border-radius: 10px; }

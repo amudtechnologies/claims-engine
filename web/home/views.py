@@ -109,6 +109,7 @@ def results(request):
         context["result"] = result
         if result and result.last_period:
             window = party_search.claim_window(result.last_period)
-            context["claim_status"] = party_search.claim_status(window)
+            source = result.source_for_period(result.last_period)
+            context["claim_status"] = party_search.claim_status(window, source)
 
     return render(request, "home/results.html", context)

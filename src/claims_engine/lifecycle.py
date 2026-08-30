@@ -60,7 +60,8 @@ def _claim_rows(con: duckdb.DuckDBPyConnection) -> pl.DataFrame:
         con.execute(
             """
             SELECT capture_id, sheet, source_row, period, court_account, deposit_no,
-                   deposit_type, amount_cop, origin_date, classification, source_extra
+                   deposit_type, amount_cop, origin_date, case_number, classification,
+                   source_extra
             FROM dep
             WHERE period <> '2017-1' AND deposit_no IS NOT NULL
             """
@@ -72,10 +73,13 @@ def _claim_rows(con: duckdb.DuckDBPyConnection) -> pl.DataFrame:
 def build_claims(con: duckdb.DuckDBPyConnection) -> pl.DataFrame:
     """One row per real deposit (best current knowledge), deduplicated
     across every period it was published in. amount_cop/origin_date/
-    deposit_type are the most recent observation's values — genuinely
-    conflicting observations of the same claim (rare, see the phase-4 plan)
-    aren't reconciled here; they stay fully recoverable via
-    observation -> capture -> file lineage."""
+    deposit_type/case_number are the most recent observation's values —
+    genuinely conflicting observations of the same claim (rare, see the
+    phase-4 plan) aren't reconciled here; they stay fully recoverable via
+    observation -> capture -> file lineage. case_number is null for every
+    period except the ones that actually carry it in staging (2017-1 is
+    excluded above regardless; the active-deposits radar is the first
+    non-excluded source to populate it)."""
     rows = _claim_rows(con)
     latest = rows.sort(["period", "source_row"], descending=[True, True]).unique(
         subset=["claim_id"], keep="first"
@@ -97,7 +101,6 @@ def build_claims(con: duckdb.DuckDBPyConnection) -> pl.DataFrame:
             return_dtype=pl.Utf8,
         )
         .alias("attributes"),
-        pl.lit(None, dtype=pl.Utf8).alias("case_number"),
         pl.lit(None, dtype=pl.Utf8).alias("legal_basis"),
         pl.lit(None, dtype=pl.Utf8).alias("claim_route"),
         pl.lit("judicial_deposit", dtype=pl.Utf8).alias("type"),
@@ -132,18 +135,32 @@ def build_claim_parties(con: duckdb.DuckDBPyConnection) -> pl.DataFrame:
     Party lookup reuses identity.resolve_document_numbers so a legal-entity
     ID's check-digit-stripped canonical form matches core.party exactly the
     way Phase 3 built it, instead of a second classification pass that could
-    silently diverge from it."""
+    silently diverge from it.
+
+    `attributes` carries the source-declared party name when the source
+    gives one (project-context.md §6: provenance, not a lookup — never
+    written through `enrichment`). Most periods have no name in staging at
+    all (null in, null out); when a claim has names from more than one
+    observation (e.g. the same deposit later republished with a name filled
+    in, or once seen from two different radars), the most recent observation
+    wins, same tie-break as build_claims — otherwise a stale/null name from
+    an older observation could survive a `.unique()` alongside a fresher one
+    and silently double the claim_party row for that (claim_id, party_id,
+    procedural_role), which would double-count the deposit wherever this
+    bridge is joined back to claim."""
     resolved = resolve_document_numbers(con).select(["document_number_raw", "party_id"])
 
     parties = to_polars(
         con.execute(
             """
-            SELECT court_account, deposit_no, plaintiff_id AS document_number_raw,
-                   'plaintiff' AS procedural_role
+            SELECT court_account, deposit_no, period, source_row,
+                   plaintiff_id AS document_number_raw, 'plaintiff' AS procedural_role,
+                   plaintiff_name AS source_name
             FROM dep
             WHERE period <> '2017-1' AND deposit_no IS NOT NULL AND plaintiff_id IS NOT NULL
             UNION ALL
-            SELECT court_account, deposit_no, defendant_id, 'defendant'
+            SELECT court_account, deposit_no, period, source_row,
+                   defendant_id, 'defendant', defendant_name
             FROM dep
             WHERE period <> '2017-1' AND deposit_no IS NOT NULL AND defendant_id IS NOT NULL
             """
@@ -151,11 +168,16 @@ def build_claim_parties(con: duckdb.DuckDBPyConnection) -> pl.DataFrame:
     )
     parties = _with_claim_id(parties)
     joined = parties.join(resolved, on="document_number_raw", how="inner")
-    return (
-        joined.select(["claim_id", "party_id", "procedural_role"])
-        .unique()
-        .with_columns(pl.lit(None, dtype=pl.Utf8).alias("attributes"))
+    latest = joined.sort(["period", "source_row"], descending=[True, True]).unique(
+        subset=["claim_id", "party_id", "procedural_role"], keep="first"
     )
+    return latest.select(["claim_id", "party_id", "procedural_role", "source_name"]).with_columns(
+        pl.col("source_name")
+        .map_elements(
+            lambda name: json.dumps({"name": name}) if name else None, return_dtype=pl.Utf8
+        )
+        .alias("attributes")
+    ).drop("source_name")
 
 
 def measure_persistence(con: duckdb.DuckDBPyConnection) -> pl.DataFrame:

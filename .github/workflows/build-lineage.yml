@@ -8,9 +8,14 @@ on:
         required: true
         default: "amud-technologies"
       raw_prefix:
-        description: "S3 prefix to list raw files under"
+        description: >-
+          S3 prefix to list raw files under. Default is the shared parent
+          covering both radars under raw/judicial-branch/ (expiring-deposits/
+          and active-deposits/) in one pass, since core/file and core/capture
+          are a full rebuilt-in-place snapshot -- narrow this only if you
+          intend to rebuild lineage for one radar alone.
         required: true
-        default: "raw/judicial-branch/expiring-deposits/"
+        default: "raw/judicial-branch/"
       staging_prefix:
         description: "S3 prefix staging Parquet was written under"
         required: true

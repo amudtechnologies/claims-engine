@@ -15,12 +15,15 @@ falling through.
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from datetime import date
 from typing import Literal
 
 import duckdb
 from django.utils import timezone
+
+from claims_engine.lineage import SOURCE_ACTIVE_DEPOSITS
 
 from . import core_cache
 from .models import ClaimWindow
@@ -37,6 +40,8 @@ class Deposit:
     constituted_on: date
     procedural_role: ProceduralRole
     period: str | None
+    source: str | None
+    source_declared_name: str | None
 
 
 @dataclass(frozen=True)
@@ -87,6 +92,30 @@ class PartySearchResult:
     def defendant_amount_cop(self) -> int:
         return sum(deposit.amount_cop for deposit in self._by_role("defendant"))
 
+    @property
+    def source_declared_name(self) -> str | None:
+        """A name the source itself stated for this party (project-context.md
+        §6: `claim_party.attributes`, provenance is the file, not a lookup) —
+        distinct from `party_name`, which only ever comes from a RUES
+        enrichment and must never be conflated with this: a source-declared
+        name is not "verified" the way a RUES match is. Picks the most
+        recent period among deposits that actually carry one — a party can
+        have claims from several deposits/periods, only some of which state
+        a name."""
+        named = [d for d in self.deposits if d.source_declared_name and d.period]
+        if not named:
+            return None
+        return max(named, key=lambda d: d.period).source_declared_name
+
+    def source_for_period(self, period: str) -> str | None:
+        """The radar a period's deposits came from — a period is never mixed
+        across radars (a semester label vs. an active-deposits batch date
+        can't collide), so the first match's source speaks for the period."""
+        for deposit in self.deposits:
+            if deposit.period == period:
+                return deposit.source
+        return None
+
     def for_period(self, period: str) -> PartySearchResult | None:
         """The same result restricted to one publication period. `None` when
         the party has no deposits in that period — distinct from no match at
@@ -112,9 +141,16 @@ def claim_window(period: str | None) -> ClaimWindow | None:
     return ClaimWindow.objects.filter(period=period).first()
 
 
-def claim_status(window: ClaimWindow | None) -> str | None:
-    """"reclamable" / "no_reclamable" for a configured claim window, or None
-    when no window has been configured for the period."""
+def claim_status(window: ClaimWindow | None, source: str | None = None) -> str | None:
+    """"activo" for a deposit from the active-deposits radar — it was never
+    part of a 20-business-day-countdown publication, so it's never checked
+    against a `ClaimWindow` at all (a data-entry lag on a real expiring
+    period must stay distinguishable from this — see the module docstring
+    above `claim_window`). Otherwise "reclamable" / "no_reclamable" for a
+    configured claim window, or None when no window has been configured yet
+    for that period."""
+    if source == SOURCE_ACTIVE_DEPOSITS:
+        return "activo"
     if not window:
         return None
     return "reclamable" if timezone.localdate() <= window.closes_on else "no_reclamable"
@@ -233,18 +269,25 @@ def _fetch_deposits(con: duckdb.DuckDBPyConnection, party_id: str) -> list[Depos
     rows = con.execute(
         f"""
         WITH party_claims AS (
-            SELECT cp.claim_id, cp.procedural_role, c.court_id, c.amount_cop, c.origin_date
+            SELECT cp.claim_id, cp.procedural_role, cp.attributes, c.court_id,
+                   c.amount_cop, c.origin_date
             FROM read_parquet('{core_cache.table_path('claim_party')}') cp
             JOIN read_parquet('{core_cache.table_path('claim')}') c USING (claim_id)
             WHERE cp.party_id = ?
         ),
         claim_periods AS (
-            SELECT o.claim_id, MAX(f.period) AS period
+            -- A claim can carry observations from both radars (e.g. an
+            -- active deposit later published as expiring) -- picks the
+            -- (period, source) pair belonging to the single latest
+            -- observation, not an independent MAX(period) next to an
+            -- arbitrary source, which could pair a claim's newest period
+            -- with a stale source.
+            SELECT o.claim_id, f.period, f.source
             FROM read_parquet('{core_cache.table_path('observation')}') o
             JOIN read_parquet('{core_cache.table_path('capture')}') cap USING (capture_id)
             JOIN read_parquet('{core_cache.table_path('file')}') f USING (file_id)
             WHERE o.claim_id IN (SELECT claim_id FROM party_claims)
-            GROUP BY o.claim_id
+            QUALIFY ROW_NUMBER() OVER (PARTITION BY o.claim_id ORDER BY f.period DESC) = 1
         ),
         court_names AS (
             SELECT court_id, name
@@ -257,7 +300,9 @@ def _fetch_deposits(con: duckdb.DuckDBPyConnection, party_id: str) -> list[Depos
             party_claims.amount_cop,
             party_claims.origin_date,
             party_claims.procedural_role,
-            claim_periods.period
+            claim_periods.period,
+            claim_periods.source,
+            party_claims.attributes
         FROM party_claims
         LEFT JOIN claim_periods USING (claim_id)
         LEFT JOIN court_names USING (court_id)
@@ -272,8 +317,19 @@ def _fetch_deposits(con: duckdb.DuckDBPyConnection, party_id: str) -> list[Depos
             constituted_on=origin_date,
             procedural_role=procedural_role,
             period=period,
+            source=source,
+            source_declared_name=json.loads(attributes)["name"] if attributes else None,
         )
-        for claim_id, court_office, amount_cop, origin_date, procedural_role, period in rows
+        for (
+            claim_id,
+            court_office,
+            amount_cop,
+            origin_date,
+            procedural_role,
+            period,
+            source,
+            attributes,
+        ) in rows
     ]
 
 

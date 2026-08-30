@@ -1,6 +1,7 @@
 import duckdb
 import polars as pl
 
+from claims_engine.contracts import CourtSchema
 from claims_engine.identity import (
     apply_rues_classification,
     build_courts_and_names,
@@ -152,6 +153,30 @@ def test_build_courts_and_names_pads_and_dedupes_valid_accounts():
     first_row = names_for_court.row(0, named=True)
     assert first_row["first_period"] == "2020-1"
     assert first_row["last_period"] == "2021-1"
+
+
+def test_build_courts_and_names_validates_when_a_court_never_states_seccional():
+    # A single-despacho source (e.g. active-deposits' per-court extracts)
+    # can leave seccional/department/judicial_district null for every one of
+    # its rows -- that court's own mode() aggregate is then null too. Real
+    # failure mode this reproduces: to_polars used to infer that all-NULL
+    # column's dtype from its (nonexistent) non-null values, landing on
+    # polars' `Null` dtype instead of String, which CourtSchema.validate
+    # (run for real in cli.py's build-identity) rejects outright.
+    con = _connect_with_dep(
+        [
+            {
+                "court_account": "157592033001",
+                "court_name": "Juzgado 1 Familia",
+                "city": "Sogamoso",
+                "department": "Boyaca",
+                "period": "2026-08-30",
+            }
+        ]
+    )
+    courts, _ = build_courts_and_names(con)
+    validated = CourtSchema.validate(courts)
+    assert validated.row(0, named=True)["seccional"] is None
 
 
 def test_build_courts_and_names_excludes_corrupted_and_null_accounts():

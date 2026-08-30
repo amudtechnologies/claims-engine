@@ -13,6 +13,11 @@ class SheetMapping(BaseModel):
     period: str
     sheet: str
     column_map: dict[str, str]
+    # Canonical field -> ordered source columns to join with a space, for
+    # sources that split a name into separate given-name/surname columns
+    # (e.g. active-deposits' NOMBRES/APELLIDOS) instead of one whole-name
+    # column. Applied after column_map, never overlapping with it.
+    combine: dict[str, list[str]] = {}
     skip_reason: str | None = None
 
 
@@ -326,6 +331,38 @@ SHEET_MAPPINGS: list[SheetMapping] = [
             'Seccional': 'seccional',
             'Departamento': 'department',
             'Ciudad': 'city',
+        },
+    ),
+    # Active-deposits radar (docs/project-context.md — "irregular cadence" is
+    # this radar's own defining trait, so `period` here is the batch's as-of
+    # date, not a semester). Per-despacho extract, richer than the semiannual
+    # file: real case_number, and full plaintiff/defendant names split across
+    # NOMBRES/APELLIDOS columns (combined below) plus a source-declared
+    # identification-type label (CEDULA DE CIUDADANIA, etc.) -- a procedural
+    # fact about the ID's kind, never RUES's Categoria (D26): party.document_type
+    # is still RUES-sourced only, this just lands in plaintiff_id_type/
+    # defendant_id_type, the same field 2023-2's source-declared labels use.
+    SheetMapping(
+        period='2026-08-30',
+        sheet='Hoja2',
+        column_map={
+            'No. Depósito': 'deposit_no',
+            'Despacho Judicial': 'court_name',
+            'Cuenta Judicial': 'court_account',
+            'NÚMERO PROCESO': 'case_number',
+            'Fecha Constitución': 'origin_date',
+            'Valor': 'amount_cop',
+            'TIPO IDENTIFICACIÓN DEMANDANTE': 'plaintiff_id_type',
+            'NÚMERO IDENTIFICACIÓN DEMANDANTE': 'plaintiff_id',
+            'TIPO IDENTIFICACIÓN DEMANDADO': 'defendant_id_type',
+            'NÚMERO IDENTIFICACIÓN DEMANDADO': 'defendant_id',
+            'Departamento': 'department',
+            'Ciudad': 'city',
+            'Seccional': 'seccional',
+        },
+        combine={
+            'plaintiff_name': ['NOMBRES DEMANDANTE', 'APELLIDOS DEMANDANTE'],
+            'defendant_name': ['NOMBRES DEMANDADO', 'APELLIDOS DEMANDADO'],
         },
     ),
 ]

@@ -47,7 +47,12 @@ CURRENCY_FIELDS = {"amount_cop"}
 DATE_FIELDS = {"origin_date", "case_action_date"}
 ID_FIELDS = {"deposit_no", "plaintiff_id", "defendant_id"}
 
-_PERIOD_RE = re.compile(r"/(\d{4}-\d)/")
+# Matches a semester label (YYYY-N, the historical expiring-deposits shape)
+# as well as an ISO batch date (YYYY-MM-DD) or year-month, for irregular-cadence
+# sources like active-deposits where "period" is just an as-of/capture date,
+# not a semester (see docs/project-context.md §4: period is an attribute of
+# the file, never required to be a semester).
+_PERIOD_RE = re.compile(r"/(\d{4}-\d{1,2}(?:-\d{2})?)/")
 
 
 class RowRejected(Exception):
@@ -121,6 +126,9 @@ def _build_row(
     values: dict[str, object] = {}
     for source_col, canon in mapping.column_map.items():
         values[canon] = raw_row.get(source_col)
+    for canon, source_cols in mapping.combine.items():
+        parts = [str(raw_row[c]).strip() for c in source_cols if raw_row.get(c) not in (None, "")]
+        values[canon] = " ".join(parts) if parts else None
 
     out: dict = {
         "capture_id": capture_id,

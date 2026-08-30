@@ -25,13 +25,17 @@
       <div class="eyebrow mono"><span class="dot"></span>RESULTADO PARA ESTA BÚSQUEDA</div>
       {% if party_result.party_name %}
         <h2 class="jd-party-name serif">{{ party_result.party_name }}</h2>
+      {% elif party_result.source_declared_name %}
+        <h2 class="jd-party-name serif">{{ party_result.source_declared_name }}</h2>
       {% else %}
         <h2 class="jd-party-name serif">Resultados de la búsqueda</h2>
       {% endif %}
       <p class="jd-party-meta">
         {{ party_result.document_type|document_number_label }} {{ party_result.document_number }}{% if party_result.document_type %} · {{ party_result.document_type|document_type_label }}{% endif %}{% if party_result.rues_active is not None %} · {% if party_result.rues_active %}Activo en RUES{% else %}Inactivo en RUES{% endif %}{% endif %}
       </p>
-      {% if not party_result.party_name %}
+      {% if not party_result.party_name and party_result.source_declared_name %}
+        <p class="jd-party-note">Este nombre proviene del registro judicial que reportó el depósito. Todavía no lo verificamos contra el RUES.</p>
+      {% elif not party_result.party_name %}
         <p class="jd-party-note">Este número aparece en nuestros registros. Todavía no verificamos el nombre asociado. Eso no significa que el resultado sea incorrecto, solo que la verificación está en curso.</p>
       {% endif %}
       {% if party_result.document_type == "natural_person" %}

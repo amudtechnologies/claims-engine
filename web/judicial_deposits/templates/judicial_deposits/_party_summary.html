@@ -4,6 +4,7 @@
     {{ title }}
     {% if status == "reclamable" %}<span class="jd-tag jd-tag--open">Reclamable</span>
     {% elif status == "no_reclamable" %}<span class="jd-tag jd-tag--closed">No reclamable</span>
+    {% elif status == "activo" %}<span class="jd-tag jd-tag--pending">Vigente</span>
     {% endif %}
   </div>
 
