@@ -129,6 +129,33 @@ def test_parties_to_enrich_does_not_retry_a_legacy_answered_row():
     assert targets.height == 0
 
 
+def test_parties_to_enrich_restricts_to_given_party_ids():
+    # e.g. a --period or --document-number scoped run (cli.py) -- narrows
+    # the pool without bypassing the not-yet-enriched filter: p3 is excluded
+    # by the party_ids restriction, p2 by already being enriched.
+    con = _connect(
+        [
+            {"party_id": "p1", "document_number": "900111111", "document_type": None},
+            {"party_id": "p2", "document_number": "900222222", "document_type": None},
+            {"party_id": "p3", "document_number": "900333333", "document_type": None},
+        ],
+        enrichment_rows=[
+            {
+                "party_id": "p2",
+                "source": "RUES",
+                "queried_at": "2026-01-01 00:00:00",
+                "result": "{}",
+                "name": None,
+                "active": None,
+                "attributes": None,
+                "status": "not_found",
+            }
+        ],
+    )
+    targets = parties_to_enrich(con, limit=10, party_ids=["p1", "p2"])
+    assert set(targets["party_id"].to_list()) == {"p1"}
+
+
 def test_parties_to_enrich_respects_limit():
     con = _connect(
         [

@@ -9,6 +9,7 @@ dist/
 web/db.sqlite3
 web/staticfiles/
 web/var/
+exports/
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*

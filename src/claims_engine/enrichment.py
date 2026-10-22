@@ -84,7 +84,9 @@ def _classify_from_categoria(categoria: str | None) -> tuple[str | None, float |
     return None, None, "rues_categoria_unrecognized"
 
 
-def parties_to_enrich(con: duckdb.DuckDBPyConnection, limit: int) -> pl.DataFrame:
+def parties_to_enrich(
+    con: duckdb.DuckDBPyConnection, limit: int, party_ids: list[str] | None = None
+) -> pl.DataFrame:
     """Every party from the `party` view with no completed RUES attempt yet
     recorded in the `enrichment` view (status 'found' or 'not_found' -- a
     real answer from RUES). No document_type filter (D26): a party whose
@@ -103,6 +105,12 @@ def parties_to_enrich(con: duckdb.DuckDBPyConnection, limit: int) -> pl.DataFram
     (`{"error": "<reason>"}`) never does. That's enough to tell a legacy
     answered row apart from a legacy error row without guessing.
 
+    `party_ids`, if given, restricts the candidate pool to exactly those
+    parties (e.g. one period's parties, or a hand-picked few) on top of the
+    usual not-yet-enriched filter -- it never bypasses D21's "already
+    answered is a valid permanent state", it only narrows which unanswered
+    parties this run bothers with.
+
     Both views must already be registered by the caller (see cli.py's
     enrich-parties command)."""
     return to_polars(
@@ -110,7 +118,8 @@ def parties_to_enrich(con: duckdb.DuckDBPyConnection, limit: int) -> pl.DataFram
             """
             SELECT p.party_id, p.document_number
             FROM party p
-            WHERE NOT EXISTS (
+            WHERE (? IS NULL OR p.party_id = ANY(?))
+              AND NOT EXISTS (
                 SELECT 1 FROM enrichment e
                 WHERE e.party_id = p.party_id AND e.source = ?
                   AND (
@@ -121,7 +130,7 @@ def parties_to_enrich(con: duckdb.DuckDBPyConnection, limit: int) -> pl.DataFram
             ORDER BY p.party_id
             LIMIT ?
             """,
-            [SOURCE, limit],
+            [party_ids, party_ids, SOURCE, limit],
         )
     )
 
@@ -217,6 +226,7 @@ def enrich_parties(
     client: httpx.Client,
     limit: int,
     delay_seconds: float,
+    party_ids: list[str] | None = None,
     progress_every: int = 100,
     on_progress: Callable[[int, int], None] | None = None,
 ) -> pl.DataFrame:
@@ -245,7 +255,7 @@ def enrich_parties(
     of 1000 at delay_seconds=3 takes ~50+ minutes end to end, so a caller
     (the CLI) needs a way to report progress instead of going silent until
     the very end."""
-    targets = parties_to_enrich(con, limit)
+    targets = parties_to_enrich(con, limit, party_ids)
     total = targets.height
     rows = []
     made_a_call = False

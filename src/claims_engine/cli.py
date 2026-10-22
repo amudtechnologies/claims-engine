@@ -20,6 +20,7 @@ from claims_engine import (
     lineage,
     load,
     normalize,
+    parsing,
     profiling,
 )
 
@@ -346,6 +347,23 @@ def enrich_parties(
     delay_seconds: Annotated[
         float, typer.Option(help="Pause between RUES requests, in seconds.")
     ] = 3.0,
+    period: Annotated[
+        str | None,
+        typer.Option(
+            help="Restrict to parties appearing (as plaintiff or defendant) in claims "
+            "observed in this period only, e.g. 2026-2."
+        ),
+    ] = None,
+    document_number: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--document-number",
+            "-d",
+            help="Restrict to one or more specific parties by document number "
+            "(repeatable). When given, --limit is ignored -- every matching party "
+            "named is attempted, not just the first `limit` of them.",
+        ),
+    ] = None,
 ) -> None:
     """Phase 5: query RUES for up to `limit` not-yet-enriched parties from
     core/party -- every document_type, no discrimination (D26) -- and write
@@ -353,7 +371,11 @@ def enrich_parties(
     Deliberately small and rate-limited by default — rerun to make more
     progress rather than enriching everything in one sitting. This is also
     now the only source of party.document_type; run build-identity again
-    afterward to fold newly-learned classifications back onto core/party."""
+    afterward to fold newly-learned classifications back onto core/party.
+
+    `--period` and `--document-number` narrow which not-yet-enriched parties
+    this run considers (combined with AND when both are given) -- neither
+    re-queries a party that already has a real RUES answer (D21)."""
     client = boto3.client("s3")
     with tempfile.TemporaryDirectory() as tmpdir:
         typer.echo("fetching core/party...", err=True)
@@ -361,6 +383,65 @@ def enrich_parties(
 
         con = duckdb.connect()
         con.execute(f"CREATE VIEW party AS SELECT * FROM read_parquet('{tmpdir}/party.parquet')")
+
+        party_ids: list[str] | None = None
+
+        if document_number:
+            candidates = []
+            for raw in document_number:
+                digits = parsing.normalize_id(raw)
+                if digits is None:
+                    typer.echo(f"  skipping unparseable document number: {raw!r}", err=True)
+                    continue
+                candidates.append(identity.canonical_document_number(digits))
+            rows = con.execute(
+                "SELECT party_id, document_number FROM party WHERE document_number = ANY(?)",
+                [candidates],
+            ).fetchall()
+            found_numbers = {doc for _, doc in rows}
+            for requested in candidates:
+                if requested not in found_numbers:
+                    typer.echo(
+                        f"  no party in core/party matches document number {requested!r}",
+                        err=True,
+                    )
+            party_ids = [party_id for party_id, _ in rows]
+            if not party_ids:
+                typer.echo("No matching parties found for --document-number.", err=True)
+                raise typer.Exit(code=1)
+            limit = len(party_ids)
+
+        if period:
+            typer.echo(
+                f"fetching claim_party/observation/capture/file for period={period}...", err=True
+            )
+            for table in ("claim_party", "observation", "capture", "file"):
+                client.download_file(bucket, load.core_key(table), f"{tmpdir}/{table}.parquet")
+                con.execute(
+                    f"CREATE VIEW {table} AS SELECT * FROM read_parquet('{tmpdir}/{table}.parquet')"
+                )
+            period_party_ids = {
+                row[0]
+                for row in con.execute(
+                    """
+                    SELECT DISTINCT cp.party_id
+                    FROM claim_party cp
+                    JOIN observation o ON o.claim_id = cp.claim_id
+                    JOIN capture c ON c.capture_id = o.capture_id
+                    JOIN file f ON f.file_id = c.file_id
+                    WHERE f.period = ?
+                    """,
+                    [period],
+                ).fetchall()
+            }
+            party_ids = (
+                [pid for pid in party_ids if pid in period_party_ids]
+                if party_ids is not None
+                else list(period_party_ids)
+            )
+            if not party_ids:
+                typer.echo(f"No matching parties found for period={period}.", err=True)
+                raise typer.Exit(code=1)
 
         enrichment_keys = discover.list_keys(bucket, "core/enrichment/")
         if enrichment_keys:
@@ -404,7 +485,7 @@ def enrich_parties(
 
         with httpx.Client(timeout=30.0) as http_client:
             results = enrichment.enrich_parties(
-                con, http_client, limit, delay_seconds, on_progress=_progress
+                con, http_client, limit, delay_seconds, party_ids=party_ids, on_progress=_progress
             )
 
         if results.height == 0:
