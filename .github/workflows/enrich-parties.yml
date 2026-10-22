@@ -23,6 +23,14 @@ on:
         description: "Pause between RUES requests, in seconds"
         required: true
         default: "3.0"
+      period:
+        description: "Optional: restrict to parties in this period only, e.g. 2026-2"
+        required: false
+        default: ""
+      document_numbers:
+        description: "Optional: restrict to these document numbers, comma-separated"
+        required: false
+        default: ""
 
 jobs:
   enrich-parties:
@@ -47,8 +55,22 @@ jobs:
           aws-region: us-east-1
 
       - name: Enrich parties via RUES (Phase 5)
-        run: >
-          uv run claims-engine enrich-parties
-          "${{ github.event.inputs.bucket || 'amud-technologies' }}"
-          --limit ${{ github.event.inputs.limit || '4000' }}
-          --delay-seconds ${{ github.event.inputs.delay_seconds || '3.0' }}
+        env:
+          BUCKET: ${{ github.event.inputs.bucket || 'amud-technologies' }}
+          LIMIT: ${{ github.event.inputs.limit || '4000' }}
+          DELAY_SECONDS: ${{ github.event.inputs.delay_seconds || '3.0' }}
+          PERIOD: ${{ github.event.inputs.period }}
+          DOCUMENT_NUMBERS: ${{ github.event.inputs.document_numbers }}
+        run: |
+          args=("$BUCKET" --limit "$LIMIT" --delay-seconds "$DELAY_SECONDS")
+          if [ -n "$PERIOD" ]; then
+            args+=(--period "$PERIOD")
+          fi
+          if [ -n "$DOCUMENT_NUMBERS" ]; then
+            IFS=',' read -ra docs <<< "$DOCUMENT_NUMBERS"
+            for d in "${docs[@]}"; do
+              trimmed="$(echo "$d" | xargs)"
+              [ -n "$trimmed" ] && args+=(--document-number "$trimmed")
+            done
+          fi
+          uv run claims-engine enrich-parties "${args[@]}"
