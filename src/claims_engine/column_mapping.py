@@ -333,6 +333,22 @@ SHEET_MAPPINGS: list[SheetMapping] = [
             'Ciudad': 'city',
         },
     ),
+    SheetMapping(
+        period='2026-2',
+        sheet='Busqueda',
+        column_map={
+            'No. Depósito': 'deposit_no',
+            'Despacho Judicial': 'court_name',
+            'Cuenta Judicial': 'court_account',
+            'Identificación Demandante': 'plaintiff_id',
+            'Identificación Demandado': 'defendant_id',
+            'Valor': 'amount_cop',
+            'Fecha Constitución': 'origin_date',
+            'Seccional': 'seccional',
+            'Departamento': 'department',
+            'Ciudad': 'city',
+        },
+    ),
     # Active-deposits radar (docs/project-context.md — "irregular cadence" is
     # this radar's own defining trait, so `period` here is the batch's as-of
     # date, not a semester). Per-despacho extract, richer than the semiannual

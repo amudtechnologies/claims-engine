@@ -15,6 +15,7 @@ falling through.
 
 from __future__ import annotations
 
+import glob
 import json
 from dataclasses import dataclass
 from datetime import date
@@ -250,6 +251,14 @@ def _find_party(con: duckdb.DuckDBPyConnection, digits: str) -> tuple[str, str, 
 def _fetch_enrichment(
     con: duckdb.DuckDBPyConnection, party_id: str
 ) -> tuple[str | None, bool | None]:
+    # read_parquet raises IOException on a glob that matches zero files,
+    # rather than returning an empty result — distinct from D21's "a party
+    # with no enrichment is a valid state": this is zero enrichment batches
+    # existing at all (freshly reset core/enrichment/, or a radar before its
+    # first enrich-parties run), which is equally valid and must not crash
+    # the search.
+    if not glob.glob(core_cache.enrichment_glob()):
+        return None, None
     row = con.execute(
         f"""
         SELECT name, active
