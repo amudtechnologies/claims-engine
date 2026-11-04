@@ -472,7 +472,13 @@ a.radar-list-item:hover::after {
     transition: max-height 0.25s ease, opacity 0.2s ease;
   }
   .nav-links a { padding: 13px 2px; font-size: 1rem; }
-  .nav-toggle-input:checked ~ .nav-links { max-height: 220px; opacity: 1; }
+  .nav-toggle-input:checked ~ .nav-links { max-height: 420px; opacity: 1; }
+  .nav-cta { display: none; }
 
   .footer-inner { flex-direction: column; align-items: flex-start; }
 }
+
+/* NAV CTA + FOOTER (dynamic pages) */
+.nav-cta { height: 38px; padding: 0 16px; font-size: 0.86rem; }
+.footer-links[aria-label] { max-width: 520px; }
+.footer-independence { flex-basis: 100%; margin: 0; font-size: 0.78rem; color: var(--ink-softer); max-width: 70ch; }

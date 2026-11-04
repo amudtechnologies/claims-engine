@@ -1,0 +1,7 @@
+{% load cms_extras %}
+<nav class="radar-breadcrumb mono" aria-label="Ruta de navegación">
+  {% for label, url in crumbs %}
+    {% if url %}<a href="{{ url }}">{{ label }}</a> <span aria-hidden="true">/</span>{% else %}<span aria-current="page">{{ label }}</span>{% endif %}
+  {% endfor %}
+</nav>
+{% ld_json ld %}

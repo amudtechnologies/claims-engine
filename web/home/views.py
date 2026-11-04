@@ -1,8 +1,9 @@
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
-from django.urls import reverse
 from django.utils import timezone
 from judicial_deposits import core_cache, party_search
+
+from .models import Radar
 
 
 def robots_txt(request):
@@ -10,38 +11,16 @@ def robots_txt(request):
     utility page (also marked noindex in its own template), never a page a
     search result should point to. See docs/project-context.md's SEO
     strategy: this is both a thin-content and a privacy consideration, since
-    a crawled URL could otherwise carry a real document number."""
+    a crawled URL could otherwise carry a real document number. The sitemap
+    itself is django.contrib.sitemaps (cms/sitemaps.py), wired in urls.py."""
     lines = [
         "User-agent: *",
         "Disallow: /resultados/",
-        "Disallow: /admin/",
+        "Disallow: /management/",
         "",
         f"Sitemap: {request.scheme}://{request.get_host()}/sitemap.xml",
     ]
     return HttpResponse("\n".join(lines), content_type="text/plain")
-
-
-def sitemap_xml(request):
-    """Hand-rolled instead of django.contrib.sitemaps — avoids pulling in the
-    sites framework (SITE_ID, a DB-backed Site row) for what is, today, three
-    static URLs. /resultados/ is deliberately absent: it's personalized and
-    already noindexed."""
-    base = f"{request.scheme}://{request.get_host()}"
-    pages = [
-        (reverse("home:index"), "1.0", "weekly"),
-        (reverse("judicial_deposits:index"), "0.9", "weekly"),
-        (reverse("home:radares"), "0.6", "monthly"),
-    ]
-    entries = "".join(
-        f"<url><loc>{base}{path}</loc><changefreq>{freq}</changefreq><priority>{priority}</priority></url>"
-        for path, priority, freq in pages
-    )
-    xml = (
-        '<?xml version="1.0" encoding="UTF-8"?>'
-        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-        f"{entries}</urlset>"
-    )
-    return HttpResponse(xml, content_type="application/xml")
 
 
 def index(request):
@@ -54,6 +33,16 @@ def index(request):
             "depósitos judiciales sin reclamar. Consulte gratis con su NIT o cédula."
         ),
     }
+    context["radars"] = Radar.objects.filter(is_published=True)
+    if core_cache.is_synced():
+        # Real figures from the processed corpus; omitted entirely (never
+        # placeholder numbers) when the cache hasn't synced.
+        context["evidence"] = {
+            "observation_count": party_search.total_observation_count(),
+            "court_count": party_search.total_court_count(),
+            "total_amount_cop": party_search.total_claim_amount_cop(),
+            "latest_year": (party_search.latest_published_period() or "").split("-")[0] or None,
+        }
     return render(request, "home/index.html", context)
 
 
@@ -71,6 +60,7 @@ def radares(request):
             "activos asociados a una persona o empresa."
         ),
     }
+    context["radars"] = Radar.objects.filter(is_published=True)
     if core_cache.is_synced():
         context["jd_total_amount_cop"] = party_search.total_claim_amount_cop()
         context["jd_observation_count"] = party_search.total_observation_count()

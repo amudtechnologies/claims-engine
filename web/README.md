@@ -89,3 +89,34 @@ raw EC2 box.
 multiple instances each keeps its own cache in sync independently. That's
 redundant S3 traffic, not a correctness problem, and matches this project's
 preference for no shared-state orchestration.
+
+## CMS (páginas, guías y radares)
+
+Editorial content lives in the `cms` app and is managed from Django Admin
+(`/management/admin/`) — no code change or redeploy to add, edit, publish or
+remove content.
+
+- **Páginas** (`/<slug>/`): institutional/legal/landing pages. "Mostrar en el
+  footer" + "orden en el footer" drive the footer links. Migration
+  `cms.0002_seed_draft_pages` creates *draft* placeholders (Nosotros, política
+  de datos, términos); the legal ones need counsel review before publishing.
+- **Artículos** (`/guias/<slug>/`, listing `/guias/`, categories
+  `/guias/categoria/<slug>/`) with author, categories, excerpt and SEO fields.
+- **Radares** (`home.Radar`): the cards on the home page and `/radares/`. A new
+  row appears automatically; "En desarrollo" radars never show figures.
+- Visibility: only `status = Publicado` with `published_at <= now` is public,
+  in the footer and in `/sitemap.xml`. Drafts 404 publicly; staff with change
+  permission can preview them (marked `noindex`). A future `published_at`
+  schedules publication.
+- Changing the slug of published content creates a 301 `Redirect` automatically.
+- Permissions: `cms.publish_page` / `cms.publish_article` are required to change
+  status, publication date or footer placement; editors without them save drafts.
+- Body HTML is sanitized on save (`cms/sanitize.py`, `nh3`); the editor
+  (django-summernote, MIT) is attached only in `cms/admin.py`.
+- Media: set `MEDIA_S3_BUCKET` (optional `MEDIA_S3_CUSTOM_DOMAIN`) in production to
+  store uploads under `s3://<bucket>/media/`. That prefix must be publicly
+  readable and the instance role needs `s3:PutObject`/`s3:DeleteObject` on
+  `media/*` only. Without it, uploads go to `web/var/media` (lost on redeploy).
+
+Deploying: `uv sync`, `migrate` (the entrypoint already runs it), `collectstatic`.
+Migrations are additive (new tables only).

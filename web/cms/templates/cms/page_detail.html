@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static cms_extras %}
+
+{% block robots_meta %}{% if is_preview %}<meta name="robots" content="noindex,nofollow">{% endif %}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/cms.css' %}">{% endblock %}
+{% block og_image %}{% if page.featured_image %}{{ request.scheme }}://{{ request.get_host }}{{ page.featured_image.url }}{% else %}{{ block.super }}{% endif %}{% endblock %}
+
+{% block content %}
+<article class="prose-page">
+  <div class="wrap prose-wrap">
+    {% if is_preview %}<p class="cms-preview-note">Vista previa de borrador — no es pública.</p>{% endif %}
+    {% breadcrumbs crumbs %}
+    <h1 class="serif">{{ page.title }}</h1>
+    {% if page.featured_image %}<img class="prose-hero-img" src="{{ page.featured_image.url }}" alt="">{% endif %}
+    <div class="prose">{{ page.body|safe }}</div>
+  </div>
+</article>
+{% endblock %}

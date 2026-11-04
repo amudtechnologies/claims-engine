@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static cms_extras %}
+
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/cms.css' %}">{% endblock %}
+{% block canonical %}{{ request.scheme }}://{{ request.get_host }}{{ request.path }}{% if page_obj.number > 1 %}?page={{ page_obj.number }}{% endif %}{% endblock %}
+{% block extra_head %}
+  {% if page_obj.has_previous %}<link rel="prev" href="{{ request.path }}{% if page_obj.previous_page_number > 1 %}?page={{ page_obj.previous_page_number }}{% endif %}">{% endif %}
+  {% if page_obj.has_next %}<link rel="next" href="{{ request.path }}?page={{ page_obj.next_page_number }}">{% endif %}
+{% endblock %}
+
+{% block content %}
+<section class="articles-index">
+  <div class="wrap">
+    {% breadcrumbs crumbs %}
+    <h1 class="serif">{% if category %}{{ category.name }}{% else %}Guías y noticias{% endif %}</h1>
+    <p class="lede">{% if category and category.description %}{{ category.description }}{% else %}Respuestas claras sobre depósitos judiciales, acreencias y derechos económicos en Colombia.{% endif %}</p>
+
+    {% if categories %}
+    <nav class="cat-filter" aria-label="Categorías">
+      <a href="{% url 'cms:article_list' %}" class="jd-tag {% if not category %}jd-tag--open{% else %}jd-tag--pending{% endif %}">Todas</a>
+      {% for c in categories %}
+        <a href="{{ c.get_absolute_url }}" class="jd-tag {% if category and c.pk == category.pk %}jd-tag--open{% else %}jd-tag--pending{% endif %}">{{ c.name }}</a>
+      {% endfor %}
+    </nav>
+    {% endif %}
+
+    {% if page_obj.object_list %}
+    <ul class="article-list">
+      {% for a in page_obj %}
+      <li class="article-card">
+        <a href="{{ a.get_absolute_url }}" class="article-card-link">
+          {% if a.featured_image %}<img src="{{ a.featured_image.url }}" alt="" loading="lazy" class="article-card-img">{% endif %}
+          <h2 class="serif">{{ a.title }}</h2>
+          <p>{{ a.excerpt }}</p>
+          <span class="article-meta mono">{{ a.published_at|date:"j \d\e F \d\e Y" }} · {{ a.author_display }}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+
+    {% if page_obj.has_other_pages %}
+    <nav class="pager" aria-label="Paginación">
+      {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" rel="prev">&larr; Anteriores</a>{% endif %}
+      <span class="mono">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" rel="next">Siguientes &rarr;</a>{% endif %}
+    </nav>
+    {% endif %}
+    {% else %}
+      <p class="results-empty-note">Todavía no hay publicaciones{% if category %} en esta categoría{% endif %}.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

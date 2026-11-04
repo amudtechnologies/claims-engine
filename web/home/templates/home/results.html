@@ -97,6 +97,29 @@
       <p class="results-more-radars">Estamos construyendo nuevos radares sobre otras fuentes. Vuelva a consultar este número más adelante. <a href="{% url 'home:radares' %}">Conozca los radares en desarrollo</a></p>
     </div>
   </section>
+
+  <section class="results-next">
+    <div class="wrap results-next-grid">
+      <div>
+        <h2 class="serif">Qué significa este resultado</h2>
+        <p>Su número <strong>aparece en una fuente pública</strong>. Eso es una coincidencia, no un derecho acreditado ni dinero disponible: la lista no indica a quién pertenece el valor y el plazo para reclamar puede haber vencido.</p>
+        <h3>Qué falta verificar</h3>
+        <ul>
+          <li>Si usted es el beneficiario del depósito y no la contraparte del proceso.</li>
+          <li>El proceso judicial y el despacho donde se constituyó.</li>
+          <li>Si el plazo de reclamación sigue abierto{% if claim_status == "reclamable" %} (según nuestros datos, este periodo aún figura como reclamable){% endif %}.</li>
+        </ul>
+      </div>
+      <div class="results-next-cta">
+        <h3>Qué puede hacer ahora</h3>
+        <p>Si quiere que revisemos su caso y lo acompañemos en la verificación y en la gestión de la reclamación, escríbanos.</p>
+        {% if company_profile.email %}
+        <a class="btn btn-primary" href="mailto:{{ company_profile.email }}?subject=Quiero%20verificar%20mi%20resultado&amp;body=Mi%20n%C3%BAmero%20consultado%20es%20{{ result.document_number|urlencode }}.">Solicitar acompañamiento</a>
+        {% endif %}
+        <p class="results-next-fine">Amud es una plataforma privada e independiente de la Rama Judicial y del Banco Agrario.</p>
+      </div>
+    </div>
+  </section>
 {% else %}
   <section class="results-empty">
     <div class="wrap">

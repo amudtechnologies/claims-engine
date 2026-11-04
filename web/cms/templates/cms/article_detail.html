@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static cms_extras %}
+
+{% block robots_meta %}{% if is_preview %}<meta name="robots" content="noindex,nofollow">{% endif %}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/cms.css' %}">{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block og_image %}{% if article.featured_image %}{{ request.scheme }}://{{ request.get_host }}{{ article.featured_image.url }}{% else %}{{ block.super }}{% endif %}{% endblock %}
+{% block extra_head %}{% if not is_preview %}{% ld_json article_ld %}{% endif %}{% endblock %}
+
+{% block content %}
+<article class="prose-page">
+  <div class="wrap prose-wrap">
+    {% if is_preview %}<p class="cms-preview-note">Vista previa de borrador — no es pública.</p>{% endif %}
+    {% breadcrumbs crumbs %}
+    <h1 class="serif">{{ article.title }}</h1>
+    <p class="article-meta mono">
+      {% if article.published_at %}<time datetime="{{ article.published_at|date:'c' }}">{{ article.published_at|date:"j \d\e F \d\e Y" }}</time> · {% endif %}{{ article.author_display }}
+    </p>
+    {% if categories %}
+    <p class="article-cats">{% for c in categories %}<a class="jd-tag jd-tag--pending" href="{{ c.get_absolute_url }}">{{ c.name }}</a> {% endfor %}</p>
+    {% endif %}
+    {% if article.featured_image %}<img class="prose-hero-img" src="{{ article.featured_image.url }}" alt="">{% endif %}
+    <div class="prose">{{ article.body|safe }}</div>
+    {% include "cms/_share.html" with url=canonical_url title=article.title %}
+    <p class="article-note">Este contenido es informativo y no constituye asesoría jurídica.</p>
+  </div>
+</article>
+
+{% if related_articles %}
+<section class="article-related">
+  <div class="wrap prose-wrap">
+    <div class="eyebrow mono"><span class="dot"></span>Sigue leyendo</div>
+    <ul class="article-list article-list--compact">
+      {% for a in related_articles %}<li><a href="{{ a.get_absolute_url }}">{{ a.title }}</a></li>{% endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

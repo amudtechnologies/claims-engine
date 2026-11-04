@@ -61,3 +61,14 @@
     flex: none;
   }
 }
+
+/* NEXT STEPS (post-result journey) */
+.results-next { padding: 8px 0 clamp(48px, 7vw, 88px); }
+.results-next-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 28px; }
+.results-next h2 { margin: 0 0 12px; font-size: 1.5rem; font-weight: 600; }
+.results-next h3 { margin: 18px 0 8px; font-size: 1rem; }
+.results-next p, .results-next li { line-height: 1.6; color: var(--ink-soft); font-size: 0.95rem; }
+.results-next-cta { padding: 24px; background: var(--surface); border: 1px solid var(--hair); border-radius: 10px; align-self: start; }
+.results-next-cta h3 { margin-top: 0; }
+.results-next-fine { font-size: 0.78rem !important; color: var(--ink-softer) !important; margin: 16px 0 0; }
+@media (max-width: 900px) { .results-next-grid { grid-template-columns: 1fr; } }

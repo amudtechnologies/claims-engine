@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -99,8 +100,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',
+    'django_summernote',
     'home',
     'judicial_deposits',
+    'cms',
 ]
 
 MIDDLEWARE = [
@@ -127,6 +131,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'home.context_processors.company_profile',
+                'cms.context_processors.footer_pages',
             ],
         },
     },
@@ -201,12 +206,32 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# Uploaded media (CMS images). App Runner's disk is ephemeral, so production
+# sets MEDIA_S3_BUCKET and uploads go to s3://<bucket>/media/ (never raw/,
+# staging/, core/ or marts/ — the pipeline's prefixes stay untouched). Without
+# it, uploads land in web/var/media for local dev.
+MEDIA_S3_BUCKET = os.environ.get('MEDIA_S3_BUCKET')
+MEDIA_ROOT = BASE_DIR / 'var' / 'media'
+MEDIA_URL = 'media/'
+
+if MEDIA_S3_BUCKET:
+    _default_storage = {
+        'BACKEND': 'storages.backends.s3.S3Storage',
+        'OPTIONS': {
+            'bucket_name': MEDIA_S3_BUCKET,
+            'location': 'media',
+            'default_acl': None,
+            'querystring_auth': False,
+            'custom_domain': os.environ.get('MEDIA_S3_CUSTOM_DOMAIN') or None,
+        },
+    }
+else:
+    _default_storage = {'BACKEND': 'django.core.files.storage.FileSystemStorage'}
+
 # Served straight out of the app container by whitenoise — no separate
 # static host needed at this traffic scale.
 STORAGES = {
-    'default': {
-        'BACKEND': 'django.core.files.storage.FileSystemStorage',
-    },
+    'default': _default_storage,
     'staticfiles': {
         'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
     },
@@ -233,3 +258,29 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+
+
+# CMS editor (django-summernote, MIT). Only the admin widget depends on it —
+# stored content is plain sanitized HTML (cms/sanitize.py).
+SUMMERNOTE_THEME = 'lite'
+SUMMERNOTE_CONFIG = {
+    'attachment_filesize_limit': 5 * 1024 * 1024,
+    'summernote': {
+        'toolbar': [
+            ['style', ['style']],
+            ['font', ['bold', 'italic', 'underline', 'clear']],
+            ['para', ['ul', 'ol']],
+            ['insert', ['link', 'picture', 'table']],
+            ['view', ['codeview']],
+        ],
+        'styleTags': ['p', 'blockquote', 'h2', 'h3', 'h4'],
+    },
+}
+# The editor renders inside an iframe served from the same origin.
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+
+# The manifest storage needs `collectstatic` to have run; tests render
+# templates without it.
+if 'test' in sys.argv:
+    STORAGES['staticfiles'] = {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'}
