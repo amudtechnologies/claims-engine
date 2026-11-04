@@ -1,5 +1,9 @@
+import mimetypes
+import posixpath
+
+from django.core.files.storage import default_storage
 from django.core.paginator import Paginator
-from django.http import Http404, HttpResponsePermanentRedirect
+from django.http import FileResponse, Http404, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
@@ -134,3 +138,23 @@ def article_list(request, category_slug=None):
             "page_description": description,
         },
     )
+
+
+MEDIA_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
+
+
+def media(request, path):
+    """Serves uploaded images from the (private) media bucket. Images only,
+    and only normalized relative paths."""
+    clean = posixpath.normpath(path)
+    extension = posixpath.splitext(clean)[1].lower()
+    if clean.startswith(("..", "/")) or extension not in MEDIA_EXTENSIONS:
+        raise Http404
+    try:
+        file = default_storage.open(clean, "rb")
+    except OSError:
+        raise Http404 from None
+    content_type = mimetypes.guess_type(clean)[0] or "application/octet-stream"
+    response = FileResponse(file, content_type=content_type)
+    response["Cache-Control"] = "public, max-age=86400"
+    return response

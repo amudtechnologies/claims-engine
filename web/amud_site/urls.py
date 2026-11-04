@@ -1,5 +1,6 @@
 """URL configuration for amud_site project."""
 
+from cms import views as cms_views
 from cms.sitemaps import sitemaps
 from django.conf import settings
 from django.conf.urls.static import static
@@ -19,5 +20,7 @@ urlpatterns = [
     path("", include("cms.urls")),
 ]
 
-if settings.DEBUG and not settings.MEDIA_S3_BUCKET:
+if settings.MEDIA_S3_BUCKET:
+    urlpatterns.insert(0, path("media/<path:path>", cms_views.media, name="media"))
+elif settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

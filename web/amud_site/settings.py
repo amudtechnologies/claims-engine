@@ -207,22 +207,21 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Uploaded media (CMS images). App Runner's disk is ephemeral, so production
-# sets MEDIA_S3_BUCKET and uploads go to s3://<bucket>/media/ (never raw/,
-# staging/, core/ or marts/ — the pipeline's prefixes stay untouched). Without
+# sets MEDIA_S3_BUCKET and uploads go to s3://<bucket>/media/ in a dedicated
+# private bucket (not the pipeline's), served back through Django's /media/ route. Without
 # it, uploads land in web/var/media for local dev.
 MEDIA_S3_BUCKET = os.environ.get('MEDIA_S3_BUCKET')
 MEDIA_ROOT = BASE_DIR / 'var' / 'media'
 MEDIA_URL = 'media/'
+MEDIA_URL_PATH = '/media/'
 
 if MEDIA_S3_BUCKET:
     _default_storage = {
-        'BACKEND': 'storages.backends.s3.S3Storage',
+        'BACKEND': 'cms.storage.ProxiedS3Storage',
         'OPTIONS': {
             'bucket_name': MEDIA_S3_BUCKET,
             'location': 'media',
             'default_acl': None,
-            'querystring_auth': False,
-            'custom_domain': os.environ.get('MEDIA_S3_CUSTOM_DOMAIN') or None,
         },
     }
 else:

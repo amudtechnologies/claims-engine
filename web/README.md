@@ -113,10 +113,11 @@ remove content.
   status, publication date or footer placement; editors without them save drafts.
 - Body HTML is sanitized on save (`cms/sanitize.py`, `nh3`); the editor
   (django-summernote, MIT) is attached only in `cms/admin.py`.
-- Media: set `MEDIA_S3_BUCKET` (optional `MEDIA_S3_CUSTOM_DOMAIN`) in production to
-  store uploads under `s3://<bucket>/media/`. That prefix must be publicly
-  readable and the instance role needs `s3:PutObject`/`s3:DeleteObject` on
-  `media/*` only. Without it, uploads go to `web/var/media` (lost on redeploy).
+- Media: production sets `MEDIA_S3_BUCKET` (`amud-technologies-media`, private, all
+  public access blocked). Uploads go to `media/` in that bucket and are served
+  back through Django at `/media/<path>` (images only); the instance role has
+  `media-bucket-rw` (Put/Get/DeleteObject on `media/*`). Without the variable,
+  uploads go to `web/var/media` (lost on redeploy).
 
 Deploying: `uv sync`, `migrate` (the entrypoint already runs it), `collectstatic`.
 Migrations are additive (new tables only).
