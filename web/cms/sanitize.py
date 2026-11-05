@@ -6,7 +6,7 @@ safe regardless of which editor produced it."""
 import nh3
 
 ALLOWED_TAGS = {
-    "p", "br", "hr", "h2", "h3", "h4", "strong", "b", "em", "i", "u", "s",
+    "p", "br", "hr", "h2", "h3", "h4", "strong", "b", "em", "i", "u", "s", "strike",
     "ul", "ol", "li", "blockquote", "a", "img", "figure", "figcaption",
     "table", "thead", "tbody", "tfoot", "tr", "th", "td", "caption", "code", "pre",
     "span", "div", "sub", "sup",
@@ -15,11 +15,15 @@ ALLOWED_TAGS = {
 ALLOWED_ATTRIBUTES = {
     "a": {"href", "title", "target"},
     "img": {"src", "alt", "title", "width", "height"},
-    "th": {"colspan", "rowspan", "scope"},
-    "td": {"colspan", "rowspan"},
+    "th": {"colspan", "rowspan", "scope", "style"},
+    "td": {"colspan", "rowspan", "style"},
     "span": {"style"},
     "p": {"style"},
     "div": {"style"},
+    "h2": {"style"},
+    "h3": {"style"},
+    "h4": {"style"},
+    "li": {"style"},
 }
 
 # Only alignment/emphasis styles are meaningful from the editor; everything

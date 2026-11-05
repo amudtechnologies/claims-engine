@@ -267,10 +267,11 @@ SUMMERNOTE_CONFIG = {
     'summernote': {
         'toolbar': [
             ['style', ['style']],
-            ['font', ['bold', 'italic', 'underline', 'clear']],
-            ['para', ['ul', 'ol']],
-            ['insert', ['link', 'picture', 'table']],
-            ['view', ['codeview']],
+            ['font', ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['insert', ['link', 'picture', 'table', 'hr']],
+            ['history', ['undo', 'redo']],
+            ['misc', ['clear', 'fullscreen', 'codeview']],
         ],
         'styleTags': ['p', 'blockquote', 'h2', 'h3', 'h4'],
     },

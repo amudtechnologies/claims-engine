@@ -41,6 +41,17 @@ class SanitizeTests(TestCase):
         self.assertIn("<table>", clean)
         self.assertIn("noopener", clean)
 
+    def test_keeps_toolbar_output(self):
+        html = (
+            '<h2 style="text-align: center;">T</h2>'
+            "<p><strike>a</strike><sup>2</sup><sub>1</sub></p>"
+            '<hr><p style="color: red; text-align: right;">x</p>'
+        )
+        clean = sanitize_html(html)
+        for kept in ("<strike>", "<sup>", "<sub>", "<hr>", "text-align:center", "text-align:right"):
+            self.assertIn(kept, clean)
+        self.assertNotIn("red", clean)
+
     def test_save_sanitizes_body(self):
         page = make_page(body="<p>ok</p><script>bad()</script>")
         page.refresh_from_db()

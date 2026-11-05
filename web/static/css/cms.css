@@ -1,11 +1,20 @@
 /* CMS pages, articles, listing. Reuses site.css tokens. */
 .prose-page, .articles-index, .article-related { padding-top: clamp(40px, 6vw, 80px); padding-bottom: clamp(32px, 5vw, 64px); }
-.prose-wrap { max-width: 760px; }
+.prose-wrap > * { max-width: 68ch; }
+.prose-wrap > .prose-hero-img { max-width: 100%; }
 .prose-page h1, .articles-index h1 { margin: 0 0 16px; font-size: clamp(2rem, 3vw + 0.6rem, 2.8rem); line-height: 1.1; font-weight: 600; letter-spacing: -0.02em; }
 .cms-preview-note { padding: 8px 12px; background: var(--accent); border-radius: 6px; font-size: 0.85rem; font-weight: 600; }
 .prose-hero-img { width: 100%; height: auto; border-radius: 10px; margin: 8px 0 24px; }
-.prose { font-size: 1.04rem; line-height: 1.72; color: var(--ink); overflow-wrap: anywhere; }
-.prose h2, .prose h3, .prose h4 { font-family: "Piazzolla Var", Georgia, serif; line-height: 1.2; margin: 1.8em 0 0.5em; letter-spacing: -0.01em; }
+.prose { font-size: 1.0625rem; line-height: 1.75; color: rgba(28, 26, 23, 0.88); overflow-wrap: anywhere; }
+.prose > * + * { margin-top: 1.1em; margin-bottom: 0; }
+.prose p { margin: 0; }
+.prose > *:first-child { margin-top: 0; }
+.prose ul, .prose ol { padding-left: 1.4em; }
+.prose li + li { margin-top: 0.35em; }
+.prose li::marker { color: var(--accent-text); }
+.prose hr { border: 0; border-top: 1px solid var(--hair-strong); margin: 2em 0; }
+.prose strong { color: var(--ink); }
+.prose h2, .prose h3, .prose h4 { font-family: "Piazzolla Var", Georgia, serif; line-height: 1.2; margin: 1.8em 0 0.4em; letter-spacing: -0.01em; font-weight: 600; color: var(--ink); }
 .prose h2 { font-size: 1.6rem; } .prose h3 { font-size: 1.25rem; } .prose h4 { font-size: 1.05rem; }
 .prose a { color: var(--accent-text); text-decoration: underline; text-underline-offset: 3px; }
 .prose img { max-width: 100%; height: auto; border-radius: 6px; }
