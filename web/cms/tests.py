@@ -131,6 +131,11 @@ class FooterTests(TestCase):
 
 
 class ArticleTests(TestCase):
+    def setUp(self):
+        # Migration 0003 seeds sample articles/categories; these tests need a clean slate.
+        Article.objects.all().delete()
+        Category.objects.all().delete()
+
     def test_detail_seo_metadata(self):
         article = make_article(
             "como-reclamar", meta_title="Cómo reclamar", meta_description="Desc SEO"
