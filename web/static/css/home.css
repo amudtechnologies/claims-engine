@@ -46,17 +46,6 @@ a.radar-list-item:hover { box-shadow: var(--shadow-md); border-color: var(--teal
 .tech-item h3 { margin: 0 0 10px; font-size: 1.02rem; font-weight: 700; letter-spacing: -0.01em; color: var(--navy); }
 .tech-item p { margin: 0; font-size: 0.9rem; line-height: 1.6; color: var(--ink-soft); }
 
-/* AUDIENCES */
-.audiences { padding-bottom: clamp(56px, 8vw, 104px); }
-.audiences-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.audience { padding: 32px; background: var(--white); border: 1px solid var(--hair); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); }
-.audience:last-child { background: var(--navy); border-color: var(--navy); color: var(--on-navy-soft); }
-.audience:last-child h2 { color: var(--on-navy); }
-.audience:last-child .eyebrow { color: var(--teal); }
-.audience:last-child p { color: var(--on-navy-soft); }
-.audience h2 { margin: 0 0 12px; font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
-.audience p { margin: 0 0 24px; line-height: 1.6; color: var(--ink-soft); }
-
 /* TRUST */
 .trust { background: var(--panel); }
 .trust .section-head { margin-bottom: 32px; }
@@ -74,7 +63,7 @@ a.radar-list-item:hover { box-shadow: var(--shadow-md); border-color: var(--teal
   .steps--four { grid-template-columns: 1fr; }
   .steps--four .step { padding-top: 24px; }
   .tech-grid { grid-template-columns: 1fr 1fr; }
-  .audiences-grid, .levels { grid-template-columns: 1fr; }
+  .levels { grid-template-columns: 1fr; }
   .evidence-grid > div { border-top: 1px solid var(--hair); }
 }
 @media (max-width: 560px) { .tech-grid { grid-template-columns: 1fr; } }
