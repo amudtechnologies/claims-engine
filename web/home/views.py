@@ -28,9 +28,9 @@ def index(request):
         "active_nav": "home",
         "page_title": "Dinero que ya tiene dueño, identificado antes que nadie — Amud Technologies",
         "page_description": (
-            "Amud Technologies identifica dinero, derechos y activos que ya le "
-            "pertenecen a personas y empresas en Colombia — empezando por "
-            "depósitos judiciales sin reclamar. Consulte gratis con su NIT o cédula."
+            "Amud Technologies identifica acreencias y oportunidades patrimoniales "
+            "de empresas en Colombia — y también de personas naturales — empezando "
+            "por depósitos judiciales sin reclamar. Consulte gratis con su NIT o cédula."
         ),
     }
     return render(request, "home/index.html", context)
@@ -47,7 +47,7 @@ def radares(request):
         "page_description": (
             "Conozca los radares de Amud Technologies: fuentes públicas "
             "colombianas que cruzamos para identificar dinero, derechos y "
-            "activos asociados a una persona o empresa."
+            "activos asociados a una empresa o persona natural."
         ),
     }
     context["radars"] = Radar.objects.filter(is_published=True)

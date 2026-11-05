@@ -8,9 +8,9 @@ def index(request):
         "active_nav": "judicial_deposits",
         "page_title": "Cómo saber si tiene un depósito judicial sin reclamar — Amud Technologies",
         "page_description": (
-            "Consulte gratis si su NIT o cédula aparece en depósitos judiciales "
-            "sin reclamar en Colombia — qué son, cuánto tiempo tiene para "
-            "reclamarlos y cómo hacerlo."
+            "Consulte gratis si el NIT de su empresa (o su cédula, si es persona "
+            "natural) aparece en depósitos judiciales sin reclamar en Colombia — "
+            "qué son, cuánto tiempo tiene para reclamarlos y cómo hacerlo."
         ),
     }
     if core_cache.is_synced():

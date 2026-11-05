@@ -6,7 +6,7 @@
     type="text"
     name="nit"
     value="{{ raw_document_number }}"
-    placeholder="NIT o cédula"
+    placeholder="NIT de su empresa"
     inputmode="numeric"
     autocomplete="off"
     required
@@ -19,6 +19,6 @@
   <span class="visually-hidden" role="status" aria-live="polite" data-search-status></span>
 </form>
 {% if not compact %}
-  <p class="search-form-hint">NIT (con o sin dígito de verificación) o cédula.</p>
+  <p class="search-form-hint">NIT de su empresa, con o sin dígito de verificación. Si es persona natural, también puede consultar con su cédula.</p>
   <p class="search-form-trust">Consulta gratuita · sin registro</p>
 {% endif %}
