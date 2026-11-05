@@ -400,19 +400,6 @@ a.radar-list-item:hover::after {
 .proof-num { font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 600; letter-spacing: -0.02em; color: var(--teal); line-height: 1; margin-bottom: 18px; }
 .proof-text { margin: 0; font-size: 1.05rem; line-height: 1.55; color: var(--on-navy-soft); }
 
-/* CTA */
-.cta { padding-top: clamp(72px, 9vw, 120px); padding-bottom: clamp(72px, 9vw, 120px); text-align: center; background: var(--panel); border-bottom: 1px solid var(--hair); }
-.cta h2 {
-  margin: 0 auto 18px auto;
-  max-width: 26ch;
-  font-family: var(--font-display);
-  font-size: clamp(1.8rem, 2.4vw + 1rem, 2.7rem);
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  line-height: 1.18;
-  color: var(--ink);
-}
-.cta p { margin: 0 auto 32px auto; max-width: 48ch; font-size: 1.03rem; line-height: 1.6; color: var(--ink-soft); }
 
 /* FOOTER */
 .footer { background: var(--navy); color: var(--on-navy-soft); padding-top: 48px; padding-bottom: 40px; --wm-halo: var(--navy); }

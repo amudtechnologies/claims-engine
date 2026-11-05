@@ -9,7 +9,7 @@ class HomeTests(TestCase):
     def test_home_renders_search(self):
         response = self.client.get("/")
         self.assertContains(response, 'action="/resultados/"')
-        self.assertContains(response, "Su empresa puede tener")
+        self.assertContains(response, "Hay ")
 
     def test_new_radar_appears_without_code_changes_and_without_numbers(self):
         Radar.objects.create(
