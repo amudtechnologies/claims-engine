@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static jd_extras %}
+{% load static %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/home.css' %}">
@@ -41,79 +41,6 @@
   </div>
 </section>
 
-{% if evidence %}
-<section class="evidence" aria-labelledby="evidence-title">
-  <div class="wrap">
-    <h2 id="evidence-title" class="eyebrow mono"><span class="dot"></span>Capacidad de procesamiento</h2>
-    <div class="evidence-grid">
-      <div><div class="stat-num mono"><span class="js-counter" data-target="{{ evidence.observation_count }}">{{ evidence.observation_count|es_co_number }}</span></div><div class="stat-label">Registros de depósitos analizados</div></div>
-      <div><div class="stat-num mono"><span class="js-counter" data-target="{{ evidence.court_count }}">{{ evidence.court_count|es_co_number }}</span></div><div class="stat-label">Despachos judiciales cubiertos</div></div>
-      <div><div class="stat-num mono">2017–{{ evidence.latest_year|default:"2026" }}</div><div class="stat-label">Publicaciones semestrales procesadas</div></div>
-      <div><div class="stat-num mono">$ <span class="js-counter" data-target="{{ evidence.total_amount_cop }}">{{ evidence.total_amount_cop|es_co_number }}</span></div><div class="stat-label">Suma de los valores publicados</div></div>
-    </div>
-    <p class="evidence-note">Cifras calculadas sobre las publicaciones de la Rama Judicial que hemos procesado. Son valores publicados en las listas históricas, no dinero disponible para reclamar.</p>
-  </div>
-</section>
-{% endif %}
-
-<section class="method" id="radares">
-  <div class="wrap">
-    <div class="eyebrow mono"><span class="dot"></span>Nuestros radares</div>
-    <p class="method-lede">Cada radar cruza una fuente pública distinta para encontrar un tipo diferente de oportunidad. Hoy hay uno activo; los demás se anunciarán cuando estén listos.</p>
-    <div class="radar-list">
-      {% for radar in radars %}
-        {% if radar.is_active %}
-        <a href="{{ radar.cta_url }}" class="radar-list-item">
-        {% else %}
-        <div class="radar-list-item radar-list-item--soon">
-        {% endif %}
-          <div class="radar-list-item-main">
-            <span class="radar-list-item-name">{{ radar.name }}</span>
-            <span class="results-status results-status--{% if radar.is_active %}active{% else %}pending{% endif %}"><span class="dot"></span>{{ radar.get_status_display }}</span>
-          </div>
-          <p class="radar-list-item-desc">{{ radar.problem }}</p>
-          <dl class="radar-facts">
-            <div><dt>Qué identifica</dt><dd>{{ radar.identifies }}</dd></div>
-            <div><dt>Para quién</dt><dd>{{ radar.audience }}</dd></div>
-          </dl>
-          {% if radar.is_active and radar.cta_label %}<span class="radar-cta">{{ radar.cta_label }} &rarr;</span>{% endif %}
-        {% if radar.is_active %}</a>{% else %}</div>{% endif %}
-      {% endfor %}
-    </div>
-    <a href="{% url 'home:radares' %}" class="btn-link">Ver todos los radares &rarr;</a>
-  </div>
-</section>
-
-<section class="tech" id="tecnologia">
-  <div class="wrap">
-    <div class="section-head"><div class="eyebrow mono"><span class="dot"></span>Tecnología</div><h2>Infraestructura de datos construida para fuentes que cambian</h2></div>
-    <div class="tech-grid">
-      <div class="tech-item"><h3>Lectura de fuentes heterogéneas</h3><p>Procesamos archivos publicados en distintos formatos y estructuras, que además cambian de un periodo a otro.</p></div>
-      <div class="tech-item"><h3>Normalización con trazabilidad</h3><p>Cada registro se valida. Los que no cumplen se apartan con su motivo; ninguno se descarta en silencio.</p></div>
-      <div class="tech-item"><h3>Resolución de identidades</h3><p>Relacionamos números de identificación entre periodos y fuentes para reconocer a la misma persona o empresa.</p></div>
-      <div class="tech-item"><h3>Enriquecimiento con el RUES</h3><p>Cuando hay coincidencia, consultamos el Registro Único Empresarial y Social para identificar nombre y estado.</p></div>
-    </div>
-  </div>
-</section>
-
-<section class="trust" id="confianza">
-  <div class="wrap">
-    <div class="section-head"><div class="eyebrow mono"><span class="dot"></span>Confianza y metodología</div><h2>Qué significa —y qué no— un resultado</h2></div>
-    <div class="levels">
-      <div class="level"><span class="mono">1</span><h3>Coincidencia</h3><p>Su número aparece en una fuente pública. Es lo que muestra la consulta gratuita.</p></div>
-      <div class="level"><span class="mono">2</span><h3>Posible derecho</h3><p>La coincidencia sugiere una oportunidad, pero no dice a quién pertenece el dinero.</p></div>
-      <div class="level"><span class="mono">3</span><h3>Derecho verificado</h3><p>Se confirma el caso, la titularidad y el estado del proceso.</p></div>
-      <div class="level"><span class="mono">4</span><h3>Dinero disponible</h3><p>El plazo legal sigue abierto y se puede presentar la reclamación.</p></div>
-    </div>
-    <ul class="principles trust-points">
-      <li><strong>Fuentes:</strong> información pública, como la lista semestral de depósitos que publica la Rama Judicial.</li>
-      <li><strong>Limitaciones:</strong> las listas pueden estar desactualizadas, incompletas o no indicar quién es el beneficiario del dinero.</li>
-      <li><strong>Datos personales:</strong> la consulta está pensada para que cada persona verifique su propia información. El tratamiento de datos se rige por la Ley 1581 de 2012.</li>
-      <li><strong>Independencia:</strong> Amud es una plataforma privada e independiente: no pertenece al Estado ni hace parte de ninguna entidad pública.</li>
-    </ul>
-  </div>
-</section>
-
 <section class="cta">
   <div class="wrap">
     <h2>Averigüe qué aparece asociado a su identificación</h2>
@@ -122,8 +49,4 @@
   </div>
 </section>
 
-{% endblock %}
-
-{% block extra_js %}
-  <script src="{% static 'js/counter.js' %}" defer></script>
 {% endblock %}

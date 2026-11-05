@@ -33,16 +33,6 @@ def index(request):
             "depósitos judiciales sin reclamar. Consulte gratis con su NIT o cédula."
         ),
     }
-    context["radars"] = Radar.objects.filter(is_published=True)
-    if core_cache.is_synced():
-        # Real figures from the processed corpus; omitted entirely (never
-        # placeholder numbers) when the cache hasn't synced.
-        context["evidence"] = {
-            "observation_count": party_search.total_observation_count(),
-            "court_count": party_search.total_court_count(),
-            "total_amount_cop": party_search.total_claim_amount_cop(),
-            "latest_year": (party_search.latest_published_period() or "").split("-")[0] or None,
-        }
     return render(request, "home/index.html", context)
 
 

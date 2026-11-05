@@ -6,10 +6,9 @@ from .models import Radar
 
 
 class HomeTests(TestCase):
-    def test_home_renders_search_and_active_radar_from_db(self):
+    def test_home_renders_search(self):
         response = self.client.get("/")
         self.assertContains(response, 'action="/resultados/"')
-        self.assertContains(response, "Depósitos judiciales")
         self.assertContains(response, "Su patrimonio puede tener")
 
     def test_new_radar_appears_without_code_changes_and_without_numbers(self):
@@ -19,10 +18,6 @@ class HomeTests(TestCase):
         response = self.client.get("/radares/")
         self.assertContains(response, "Radar X")
         self.assertContains(response, "En desarrollo")
-
-    def test_home_omits_evidence_when_cache_unsynced(self):
-        with mock.patch("home.views.core_cache.is_synced", return_value=False):
-            self.assertNotContains(self.client.get("/"), "Capacidad de procesamiento")
 
 
 class ResultsRegressionTests(TestCase):
