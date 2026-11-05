@@ -1,0 +1,4 @@
+/* django-summernote's 'lite' theme requests summernote-lite.css, but the
+   package only ships summernote-lite.min.css; the manifest staticfiles
+   storage raises on the missing name. This alias keeps that lookup valid. */
+@import url("summernote-lite.min.css");
