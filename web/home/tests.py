@@ -10,7 +10,7 @@ class HomeTests(TestCase):
         response = self.client.get("/")
         self.assertContains(response, 'action="/resultados/"')
         self.assertContains(response, "Depósitos judiciales")
-        self.assertContains(response, "Hay ")
+        self.assertContains(response, "Su patrimonio puede tener")
 
     def test_new_radar_appears_without_code_changes_and_without_numbers(self):
         Radar.objects.create(

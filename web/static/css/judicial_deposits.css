@@ -19,7 +19,7 @@
 .jd-party-name { margin: 0 0 8px 0; font-size: clamp(1.5rem, 1.8vw + 1rem, 2rem); font-weight: 600; letter-spacing: -0.015em; color: var(--ink); }
 .jd-party-meta { margin: 0 0 28px 0; font-size: 0.92rem; color: var(--ink-softer); }
 
-.jd-summary-panel { margin-bottom: 20px; padding: 22px 24px; background: var(--ground); border: 1px solid var(--hair); border-radius: 10px; }
+.jd-summary-panel { margin-bottom: 20px; padding: 22px 24px; background: var(--ground); border: 1px solid var(--hair); border-radius: var(--r-md); }
 .jd-panel-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 18px; }
 
 .jd-window-range { display: flex; align-items: baseline; gap: 8px; margin: -10px 0 18px 0; font-size: 0.82rem; }

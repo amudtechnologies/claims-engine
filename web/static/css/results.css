@@ -13,7 +13,7 @@
 /* TABLE */
 .results-table-section { padding-bottom: clamp(56px, 8vw, 96px); }
 .results-table-title { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 16px; }
-.results-table-wrap { border: 1px solid var(--hair); border-radius: 10px; overflow-x: auto; background: var(--surface); }
+.results-table-wrap { border: 1px solid var(--hair); border-radius: var(--r-md); overflow-x: auto; background: var(--surface); }
 .results-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; min-width: 520px; }
 .results-table th { text-align: left; font-size: 0.74rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-softer); padding: 14px 20px; border-bottom: 1px solid var(--hair); }
 .results-table td { padding: 16px 20px; border-bottom: 1px solid var(--hair); color: var(--ink); }
@@ -46,7 +46,7 @@
   .results-table { min-width: 0; width: 100%; }
   .results-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   .results-table, .results-table tbody, .results-table tr, .results-table td { display: block; width: 100%; }
-  .results-table tr { margin-bottom: 12px; background: var(--surface); border: 1px solid var(--hair); border-radius: 10px; }
+  .results-table tr { margin-bottom: 12px; background: var(--surface); border: 1px solid var(--hair); border-radius: var(--r-md); }
   .results-table tr:last-child { margin-bottom: 0; }
   .results-table td { padding: 12px 16px; border-bottom: 1px solid var(--hair); white-space: normal; }
   .results-table tr td:last-child { border-bottom: none; }
@@ -68,7 +68,26 @@
 .results-next h2 { margin: 0 0 12px; font-size: 1.5rem; font-weight: 600; }
 .results-next h3 { margin: 18px 0 8px; font-size: 1rem; }
 .results-next p, .results-next li { line-height: 1.6; color: var(--ink-soft); font-size: 0.95rem; }
-.results-next-cta { padding: 24px; background: var(--surface); border: 1px solid var(--hair); border-radius: 10px; align-self: start; }
+.results-next-cta { padding: 24px; background: var(--surface); border: 1px solid var(--hair); border-radius: var(--r-md); align-self: start; }
 .results-next-cta h3 { margin-top: 0; }
 .results-next-fine { font-size: 0.78rem !important; color: var(--ink-softer) !important; margin: 16px 0 0; }
 @media (max-width: 900px) { .results-next-grid { grid-template-columns: 1fr; } }
+
+/* PROGRESS TRACK — where this result sits in the four-stage path */
+.progress-track { list-style: none; margin: 0 0 32px; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.progress-track li { position: relative; padding-top: 22px; border-top: 2px solid var(--mist); font-size: 0.9rem; color: var(--ink-softer); }
+.progress-track strong { display: block; color: var(--ink); font-weight: 600; }
+.progress-track small { display: block; margin-top: 2px; font-size: 0.78rem; line-height: 1.4; }
+.progress-dot { position: absolute; top: -7px; left: 0; width: 12px; height: 12px; border-radius: 50%; background: var(--mist); box-shadow: 0 0 0 3px var(--white); }
+.progress-track .is-done { border-top-color: var(--teal); }
+.progress-track .is-done .progress-dot { background: var(--teal); }
+.progress-track .is-current { border-top-color: var(--gold); }
+.progress-track .is-current .progress-dot { background: var(--white); border: 2px solid var(--gold); }
+@media (max-width: 700px) { .progress-track { grid-template-columns: 1fr 1fr; row-gap: 24px; } }
+.results-next-cta { box-shadow: var(--shadow-md); border-radius: var(--r-lg); }
+.results-head { background: var(--panel); border-bottom: 1px solid var(--hair); margin-bottom: 32px; }
+.results-head h1 { font-weight: 700; letter-spacing: -0.025em; }
+
+.results-empty .wrap { max-width: 720px; margin-top: 40px; margin-bottom: 64px; padding: 28px 32px; background: var(--panel); border: 1px solid var(--hair); border-left: 3px solid var(--gold); border-radius: var(--r-md); }
+.results-empty p { margin: 0 0 10px; line-height: 1.6; color: var(--ink-soft); }
+.results-empty p:last-child { margin-bottom: 0; }

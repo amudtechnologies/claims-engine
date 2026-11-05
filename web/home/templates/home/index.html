@@ -11,34 +11,32 @@
   <div class="hero-glow"></div>
   <div class="wrap hero-inner">
     <div class="hero-copy">
-      <div class="eyebrow mono"><span class="dot"></span>RADAR DE ACREENCIAS</div>
-      <h1 class="serif">Hay <span class="accent-word">dinero</span> que ya tiene dueño. Lo encontramos primero.</h1>
-      <p class="lede">Identificamos acreencias y oportunidades patrimoniales mediante inteligencia de datos y análisis de fuentes públicas.</p>
-      <div class="hero-search" id="buscar">{% include "home/_search_form.html" %}</div>
-      <a href="#como-funciona" class="btn-link">Conocer Amud &darr;</a>
+      <div class="eyebrow mono"><span class="dot"></span>Inteligencia patrimonial</div>
+      <h1>Su patrimonio puede tener más <span class="accent-word">oportunidades</span> de las que imagina.</h1>
+      <p class="lede">Inteligencia tecnológica para identificar acreencias, derechos económicos y oportunidades patrimoniales a partir de fuentes públicas.</p>
+      <div class="hero-search" id="buscar">{% include "home/_search_form.html" with button_label="Consultar ahora" %}</div>
+      <a href="#como-funciona" class="hero-secondary">Conoce cómo funciona <span aria-hidden="true">&rarr;</span></a>
     </div>
-    <div class="hero-graphic">
-      <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Una red de registros con una coincidencia identificada resaltada">
-        <line x1="70" y1="120" x2="150" y2="90" stroke="#1C1A17" stroke-opacity="0.14" stroke-width="1.5"/>
-        <line x1="150" y1="90" x2="230" y2="150" stroke="#1C1A17" stroke-opacity="0.14" stroke-width="1.5"/>
-        <line x1="230" y1="150" x2="200" y2="230" stroke="#1C1A17" stroke-opacity="0.14" stroke-width="1.5"/>
-        <line x1="200" y1="230" x2="120" y2="260" stroke="#1C1A17" stroke-opacity="0.14" stroke-width="1.5"/>
-        <line x1="120" y1="260" x2="70" y2="120" stroke="#1C1A17" stroke-opacity="0.14" stroke-width="1.5"/>
-        <line x1="230" y1="150" x2="300" y2="110" stroke="#1C1A17" stroke-opacity="0.14" stroke-width="1.5"/>
-        <line x1="200" y1="230" x2="290" y2="270" stroke="#1C1A17" stroke-opacity="0.14" stroke-width="1.5"/>
-        <line x1="120" y1="260" x2="90" y2="330" stroke="#1C1A17" stroke-opacity="0.14" stroke-width="1.5"/>
-
-        <circle cx="70" cy="120" r="5" fill="#1C1A17" fill-opacity="0.3"/>
-        <circle cx="150" cy="90" r="4" fill="#1C1A17" fill-opacity="0.3"/>
-        <circle cx="300" cy="110" r="5" fill="#1C1A17" fill-opacity="0.3"/>
-        <circle cx="290" cy="270" r="4" fill="#1C1A17" fill-opacity="0.3"/>
-        <circle cx="120" cy="260" r="5" fill="#1C1A17" fill-opacity="0.3"/>
-        <circle cx="90" cy="330" r="4" fill="#1C1A17" fill-opacity="0.3"/>
-        <circle cx="200" cy="230" r="5" fill="#1C1A17" fill-opacity="0.3"/>
-
-        <circle class="pulse-ring" cx="230" cy="150" r="14" fill="none" stroke="#CCCC4B" stroke-width="2"/>
-        <circle cx="230" cy="150" r="11" fill="#CCCC4B"/>
-        <path d="M225 150 L229 154 L237 145" stroke="#1C1A17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <div class="hero-graphic" aria-hidden="true">
+      <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="200" cy="200" r="150" stroke="#E9EEF3" stroke-opacity="0.1"/>
+        <circle cx="200" cy="200" r="100" stroke="#E9EEF3" stroke-opacity="0.1"/>
+        <circle cx="200" cy="200" r="50" stroke="#E9EEF3" stroke-opacity="0.1"/>
+        <g stroke="#E9EEF3" stroke-opacity="0.2" stroke-width="1.2">
+          <line x1="70" y1="120" x2="150" y2="90"/><line x1="150" y1="90" x2="230" y2="150"/>
+          <line x1="230" y1="150" x2="200" y2="230"/><line x1="200" y1="230" x2="120" y2="260"/>
+          <line x1="120" y1="260" x2="70" y2="120"/><line x1="230" y1="150" x2="300" y2="110"/>
+          <line x1="200" y1="230" x2="290" y2="270"/><line x1="120" y1="260" x2="90" y2="330"/>
+        </g>
+        <g fill="#E9EEF3" fill-opacity="0.4">
+          <circle cx="70" cy="120" r="4.5"/><circle cx="150" cy="90" r="3.5"/><circle cx="300" cy="110" r="4.5"/>
+          <circle cx="290" cy="270" r="3.5"/><circle cx="120" cy="260" r="4.5"/><circle cx="90" cy="330" r="3.5"/>
+          <circle cx="200" cy="230" r="4.5"/>
+        </g>
+        <circle class="pulse-ring" cx="230" cy="150" r="16" stroke="#20B6A5" stroke-width="1.6"/>
+        <circle cx="230" cy="150" r="11" fill="#20B6A5"/>
+        <path d="M225 150 L229 154 L237 145" stroke="#101F35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="230" cy="150" r="22" stroke="#C5A46D" stroke-opacity="0.7" stroke-width="1" stroke-dasharray="2 5"/>
       </svg>
     </div>
   </div>
@@ -89,13 +87,25 @@
 
 <section class="how" id="como-funciona">
   <div class="wrap">
-    <div class="section-head"><div class="eyebrow mono"><span class="dot"></span>Cómo funciona</div><h2>De información dispersa a una oportunidad verificable</h2></div>
+    <div class="section-head"><div class="eyebrow mono"><span class="dot"></span>Cómo funciona</div><h2>Conectamos información dispersa con oportunidades verificables</h2></div>
     <ol class="steps steps--four">
       <li class="step"><div class="step-num mono">01</div><h3>Recolección</h3><p>Reunimos información publicada por fuentes públicas, tal como se publica.</p></li>
       <li class="step"><div class="step-num mono">02</div><h3>Normalización y correlación</h3><p>Ordenamos formatos distintos y relacionamos personas naturales y jurídicas entre periodos.</p></li>
       <li class="step"><div class="step-num mono">03</div><h3>Coincidencias</h3><p>Identificamos dónde aparece un número de identificación y qué posibles oportunidades sugiere.</p></li>
       <li class="step"><div class="step-num mono">04</div><h3>Verificación y gestión</h3><p>Una coincidencia no es un derecho acreditado: se verifica y, si procede, se acompaña su reclamación.</p></li>
     </ol>
+  </div>
+</section>
+
+<section class="tech" id="tecnologia">
+  <div class="wrap">
+    <div class="section-head"><div class="eyebrow mono"><span class="dot"></span>Tecnología</div><h2>Infraestructura de datos construida para fuentes que cambian</h2></div>
+    <div class="tech-grid">
+      <div class="tech-item"><h3>Lectura de fuentes heterogéneas</h3><p>Procesamos archivos publicados en distintos formatos y estructuras, que además cambian de un periodo a otro.</p></div>
+      <div class="tech-item"><h3>Normalización con trazabilidad</h3><p>Cada registro se valida. Los que no cumplen se apartan con su motivo; ninguno se descarta en silencio.</p></div>
+      <div class="tech-item"><h3>Resolución de identidades</h3><p>Relacionamos números de identificación entre periodos y fuentes para reconocer a la misma persona o empresa.</p></div>
+      <div class="tech-item"><h3>Enriquecimiento con el RUES</h3><p>Cuando hay coincidencia, consultamos el Registro Único Empresarial y Social para identificar nombre y estado.</p></div>
+    </div>
   </div>
 </section>
 
@@ -138,9 +148,9 @@
 
 <section class="cta">
   <div class="wrap">
-    <h2>Averigüe si hay algo a su nombre</h2>
+    <h2>Averigüe qué aparece asociado a su identificación</h2>
     <p>La consulta inicial es gratuita y no requiere registro.</p>
-    <a href="#buscar" class="btn btn-primary btn-lg">Consultar gratis</a>
+    <a href="#buscar" class="btn btn-primary btn-lg">Consultar ahora</a>
   </div>
 </section>
 

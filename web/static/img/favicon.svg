@@ -3,6 +3,6 @@
     <rect width="48" height="48" fill="#ffffff"/>
     <circle cx="35" cy="15" r="7.5" fill="#000000"/>
   </mask>
-  <circle cx="24" cy="24" r="15" fill="none" stroke="#1C1A17" stroke-width="2.8" mask="url(#favicon-knockout)"/>
-  <circle cx="35" cy="15" r="6" fill="#CCCC4B"/>
+  <circle cx="24" cy="24" r="15" fill="none" stroke="#101F35" stroke-width="2.8" mask="url(#favicon-knockout)"/>
+  <circle cx="35" cy="15" r="6" fill="#20B6A5"/>
 </svg>

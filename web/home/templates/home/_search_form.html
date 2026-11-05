@@ -1,17 +1,24 @@
-<form class="search-form{% if compact %} search-form--compact{% endif %}" method="get" action="{% url 'home:results' %}">
+<form class="search-form{% if compact %} search-form--compact{% endif %}" method="get" action="{% url 'home:results' %}" data-search-form>
+  <label class="visually-hidden" for="document-number">Número de identificación (NIT o cédula)</label>
   <input
     class="search-form-input"
+    id="document-number"
     type="text"
     name="nit"
     value="{{ raw_document_number }}"
-    placeholder="Número de identificación"
+    placeholder="NIT o cédula"
     inputmode="numeric"
     autocomplete="off"
-    aria-label="Número de identificación"
+    required
   >
-  <button type="submit" class="btn btn-primary search-form-btn">Consultar</button>
+  <button type="submit" class="btn btn-primary search-form-btn">
+    <span class="btn-label">{{ button_label|default:"Consultar" }}</span>
+    <span class="btn-spinner" aria-hidden="true"></span>
+  </button>
+  <span class="search-progress" aria-hidden="true"></span>
+  <span class="visually-hidden" role="status" aria-live="polite" data-search-status></span>
 </form>
 {% if not compact %}
   <p class="search-form-hint">NIT (con o sin dígito de verificación) o cédula.</p>
-  <p class="search-form-trust mono">Gratis · sin registro</p>
+  <p class="search-form-trust">Consulta gratuita · sin registro</p>
 {% endif %}
