@@ -7,6 +7,13 @@ from django.utils.safestring import mark_safe
 register = template.Library()
 
 
+@register.filter
+def clip(value, limit=50):
+    """First `limit` characters of the text, then "..." when it was longer."""
+    text = " ".join(str(value or "").split())
+    return text if len(text) <= limit else text[:limit].rstrip() + "..."
+
+
 @register.simple_tag
 def ld_json(data):
     """A JSON-LD <script>. `<` is escaped so editor-supplied text can never

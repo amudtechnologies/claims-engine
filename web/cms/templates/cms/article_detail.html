@@ -17,9 +17,9 @@
       {% if article.published_at %}<time datetime="{{ article.published_at|date:'c' }}">{{ article.published_at|date:"j \d\e F \d\e Y" }}</time> · {% endif %}{{ article.author_display }}
     </p>
     {% if categories %}
-    <p class="article-cats">{% for c in categories %}<a class="jd-tag jd-tag--pending" href="{{ c.get_absolute_url }}">{{ c.name }}</a> {% endfor %}</p>
+    <ul class="chips article-cats" aria-label="Categorías">{% for c in categories %}<li><a class="chip" href="{{ c.get_absolute_url }}">{{ c.name }}</a></li>{% endfor %}</ul>
     {% endif %}
-    {% if article.featured_image %}<img class="prose-hero-img" src="{{ article.featured_image.url }}" alt="">{% endif %}
+    {% if article.featured_image %}<img class="prose-hero-img" src="{{ article.featured_image.url }}" alt="{{ article.title }}" width="1200" height="630">{% endif %}
     <div class="prose">{{ article.body|safe }}</div>
     {% include "cms/_share.html" with url=canonical_url title=article.title %}
     <p class="article-note">Este contenido es informativo y no constituye asesoría jurídica.</p>

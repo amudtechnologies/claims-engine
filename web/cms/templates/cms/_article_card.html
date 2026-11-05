@@ -1,0 +1,13 @@
+{% load static cms_extras %}
+<li class="article-card">
+  <a class="article-card-media" href="{{ a.get_absolute_url }}" tabindex="-1" aria-hidden="true">
+    <img src="{% if a.featured_image %}{{ a.featured_image.url }}{% else %}{% static 'img/article-placeholder.svg' %}{% endif %}" alt="" width="640" height="360" loading="lazy">
+  </a>
+  <div class="article-card-body">
+    <h3 class="serif"><a href="{{ a.get_absolute_url }}">{{ a.title }}</a></h3>
+    <p>{{ a.excerpt|clip:50 }}</p>
+    <ul class="chips" aria-label="Categorías">
+      {% for c in a.categories.all %}{% if c.is_active %}<li><a class="chip" href="{{ c.get_absolute_url }}">{{ c.name }}</a></li>{% endif %}{% endfor %}
+    </ul>
+  </div>
+</li>

@@ -13,7 +13,7 @@ class StaticSitemap(Sitemap):
             ("judicial_deposits:index", 0.9, "weekly"),
             ("home:radares", 0.6, "monthly"),
         ]
-        if settings.CMS_ARTICLES_ENABLED:
+        if settings.CMS_ARTICLES_ENABLED and Article.objects.live().exists():
             items.append(("cms:article_list", 0.7, "daily"))
         return items
 

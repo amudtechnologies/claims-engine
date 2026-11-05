@@ -91,7 +91,7 @@ def article_detail(request, slug):
             "article_ld": article_ld,
             "crumbs": [
                 ("Inicio", reverse("home:index")),
-                ("Guías", reverse("cms:article_list")),
+                ("Cómo reclamar", reverse("cms:article_list")),
                 (article.title, None),
             ],
             "active_nav": "articles",
@@ -102,37 +102,94 @@ def article_detail(request, slug):
     )
 
 
+GROUP_PREVIEW_SIZE = 6
+
+
+def _group_by_first_category(articles):
+    """[(category_or_None, [articles])]: each article sits under its first
+    active category (alphabetical), so no article is repeated on the page;
+    uncategorized ones go last."""
+    groups, uncategorized = {}, []
+    for article in articles:
+        active = sorted((c for c in article.categories.all() if c.is_active), key=lambda c: c.name)
+        if active:
+            groups.setdefault(active[0], []).append(article)
+        else:
+            uncategorized.append(article)
+    ordered = sorted(groups.items(), key=lambda item: item[0].name)
+    if uncategorized:
+        ordered.append((None, uncategorized))
+    return ordered
+
+
 def article_list(request, category_slug=None):
     articles = Article.objects.live().select_related("author").prefetch_related("categories")
     category = None
+    page_obj = None
+    groups = []
     if category_slug:
         category = get_object_or_404(Category, slug=category_slug, is_active=True)
-        articles = articles.filter(categories=category)
-    page_obj = Paginator(articles, ARTICLES_PER_PAGE).get_page(request.GET.get("page"))
+        page_obj = Paginator(articles.filter(categories=category), ARTICLES_PER_PAGE).get_page(
+            request.GET.get("page")
+        )
+        shown = list(page_obj)
+    else:
+        for group_category, items in _group_by_first_category(articles):
+            groups.append(
+                {
+                    "category": group_category,
+                    "articles": items[:GROUP_PREVIEW_SIZE],
+                    "total": len(items),
+                }
+            )
+        shown = [a for g in groups for a in g["articles"]]
+
     if category:
-        title = category.meta_title or f"{category.name} — Guías y noticias"
+        title = category.meta_title or f"{category.name}: guías para reclamar"
         description = category.meta_description or category.description
     else:
-        title = "Guías y noticias sobre depósitos judiciales y acreencias"
+        title = "Guías para reclamar depósitos judiciales y acreencias"
         description = (
-            "Guías prácticas y novedades sobre depósitos judiciales, acreencias y "
-            "derechos económicos en Colombia, publicadas por Amud Technologies."
+            "Guías prácticas sobre depósitos judiciales, acreencias y derechos "
+            "económicos en Colombia: qué son, cuánto tiempo hay para reclamarlos "
+            "y cómo hacerlo."
         )
     crumbs = [("Inicio", reverse("home:index"))]
     if category:
-        crumbs += [("Guías", reverse("cms:article_list")), (category.name, None)]
+        crumbs += [("Cómo reclamar", reverse("cms:article_list")), (category.name, None)]
     else:
-        crumbs.append(("Guías", None))
+        crumbs.append(("Cómo reclamar", None))
+    list_ld = {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "name": title,
+        "description": description,
+        "mainEntity": {
+            "@type": "ItemList",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": i,
+                    "url": request.build_absolute_uri(a.get_absolute_url()),
+                    "name": a.seo_title,
+                }
+                for i, a in enumerate(shown, start=1)
+            ],
+        },
+    }
     return render(
         request,
         "cms/article_list.html",
         {
             "crumbs": crumbs,
             "page_obj": page_obj,
+            "groups": groups,
+            "has_articles": bool(shown),
             "category": category,
             "categories": Category.objects.filter(
                 is_active=True, pk__in=Article.objects.live().values("categories")
             ),
+            "list_ld": list_ld,
             "active_nav": "articles",
             "page_title": f"{title} — Amud Technologies",
             "page_description": description,

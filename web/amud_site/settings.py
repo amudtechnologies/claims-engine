@@ -280,11 +280,9 @@ SUMMERNOTE_CONFIG = {
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 
-# The public articles section (/guias/) is switched off; models, admin and
-# stored content stay intact. Set CMS_ARTICLES_ENABLED=True to bring it back.
-CMS_ARTICLES_ENABLED = (
-    os.environ.get('CMS_ARTICLES_ENABLED', 'False') == 'True' or 'test' in sys.argv
-)
+# The public articles section (/guias/). On by default; set
+# CMS_ARTICLES_ENABLED=False to switch it off (models, admin and content stay).
+CMS_ARTICLES_ENABLED = os.environ.get('CMS_ARTICLES_ENABLED', 'True') != 'False'
 
 
 # The manifest storage needs `collectstatic` to have run; tests render

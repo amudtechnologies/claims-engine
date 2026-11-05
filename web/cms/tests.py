@@ -163,13 +163,54 @@ class ArticleTests(TestCase):
         self.assertNotContains(response, "Guía oculta")
         self.assertEqual(self.client.get("/guias/oculta/").status_code, 404)
 
-    def test_pagination(self):
+    def test_category_page_paginates(self):
+        cat = Category.objects.create(name="Guías", slug="guias-cat")
         for i in range(11):
-            make_article(f"art-{i}", title=f"Art {i}")
-        self.assertEqual(len(self.client.get("/guias/").context["page_obj"]), 9)
-        page2 = self.client.get("/guias/?page=2")
+            make_article(f"art-{i}", title=f"Art {i}").categories.add(cat)
+        self.assertEqual(len(self.client.get("/guias/categoria/guias-cat/").context["page_obj"]), 9)
+        page2 = self.client.get("/guias/categoria/guias-cat/?page=2")
         self.assertEqual(len(page2.context["page_obj"]), 2)
-        self.assertContains(page2, 'rel="canonical" href="http://testserver/guias/?page=2"')
+        self.assertContains(
+            page2, 'rel="canonical" href="http://testserver/guias/categoria/guias-cat/?page=2"'
+        )
+
+    def test_list_groups_by_category_with_chips_and_clipped_summary(self):
+        legal = Category.objects.create(name="Legal", slug="legal")
+        deposits = Category.objects.create(name="Depósitos", slug="depositos")
+        long_excerpt = "x" * 80
+        make_article("a1", title="Primera", excerpt=long_excerpt).categories.add(legal, deposits)
+        make_article("a2", title="Segunda").categories.add(legal)
+        make_article("a3", title="Sin categoría")
+        response = self.client.get("/guias/")
+        groups = response.context["groups"]
+        # Each article appears once, under its first category (alphabetical).
+        self.assertEqual([g["category"] for g in groups], [deposits, legal, None])
+        self.assertContains(response, 'href="/guias/categoria/legal/"')  # chip links
+        self.assertContains(response, "x" * 50 + "...")
+        self.assertNotContains(response, "x" * 51)
+
+    def test_placeholder_image_when_no_featured_image(self):
+        make_article("sin-imagen")
+        self.assertContains(self.client.get("/guias/"), "img/article-placeholder.svg")
+
+    def test_group_preview_limited_with_link_to_category(self):
+        cat = Category.objects.create(name="Legal", slug="legal")
+        for i in range(8):
+            make_article(f"g-{i}").categories.add(cat)
+        response = self.client.get("/guias/")
+        self.assertEqual(len(response.context["groups"][0]["articles"]), 6)
+        self.assertContains(response, "Ver las 8 guías")
+
+    def test_nav_and_footer_link_to_articles(self):
+        html = self.client.get("/").content.decode()
+        self.assertEqual(html.count('href="/guias/"'), 2)
+        self.assertIn("Cómo reclamar", html)
+
+    def test_empty_list_is_noindex_and_not_in_sitemap(self):
+        self.assertContains(self.client.get("/guias/"), "noindex")
+        self.assertNotContains(self.client.get("/sitemap.xml"), "/guias/</loc>")
+        make_article("uno")
+        self.assertNotContains(self.client.get("/guias/"), "noindex")
 
     def test_category_filter_and_inactive_category(self):
         cat = Category.objects.create(name="Prescripción", slug="prescripcion")
