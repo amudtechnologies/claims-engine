@@ -15,7 +15,6 @@
       <h1>Su patrimonio puede tener más <span class="accent-word">oportunidades</span> de las que imagina.</h1>
       <p class="lede">Inteligencia tecnológica para identificar acreencias, derechos económicos y oportunidades patrimoniales a partir de fuentes públicas.</p>
       <div class="hero-search" id="buscar">{% include "home/_search_form.html" with button_label="Consultar ahora" %}</div>
-      <a href="#como-funciona" class="hero-secondary">Conoce cómo funciona <span aria-hidden="true">&rarr;</span></a>
     </div>
     <div class="hero-graphic" aria-hidden="true">
       <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -82,18 +81,6 @@
       {% endfor %}
     </div>
     <a href="{% url 'home:radares' %}" class="btn-link">Ver todos los radares &rarr;</a>
-  </div>
-</section>
-
-<section class="how" id="como-funciona">
-  <div class="wrap">
-    <div class="section-head"><div class="eyebrow mono"><span class="dot"></span>Cómo funciona</div><h2>Conectamos información dispersa con oportunidades verificables</h2></div>
-    <ol class="steps steps--four">
-      <li class="step"><div class="step-num mono">01</div><h3>Recolección</h3><p>Reunimos información publicada por fuentes públicas, tal como se publica.</p></li>
-      <li class="step"><div class="step-num mono">02</div><h3>Normalización y correlación</h3><p>Ordenamos formatos distintos y relacionamos personas naturales y jurídicas entre periodos.</p></li>
-      <li class="step"><div class="step-num mono">03</div><h3>Coincidencias</h3><p>Identificamos dónde aparece un número de identificación y qué posibles oportunidades sugiere.</p></li>
-      <li class="step"><div class="step-num mono">04</div><h3>Verificación y gestión</h3><p>Una coincidencia no es un derecho acreditado: se verifica y, si procede, se acompaña su reclamación.</p></li>
-    </ol>
   </div>
 </section>
 

@@ -1,7 +1,5 @@
 /* HOME — sections built on the tokens in site.css */
 
-.hero-secondary { display: inline-flex; gap: 8px; margin-top: 6px; font-size: 0.95rem; font-weight: 600; color: var(--on-navy); border-bottom: 1px solid var(--hair-on-navy); padding-bottom: 3px; }
-.hero-secondary:hover { border-color: var(--teal); }
 .hero-search { margin-bottom: 28px; }
 .hero .search-form { max-width: 520px; padding: 8px; background: rgba(255, 255, 255, 0.07); border: 1px solid var(--hair-on-navy); border-radius: var(--r-md); }
 .hero .search-form-input { border: 0; height: 48px; }
@@ -29,25 +27,15 @@ a.radar-list-item:hover { box-shadow: var(--shadow-md); border-color: var(--teal
 .radar-list-item-name { font-weight: 700; letter-spacing: -0.01em; }
 .radar-cta { display: inline-block; margin-top: 14px; font-size: 0.88rem; font-weight: 600; color: var(--teal-ink); }
 
-/* HOW — timeline */
-.how { padding-top: clamp(56px, 8vw, 104px); padding-bottom: clamp(56px, 8vw, 104px); background: var(--panel); border-top: 1px solid var(--hair); }
-.section-head h2 { font-weight: 700; letter-spacing: -0.025em; }
-.steps { list-style: none; margin: 0; padding: 0; }
-.steps--four { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; counter-reset: step; }
-.steps--four .step { position: relative; padding: 32px 0 0; border-left: 0; border-top: 1px solid var(--hair-strong); }
-.steps--four .step::before { content: ""; position: absolute; top: -5px; left: 0; width: 9px; height: 9px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 4px var(--panel); }
-.step-num { color: var(--teal-ink); font-size: 0.8rem; letter-spacing: 0.08em; margin-bottom: 12px; }
-.step h3 { font-weight: 700; letter-spacing: -0.01em; }
-
 /* TECHNOLOGY */
-.tech { padding-top: clamp(56px, 8vw, 104px); padding-bottom: clamp(56px, 8vw, 104px); }
+.tech { padding-top: clamp(56px, 8vw, 104px); padding-bottom: clamp(56px, 8vw, 104px); background: var(--panel); border-top: 1px solid var(--hair); }
 .tech-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
 .tech-item { padding: 24px; background: var(--white); border: 1px solid var(--hair); border-radius: var(--r-md); box-shadow: var(--shadow-sm); border-top: 2px solid var(--teal); }
 .tech-item h3 { margin: 0 0 10px; font-size: 1.02rem; font-weight: 700; letter-spacing: -0.01em; color: var(--navy); }
 .tech-item p { margin: 0; font-size: 0.9rem; line-height: 1.6; color: var(--ink-soft); }
 
 /* TRUST */
-.trust { background: var(--panel); }
+.trust { background: var(--white); border-top: 1px solid var(--hair); }
 .trust .section-head { margin-bottom: 32px; }
 .levels { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 40px; }
 .level { padding: 20px; border: 1px solid var(--hair); border-radius: var(--r-md); background: var(--white); }
@@ -60,8 +48,6 @@ a.radar-list-item:hover { box-shadow: var(--shadow-md); border-color: var(--teal
 .principles li { border-top-color: var(--hair-strong); }
 
 @media (max-width: 900px) {
-  .steps--four { grid-template-columns: 1fr; }
-  .steps--four .step { padding-top: 24px; }
   .tech-grid { grid-template-columns: 1fr 1fr; }
   .levels { grid-template-columns: 1fr; }
   .evidence-grid > div { border-top: 1px solid var(--hair); }

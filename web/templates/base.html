@@ -65,7 +65,6 @@
       <nav class="nav-links">
         <a href="{% url 'home:index' %}" class="{% if active_nav == 'home' %}is-active{% endif %}">Inicio</a>
         <a href="{% url 'home:radares' %}" class="{% if active_nav == 'radares' or active_nav == 'judicial_deposits' %}is-active{% endif %}">Radares</a>
-        <a href="{% url 'home:index' %}#como-funciona">Cómo funciona</a>
         {% if articles_enabled %}<a href="{% url 'cms:article_list' %}" class="{% if active_nav == 'articles' %}is-active{% endif %}">Guías</a>{% endif %}
       </nav>
       <div class="nav-right">

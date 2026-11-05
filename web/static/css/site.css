@@ -408,16 +408,6 @@ a.radar-list-item:hover::after {
   color: var(--ink);
 }
 
-/* STEPS */
-.how { padding-top: clamp(68px, 9vw, 120px); padding-bottom: clamp(68px, 9vw, 120px); }
-.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; }
-.step { padding: 4px 36px; border-left: 1px solid var(--hair); }
-.step:first-child { border-left: none; padding-left: 0; }
-.step-num { font-size: 0.95rem; font-weight: 600; color: var(--teal-ink); margin-bottom: 24px; }
-.step-icon { margin-bottom: 20px; color: var(--ink); }
-.step h3 { margin: 0 0 12px 0; font-size: 1.15rem; font-weight: 700; color: var(--ink); letter-spacing: -0.005em; }
-.step p { margin: 0; font-size: 0.97rem; line-height: 1.62; color: var(--ink-soft); }
-
 /* TRUST */
 .trust { padding-top: clamp(68px, 9vw, 120px); padding-bottom: clamp(68px, 9vw, 120px); background: var(--panel); border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair); }
 .trust-inner { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: 60px; align-items: center; }
@@ -469,9 +459,6 @@ a.radar-list-item:hover::after {
   .hero-graphic { display: none; }
   .trust-inner { grid-template-columns: 1fr; }
   .trust-visual { order: -1; }
-  .steps { grid-template-columns: 1fr; gap: 36px; }
-  .step { border-left: none; padding-left: 0; border-top: 1px solid var(--hair); padding-top: 30px; }
-  .step:first-child { border-top: none; padding-top: 0; }
 
   /* The hero's full-width stacked search stays; the compact bar used on
      every results/radar page keeps its single-row layout on mobile too —
