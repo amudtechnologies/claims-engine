@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from .models import Page
 
 
@@ -7,6 +9,7 @@ def footer_pages(request):
     from django.utils.functional import SimpleLazyObject
 
     return {
+        "articles_enabled": settings.CMS_ARTICLES_ENABLED,
         "footer_pages": SimpleLazyObject(
             lambda: list(
                 Page.objects.live()

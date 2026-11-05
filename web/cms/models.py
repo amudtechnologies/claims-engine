@@ -72,7 +72,7 @@ class Category(models.Model):
         return self.name
 
     def get_absolute_url(self) -> str:
-        return reverse("cms:category", kwargs={"category_slug": self.slug})
+        return f"/guias/categoria/{self.slug}/"
 
 
 class PublishableContent(models.Model):
@@ -186,7 +186,8 @@ class Article(PublishableContent):
         permissions = [("publish_article", "Puede publicar y despublicar artículos")]
 
     def path_for_slug(self, slug: str) -> str:
-        return reverse("cms:article_detail", kwargs={"slug": slug})
+        # Literal, not reverse(): must work while the /guias/ routes are off.
+        return f"/guias/{slug}/"
 
     @property
     def author_display(self) -> str:

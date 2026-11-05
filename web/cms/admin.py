@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin, messages
 from django.utils import timezone
 from django_summernote.widgets import SummernoteWidget
@@ -109,7 +110,7 @@ class ArticleAdmin(PublishPermissionMixin, admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
     def view_on_site(self, obj):
-        return obj.get_absolute_url()
+        return obj.get_absolute_url() if settings.CMS_ARTICLES_ENABLED else None
 
 
 @admin.register(Category)

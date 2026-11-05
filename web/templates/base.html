@@ -66,7 +66,7 @@
         <a href="{% url 'home:index' %}" class="{% if active_nav == 'home' %}is-active{% endif %}">Inicio</a>
         <a href="{% url 'home:radares' %}" class="{% if active_nav == 'radares' or active_nav == 'judicial_deposits' %}is-active{% endif %}">Radares</a>
         <a href="{% url 'home:index' %}#como-funciona">Cómo funciona</a>
-        <a href="{% url 'cms:article_list' %}" class="{% if active_nav == 'articles' %}is-active{% endif %}">Guías</a>
+        {% if articles_enabled %}<a href="{% url 'cms:article_list' %}" class="{% if active_nav == 'articles' %}is-active{% endif %}">Guías</a>{% endif %}
       </nav>
       <div class="nav-right">
         <a href="{% url 'home:index' %}#buscar" class="btn btn-primary nav-cta">Consultar gratis</a>
@@ -99,7 +99,7 @@
       <nav class="footer-links" aria-label="Navegación del sitio">
         <a href="{% url 'home:index' %}">Inicio</a>
         <a href="{% url 'home:radares' %}">Radares</a>
-        <a href="{% url 'cms:article_list' %}">Guías</a>
+        {% if articles_enabled %}<a href="{% url 'cms:article_list' %}">Guías</a>{% endif %}
       </nav>
       {% if footer_pages %}
       <nav class="footer-links" aria-label="Información legal e institucional">
@@ -111,7 +111,7 @@
       <div class="footer-meta">
         <span>{{ company_profile.email }}</span>
       </div>
-      <p class="footer-independence">Amud Technologies es una plataforma privada e independiente: no hace parte de la Rama Judicial ni del Banco Agrario.</p>
+      <p class="footer-independence">Amud Technologies es una plataforma privada e independiente: no pertenece al Estado ni hace parte de ninguna entidad pública.</p>
       <div class="footer-copy">© {% now "Y" %} Amud Technologies</div>
     </div>
   </footer>

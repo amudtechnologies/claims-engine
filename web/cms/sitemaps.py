@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
 
@@ -7,12 +8,14 @@ from .models import Article, Category, Page
 class StaticSitemap(Sitemap):
 
     def items(self):
-        return [
+        items = [
             ("home:index", 1.0, "weekly"),
             ("judicial_deposits:index", 0.9, "weekly"),
             ("home:radares", 0.6, "monthly"),
-            ("cms:article_list", 0.7, "daily"),
         ]
+        if settings.CMS_ARTICLES_ENABLED:
+            items.append(("cms:article_list", 0.7, "daily"))
+        return items
 
     def location(self, item):
         return reverse(item[0])
@@ -52,9 +55,6 @@ class CategorySitemap(Sitemap):
         return Category.objects.filter(is_active=True, pk__in=live)
 
 
-sitemaps = {
-    "static": StaticSitemap,
-    "pages": PageSitemap,
-    "articles": ArticleSitemap,
-    "categories": CategorySitemap,
-}
+sitemaps = {"static": StaticSitemap, "pages": PageSitemap}
+if settings.CMS_ARTICLES_ENABLED:
+    sitemaps |= {"articles": ArticleSitemap, "categories": CategorySitemap}
