@@ -82,7 +82,7 @@
   </main>
 
   <footer class="footer">
-    <div class="wrap footer-inner">
+    <div class="wrap footer-grid">
       <div class="footer-brand">
         <div class="wordmark">
           <svg class="wordmark-mark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -96,21 +96,30 @@
           <p class="footer-desc">{{ company_profile.description }}</p>
         {% endif %}
       </div>
-      <nav class="footer-links" aria-label="Navegación del sitio">
-        <a href="{% url 'home:index' %}">Inicio</a>
-        <a href="{% url 'home:radares' %}">Radares</a>
-        {% if articles_enabled %}<a href="{% url 'cms:article_list' %}">Guías</a>{% endif %}
+      <nav class="footer-col" aria-label="Navegación del sitio">
+        <h2 class="footer-col-title">Amud</h2>
+        <ul>
+          <li><a href="{% url 'home:index' %}">Inicio</a></li>
+          <li><a href="{% url 'home:radares' %}">Radares</a></li>
+          {% if articles_enabled %}<li><a href="{% url 'cms:article_list' %}">Guías</a></li>{% endif %}
+        </ul>
       </nav>
       {% if footer_pages %}
-      <nav class="footer-links" aria-label="Información legal e institucional">
-        {% for footer_page in footer_pages %}
-          <a href="{{ footer_page.get_absolute_url }}">{{ footer_page.title }}</a>
-        {% endfor %}
+      <nav class="footer-col" aria-label="Información legal e institucional">
+        <h2 class="footer-col-title">Información</h2>
+        <ul>
+          {% for footer_page in footer_pages %}<li><a href="{{ footer_page.get_absolute_url }}">{{ footer_page.title }}</a></li>{% endfor %}
+        </ul>
       </nav>
       {% endif %}
-      <div class="footer-meta">
-        <span>{{ company_profile.email }}</span>
+      {% if company_profile.email %}
+      <div class="footer-col">
+        <h2 class="footer-col-title">Contacto</h2>
+        <ul><li><a href="mailto:{{ company_profile.email }}">{{ company_profile.email }}</a></li></ul>
       </div>
+      {% endif %}
+    </div>
+    <div class="wrap footer-bottom">
       <p class="footer-independence">Amud Technologies es una plataforma privada e independiente: no pertenece al Estado ni hace parte de ninguna entidad pública.</p>
       <div class="footer-copy">© {% now "Y" %} Amud Technologies</div>
     </div>
