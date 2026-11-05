@@ -193,5 +193,5 @@ class Article(PublishableContent):
     def author_display(self) -> str:
         """Public byline. Never falls back to the login username."""
         if self.author:
-            return self.author.get_full_name() or "Equipo Amud"
-        return "Equipo Amud"
+            return self.author.get_full_name() or "Equipo Amud Technologies"
+        return "Equipo Amud Technologies"

@@ -65,7 +65,7 @@
       <nav class="nav-links">
         <a href="{% url 'home:index' %}" class="{% if active_nav == 'home' %}is-active{% endif %}">Inicio</a>
         <a href="{% url 'home:radares' %}" class="{% if active_nav == 'radares' or active_nav == 'judicial_deposits' %}is-active{% endif %}">Radares</a>
-        {% if articles_enabled %}<a href="{% url 'cms:article_list' %}" class="{% if active_nav == 'articles' %}is-active{% endif %}">Cómo reclamar</a>{% endif %}
+        {% if articles_enabled %}<a href="{% url 'cms:article_list' %}" class="{% if active_nav == 'articles' %}is-active{% endif %}">Aprenda</a>{% endif %}
       </nav>
       <div class="nav-right">
         <a href="{% url 'home:index' %}#buscar" class="btn btn-primary nav-cta">Consultar gratis</a>
@@ -100,7 +100,7 @@
         <ul>
           <li><a href="{% url 'home:index' %}">Inicio</a></li>
           <li><a href="{% url 'home:radares' %}">Radares</a></li>
-          {% if articles_enabled %}<li><a href="{% url 'cms:article_list' %}">Cómo reclamar</a></li>{% endif %}
+          {% if articles_enabled %}<li><a href="{% url 'cms:article_list' %}">Aprenda</a></li>{% endif %}
         </ul>
       </nav>
       {% if footer_pages %}

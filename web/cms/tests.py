@@ -156,7 +156,7 @@ class ArticleTests(TestCase):
     def test_author_display_never_leaks_username(self):
         user = get_user_model().objects.create_user("secret_login", password="pw")
         article = make_article("a", author=user)
-        self.assertEqual(article.author_display, "Equipo Amud")
+        self.assertEqual(article.author_display, "Equipo Amud Technologies")
         self.assertNotContains(self.client.get("/guias/a/"), "secret_login")
 
     def test_list_updates_automatically_and_hides_drafts(self):
@@ -209,7 +209,7 @@ class ArticleTests(TestCase):
     def test_nav_and_footer_link_to_articles(self):
         html = self.client.get("/").content.decode()
         self.assertEqual(html.count('href="/guias/"'), 2)
-        self.assertIn("Cómo reclamar", html)
+        self.assertIn(">Aprenda</a>", html)
 
     def test_empty_list_is_noindex_and_not_in_sitemap(self):
         self.assertContains(self.client.get("/guias/"), "noindex")

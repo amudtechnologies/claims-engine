@@ -91,7 +91,7 @@ def article_detail(request, slug):
             "article_ld": article_ld,
             "crumbs": [
                 ("Inicio", reverse("home:index")),
-                ("Cómo reclamar", reverse("cms:article_list")),
+                ("Aprenda", reverse("cms:article_list")),
                 (article.title, None),
             ],
             "active_nav": "articles",
@@ -145,20 +145,19 @@ def article_list(request, category_slug=None):
         shown = [a for g in groups for a in g["articles"]]
 
     if category:
-        title = category.meta_title or f"{category.name}: guías para reclamar"
+        title = category.meta_title or f"{category.name}: guías y explicaciones"
         description = category.meta_description or category.description
     else:
-        title = "Guías para reclamar depósitos judiciales y acreencias"
+        title = "Guías sobre depósitos judiciales, acreencias y derechos económicos"
         description = (
-            "Guías prácticas sobre depósitos judiciales, acreencias y derechos "
-            "económicos en Colombia: qué son, cuánto tiempo hay para reclamarlos "
-            "y cómo hacerlo."
+            "Explicaciones claras sobre depósitos judiciales, acreencias y derechos "
+            "económicos en Colombia: qué son, cómo funcionan y qué puede hacer."
         )
     crumbs = [("Inicio", reverse("home:index"))]
     if category:
-        crumbs += [("Cómo reclamar", reverse("cms:article_list")), (category.name, None)]
+        crumbs += [("Aprenda", reverse("cms:article_list")), (category.name, None)]
     else:
-        crumbs.append(("Cómo reclamar", None))
+        crumbs.append(("Aprenda", None))
     list_ld = {
         "@context": "https://schema.org",
         "@type": "CollectionPage",
