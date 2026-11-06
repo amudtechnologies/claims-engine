@@ -44,9 +44,7 @@
         {{ identity.document_type|document_number_label }} {{ identity.document_number }}{% if identity.document_type %} · {{ identity.document_type|document_type_label }}{% endif %}{% if identity.rues_active is not None %} · {% if identity.rues_active %}Activo en RUES{% else %}Inactivo en RUES{% endif %}{% endif %}
         <br>Búsqueda realizada el {{ searched_at|date:"j \d\e F \d\e Y" }}
       </p>
-      {% if not identity.party_name and identity.source_declared_name %}
-        <p class="results-privacy-note">Este nombre proviene del registro judicial que reportó el depósito. Todavía no lo verificamos contra el RUES.</p>
-      {% elif not identity.party_name %}
+      {% if not identity.party_name and not identity.source_declared_name %}
         <p class="results-privacy-note">Este número aparece en nuestros registros. Todavía no verificamos el nombre asociado. Eso no significa que el resultado sea incorrecto, solo que la verificación está en curso.</p>
       {% endif %}
       {% if identity.document_type == "natural_person" %}
