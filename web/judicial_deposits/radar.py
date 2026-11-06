@@ -29,7 +29,6 @@ def search(raw_document_number: str) -> RadarMatch | None:
         finding_count=result.deposit_count,
         total_amount_cop=result.total_amount_cop,
         detail_url=f"{detail_url}?nit={quote(result.document_number)}",
-        actionable=claim_status == "reclamable",
         extra={"claim_status": claim_status},
     )
 

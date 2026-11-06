@@ -93,6 +93,5 @@ def results(request):
             # Identity (name, document type, RUES status) is core/party data,
             # the same whichever radar reports it.
             context["identity"] = matches[0][1]
-            context["actionable"] = any(match.actionable for _, match in matches)
 
     return render(request, "home/results.html", context)

@@ -26,9 +26,6 @@ class RadarMatch:
     finding_count: int
     total_amount_cop: int
     detail_url: str
-    # True when the radar considers the finding still actionable (e.g. its
-    # claim window is open); drives the shared "what to do next" copy.
-    actionable: bool = False
     # Radar-specific data for that radar's own results-row template.
     extra: dict = field(default_factory=dict)
 

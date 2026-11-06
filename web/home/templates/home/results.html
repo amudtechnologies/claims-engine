@@ -70,49 +70,12 @@
           </thead>
           <tbody>
             {% for spec, match in matches %}{% include spec.results_row_template %}{% endfor %}
-            <tr class="results-table-row--pending">
-              <td class="results-table-radar">Más radares</td>
-              <td data-label="Hallazgos">—</td>
-              <td data-label="Valor estimado">—</td>
-              <td data-label="Estado"><span class="results-status results-status--pending"><span class="dot"></span>En desarrollo</span></td>
-            </tr>
           </tbody>
         </table>
       </div>
-      <p class="results-more-radars">Estamos construyendo nuevos radares sobre otras fuentes. Vuelva a consultar este número más adelante. <a href="{% url 'home:radares' %}">Conozca los radares en desarrollo</a></p>
     </div>
   </section>
 
-  <section class="results-next">
-    <div class="wrap">
-      <ol class="progress-track" aria-label="Etapas de una oportunidad patrimonial">
-        <li class="is-done"><span class="progress-dot" aria-hidden="true"></span><strong>Coincidencia</strong><small>Su número aparece en una fuente pública</small></li>
-        <li class="is-current"><span class="progress-dot" aria-hidden="true"></span><strong>Posible derecho</strong><small>Por verificar</small></li>
-        <li><span class="progress-dot" aria-hidden="true"></span><strong>Derecho verificado</strong><small>Pendiente</small></li>
-        <li><span class="progress-dot" aria-hidden="true"></span><strong>Dinero disponible</strong><small>Pendiente</small></li>
-      </ol>
-    </div>
-    <div class="wrap results-next-grid">
-      <div>
-        <h2 class="serif">Qué significa este resultado</h2>
-        <p>Su número <strong>aparece en una fuente pública</strong>. Eso es una coincidencia, no un derecho acreditado ni dinero disponible: la lista no indica a quién pertenece el valor y el plazo para reclamar puede haber vencido.</p>
-        <h3>Qué falta verificar</h3>
-        <ul>
-          <li>Si usted es el beneficiario del depósito y no la contraparte del proceso.</li>
-          <li>El proceso judicial y el despacho donde se constituyó.</li>
-          <li>Si el plazo de reclamación sigue abierto{% if actionable %} (según nuestros datos, hay hallazgos que aún figuran como reclamables){% endif %}.</li>
-        </ul>
-      </div>
-      <div class="results-next-cta">
-        <h3>Qué puede hacer ahora</h3>
-        <p>Si quiere que revisemos su caso y lo acompañemos en la verificación y en la gestión de la reclamación, escríbanos.</p>
-        {% if company_profile.email %}
-        <a class="btn btn-primary" href="mailto:{{ company_profile.email }}?subject=Quiero%20verificar%20mi%20resultado&amp;body=Mi%20n%C3%BAmero%20consultado%20es%20{{ identity.document_number|urlencode }}.">Solicitar acompañamiento</a>
-        {% endif %}
-        <p class="results-next-fine">Amud Technologies es una plataforma privada e independiente: no pertenece al Estado ni hace parte de ninguna entidad pública.</p>
-      </div>
-    </div>
-  </section>
 {% else %}
   <section class="results-empty">
     <div class="wrap">

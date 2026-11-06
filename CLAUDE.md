@@ -18,9 +18,9 @@ should be visible on arrival, not one click away. This is an informational
 self-lookup — someone enters a NIT or cédula and sees only what's on record for
 it — the D24 self-lookup pattern, serving natural persons as well as legal
 entities per D28, not outbound outreach or sales scoring. `/resultados/` renders
-one row per radar (today, only Depósitos judiciales has real data; other radars
-are listed as "En desarrollo" with no numbers — never fabricated placeholder
-figures). It deliberately omits
+one row per radar that found something for the number (today only Depósitos
+judiciales exists) — radars without a match, or not built yet, are simply not
+listed: no "En desarrollo" rows and never fabricated placeholder figures. It deliberately omits
 any probability/validation scoring split: that's the inference layer (Phase 6),
 explicitly out of the active plan (§7), and any "which finding is worth acting on"
 signal is a scoring-for-sales judgment this phase doesn't build. It queries

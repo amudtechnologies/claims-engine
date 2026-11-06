@@ -95,7 +95,6 @@ class ResultsTests(TestCase):
             finding_count=2,
             total_amount_cop=5_000_000,
             detail_url="/depositos-judiciales/resultado/?nit=900123456",
-            actionable=True,
             extra={"claim_status": "reclamable"},
         )
         spec = {r.slug: r for r in radars.all_radars()}["depositos-judiciales"]
@@ -112,4 +111,5 @@ class ResultsTests(TestCase):
         self.assertContains(response, "$ 5.000.000")
         self.assertContains(response, "Reclamable")
         self.assertContains(response, "NIT 900123456")
-        self.assertContains(response, "Solicitar acompañamiento")
+        self.assertNotContains(response, "Más radares")
+        self.assertNotContains(response, "Qué puede hacer ahora")
