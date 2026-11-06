@@ -6,4 +6,5 @@ app_name = "judicial_deposits"
 
 urlpatterns = [
     path("", views.index, name="index"),
+    path("resultado/", views.detail, name="detail"),
 ]

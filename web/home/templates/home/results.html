@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static jd_extras %}
+{% load static home_extras %}
 
 {% block robots_meta %}<meta name="robots" content="noindex,follow">{% endblock %}
 
@@ -30,26 +30,26 @@
       <p>«{{ raw_document_number }}» no tiene el formato de un número de identificación válido. Ingrese un NIT o una cédula.</p>
     </div>
   </section>
-{% elif result %}
+{% elif matches %}
   <section class="results-head">
     <div class="wrap">
-      {% if result.party_name %}
-        <h1 class="serif">Resultados para {{ result.party_name }}</h1>
-      {% elif result.source_declared_name %}
-        <h1 class="serif">Resultados para {{ result.source_declared_name }}</h1>
+      {% if identity.party_name %}
+        <h1 class="serif">Resultados para {{ identity.party_name }}</h1>
+      {% elif identity.source_declared_name %}
+        <h1 class="serif">Resultados para {{ identity.source_declared_name }}</h1>
       {% else %}
         <h1 class="serif">Resultados de la búsqueda</h1>
       {% endif %}
       <p class="results-meta">
-        {{ result.document_type|document_number_label }} {{ result.document_number }}{% if result.document_type %} · {{ result.document_type|document_type_label }}{% endif %}{% if result.rues_active is not None %} · {% if result.rues_active %}Activo en RUES{% else %}Inactivo en RUES{% endif %}{% endif %}
+        {{ identity.document_type|document_number_label }} {{ identity.document_number }}{% if identity.document_type %} · {{ identity.document_type|document_type_label }}{% endif %}{% if identity.rues_active is not None %} · {% if identity.rues_active %}Activo en RUES{% else %}Inactivo en RUES{% endif %}{% endif %}
         <br>Búsqueda realizada el {{ searched_at|date:"j \d\e F \d\e Y" }}
       </p>
-      {% if not result.party_name and result.source_declared_name %}
+      {% if not identity.party_name and identity.source_declared_name %}
         <p class="results-privacy-note">Este nombre proviene del registro judicial que reportó el depósito. Todavía no lo verificamos contra el RUES.</p>
-      {% elif not result.party_name %}
+      {% elif not identity.party_name %}
         <p class="results-privacy-note">Este número aparece en nuestros registros. Todavía no verificamos el nombre asociado. Eso no significa que el resultado sea incorrecto, solo que la verificación está en curso.</p>
       {% endif %}
-      {% if result.document_type == "natural_person" %}
+      {% if identity.document_type == "natural_person" %}
         <p class="results-privacy-note">Esta consulta está pensada para que usted verifique su propia información pública — no la use para consultar a terceros sin su autorización.</p>
       {% endif %}
     </div>
@@ -69,22 +69,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr class="results-row results-row--link" data-row-href="{% url 'judicial_deposits:index' %}?nit={{ result.document_number|urlencode }}">
-              <td class="results-table-radar">
-                <a href="{% url 'judicial_deposits:index' %}?nit={{ result.document_number|urlencode }}">Depósitos judiciales</a>
-                <span class="results-row-caret" aria-hidden="true">&rsaquo;</span>
-              </td>
-              <td class="mono" data-label="Hallazgos">{{ result.deposit_count }}</td>
-              <td class="mono" data-label="Valor estimado">{{ result.total_amount_cop|cop }}</td>
-              <td data-label="Estado">
-                <span class="results-table-status-cell">
-                  <span class="results-status results-status--active"><span class="dot"></span>Activo</span>
-                  {% if claim_status == "reclamable" %}<span class="jd-tag jd-tag--open">Reclamable</span>
-                  {% elif claim_status == "no_reclamable" %}<span class="jd-tag jd-tag--closed">No reclamable</span>
-                  {% elif claim_status == "activo" %}<span class="jd-tag jd-tag--pending">Vigente</span>{% endif %}
-                </span>
-              </td>
-            </tr>
+            {% for spec, match in matches %}{% include spec.results_row_template %}{% endfor %}
             <tr class="results-table-row--pending">
               <td class="results-table-radar">Más radares</td>
               <td data-label="Hallazgos">—</td>
@@ -115,14 +100,14 @@
         <ul>
           <li>Si usted es el beneficiario del depósito y no la contraparte del proceso.</li>
           <li>El proceso judicial y el despacho donde se constituyó.</li>
-          <li>Si el plazo de reclamación sigue abierto{% if claim_status == "reclamable" %} (según nuestros datos, este periodo aún figura como reclamable){% endif %}.</li>
+          <li>Si el plazo de reclamación sigue abierto{% if actionable %} (según nuestros datos, hay hallazgos que aún figuran como reclamables){% endif %}.</li>
         </ul>
       </div>
       <div class="results-next-cta">
         <h3>Qué puede hacer ahora</h3>
         <p>Si quiere que revisemos su caso y lo acompañemos en la verificación y en la gestión de la reclamación, escríbanos.</p>
         {% if company_profile.email %}
-        <a class="btn btn-primary" href="mailto:{{ company_profile.email }}?subject=Quiero%20verificar%20mi%20resultado&amp;body=Mi%20n%C3%BAmero%20consultado%20es%20{{ result.document_number|urlencode }}.">Solicitar acompañamiento</a>
+        <a class="btn btn-primary" href="mailto:{{ company_profile.email }}?subject=Quiero%20verificar%20mi%20resultado&amp;body=Mi%20n%C3%BAmero%20consultado%20es%20{{ identity.document_number|urlencode }}.">Solicitar acompañamiento</a>
         {% endif %}
         <p class="results-next-fine">Amud Technologies es una plataforma privada e independiente: no pertenece al Estado ni hace parte de ninguna entidad pública.</p>
       </div>

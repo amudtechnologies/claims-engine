@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static jd_extras %}
+{% load static home_extras %}
 
 {% block content %}
 
@@ -10,30 +10,28 @@
     <p class="lede">Monitoreamos múltiples fuentes para identificar dinero, derechos económicos, oportunidades o activos que podrían corresponderle. Cada radar está diseñado para encontrar oportunidades diferentes y responder a necesidades específicas.</p>
 
     <div class="radar-list">
-      {% for radar in radars %}
-        {% if radar.is_active %}<a href="{{ radar.cta_url }}" class="radar-list-item">{% else %}<div class="radar-list-item radar-list-item--soon">{% endif %}
+      {% for spec, stats in radars %}
+        {% if spec.is_active %}<a href="{% url spec.landing_url_name %}" class="radar-list-item">{% else %}<div class="radar-list-item radar-list-item--soon">{% endif %}
           <div class="radar-list-item-main">
-            <span class="radar-list-item-name">{{ radar.name }}</span>
-            <span class="results-status results-status--{% if radar.is_active %}active{% else %}pending{% endif %}"><span class="dot"></span>{{ radar.get_status_display }}</span>
+            <span class="radar-list-item-name">{{ spec.name }}</span>
+            <span class="results-status results-status--{% if spec.is_active %}active{% else %}pending{% endif %}"><span class="dot"></span>{{ spec.status_label }}</span>
           </div>
-          <p class="radar-list-item-desc">{{ radar.problem }}</p>
+          <p class="radar-list-item-desc">{{ spec.problem }}</p>
           <dl class="radar-facts">
-            <div><dt>Qué identifica</dt><dd>{{ radar.identifies }}</dd></div>
-            <div><dt>Para quién</dt><dd>{{ radar.audience }}</dd></div>
+            <div><dt>Qué identifica</dt><dd>{{ spec.identifies }}</dd></div>
+            <div><dt>Para quién</dt><dd>{{ spec.audience }}</dd></div>
           </dl>
-          {% if radar.slug == "depositos-judiciales" and jd_observation_count %}
+          {% if stats %}
           <div class="radar-list-item-stats">
+            {% for value, label in stats %}
             <div>
-              <div class="radar-list-item-stat-num mono">{{ jd_total_amount_cop|cop }}</div>
-              <div class="radar-list-item-stat-label">Valor total en el histórico 2017–2026</div>
+              <div class="radar-list-item-stat-num mono">{{ value }}</div>
+              <div class="radar-list-item-stat-label">{{ label }}</div>
             </div>
-            <div>
-              <div class="radar-list-item-stat-num mono">{{ jd_observation_count|es_co_number }}</div>
-              <div class="radar-list-item-stat-label">Observaciones registradas</div>
-            </div>
+            {% endfor %}
           </div>
           {% endif %}
-        {% if radar.is_active %}</a>{% else %}</div>{% endif %}
+        {% if spec.is_active %}</a>{% else %}</div>{% endif %}
       {% endfor %}
     </div>
 

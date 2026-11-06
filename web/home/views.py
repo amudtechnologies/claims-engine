@@ -1,9 +1,8 @@
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
-from judicial_deposits import core_cache, party_search
 
-from .models import Radar
+from . import radars
 
 
 def robots_txt(request):
@@ -37,10 +36,8 @@ def index(request):
 
 
 def radares(request):
-    """The radar family index — Radar de Acreencias is the platform; each radar
-    below is one data source it searches. Cross-radar by nature (lists every
-    radar, not just judicial deposits), so it lives in `home` alongside
-    `results` rather than inside one radar's own app."""
+    """The radar family index. Each radar is its own app that registers a
+    RadarSpec (home/radars.py); this page only lists what is registered."""
     context = {
         "active_nav": "radares",
         "page_title": "Radares activos y en desarrollo — Amud Technologies",
@@ -49,11 +46,11 @@ def radares(request):
             "colombianas que cruzamos para identificar dinero, derechos y "
             "activos asociados a una empresa o persona natural."
         ),
+        "radars": [
+            (spec, spec.card_stats() if spec.card_stats else [])
+            for spec in radars.all_radars()
+        ],
     }
-    context["radars"] = Radar.objects.filter(is_published=True)
-    if core_cache.is_synced():
-        context["jd_total_amount_cop"] = party_search.total_claim_amount_cop()
-        context["jd_observation_count"] = party_search.total_observation_count()
     return render(request, "home/radares.html", context)
 
 
@@ -62,7 +59,7 @@ def results(request):
     if not raw_document_number:
         return redirect("home:index")
 
-    normalized_document_number = party_search.normalize_document_number(raw_document_number)
+    normalized_document_number = "".join(c for c in raw_document_number if c.isdigit())
     context = {
         "active_nav": "home",
         "page_title": "Resultados de su consulta — Amud Technologies",
@@ -80,16 +77,22 @@ def results(request):
         "document_number_looks_invalid": len(normalized_document_number) < 5,
     }
 
-    if not core_cache.is_synced():
+    available = [r for r in radars.all_radars() if r.is_active and r.is_available()]
+    if not available:
         context["cache_unavailable"] = True
         return render(request, "home/results.html", context)
 
     if not context["document_number_looks_invalid"]:
-        result = party_search.search_party(raw_document_number)
-        context["result"] = result
-        if result and result.last_period:
-            window = party_search.claim_window(result.last_period)
-            source = result.source_for_period(result.last_period)
-            context["claim_status"] = party_search.claim_status(window, source)
+        matches = []
+        for spec in available:
+            match = spec.search(raw_document_number)
+            if match:
+                matches.append((spec, match))
+        context["matches"] = matches
+        if matches:
+            # Identity (name, document type, RUES status) is core/party data,
+            # the same whichever radar reports it.
+            context["identity"] = matches[0][1]
+            context["actionable"] = any(match.actionable for _, match in matches)
 
     return render(request, "home/results.html", context)

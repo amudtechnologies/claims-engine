@@ -142,24 +142,30 @@ Adding a radar should mean writing an adapter, not modifying the core.
 
 `web/` is a Django project — the public-facing site, separate from the pipeline
 layers above (it consumes what the pipeline produces; it never writes to
-`raw/`/`staging/`/`core/`/`marts/`). Two apps so far:
+`raw/`/`staging/`/`core/`/`marts/`).
 
-- `home` — the Amud Technologies company page. Amud is the claims engine in
-  general; judicial deposits is one radar under it, not the whole product. Its
-  hero has the document-number search bar (NIT or cédula —
-  `home/_search_form.html`, shared with the results page's own compact search
-  bar), and its `results` view
-  (`/resultados/`, `home/views.py`) renders the consolidated, cross-radar
-  results page — the search's actual destination. `results` calls straight
-  into `judicial_deposits.party_search`/`core_cache` for data; it's cross-radar
-  by nature, so it lives here rather than inside one radar's app.
-- `judicial_deposits` — owns the radar's query logic (`party_search.py`,
-  `core_cache.py`), consumed by `home.views.results` above. Its own
-  `/depositos-judiciales/` page is now an info-only landing page for the radar
-  (what it is, aggregate stats) with a link back to the home hero search — it
-  no longer renders a search box or results itself, to avoid two competing
-  places search could happen. Queries `core/*` live via a local Parquet cache
-  (see above) until a real marts aggregation exists to query instead.
+**One Django app per radar.** Each radar app owns everything about its radar end
+to end: landing page, detail pages, the search implementation, templates,
+styles, admin, tests. Radars are *not* rows in a table. A radar plugs into the
+shell by registering a `RadarSpec` (`web/home/radars.py`) from its
+`AppConfig.ready()` — name, problem it solves, what it identifies, audience,
+status, landing URL name, a `search(document_number) -> RadarMatch | None`, an
+`is_available()` check, optional card figures, and its own results-row template.
+Adding a radar means adding an app and registering it; the shell is not edited.
+
+- `home` — the shell and the company page. Hero with the document-number search
+  (NIT or cédula, `home/_search_form.html`). It only *aggregates* radars: the
+  `/radares/` index lists whatever is registered, and `/resultados/`
+  (`home/views.py`) asks every available radar to search the number and renders
+  each radar's own results row. Identity (name, document type, RUES status) is
+  `core/party` data, the same whichever radar reports it. `home` never imports a
+  specific radar.
+- `judicial_deposits` — the first radar. `/depositos-judiciales/` is its
+  info-only landing page (what it is, aggregate stats);
+  `/depositos-judiciales/resultado/?nit=` is its detail page for one document
+  number. `party_search.py`/`core_cache.py` query `core/*` via the local Parquet
+  cache; `radar.py` is its registration.
+- `cms` — editorial pages, articles ("Aprenda", `/guias/`), footer, sitemap.
 
 Code (apps, views, templates, static files, variables, URL names) is named in
 English like everything else in this repo. The exception is template *copy* —

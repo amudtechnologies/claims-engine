@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
+from home import radars
 
 from .models import Article, Category, Page
 
@@ -8,11 +9,9 @@ from .models import Article, Category, Page
 class StaticSitemap(Sitemap):
 
     def items(self):
-        items = [
-            ("home:index", 1.0, "weekly"),
-            ("judicial_deposits:index", 0.9, "weekly"),
-            ("home:radares", 0.6, "monthly"),
-        ]
+        items = [("home:index", 1.0, "weekly"), ("home:radares", 0.6, "monthly")]
+        # Each active radar's landing page comes from its own registration.
+        items += [(r.landing_url_name, 0.9, "weekly") for r in radars.all_radars() if r.is_active]
         if settings.CMS_ARTICLES_ENABLED and Article.objects.live().exists():
             items.append(("cms:article_list", 0.7, "daily"))
         return items

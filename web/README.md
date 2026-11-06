@@ -1,9 +1,10 @@
 # web
 
 The public-facing Django site — `home` (company page, document-number search
-hero — NIT or cédula) and
-`judicial_deposits` (radar landing page, search logic). See `CLAUDE.md` at
-the repo root for the app split and why `results` lives in `home`.
+hero, `/radares/` and the consolidated `/resultados/`), `cms` (pages and
+articles) and one app per radar (`judicial_deposits` today). Each radar app
+owns its landing, detail, search and templates and registers a `RadarSpec`
+(`home/radars.py`) from `AppConfig.ready()`; see `CLAUDE.md` at the repo root.
 
 ## Local development
 
@@ -102,8 +103,6 @@ remove content.
   de datos, términos); the legal ones need counsel review before publishing.
 - **Artículos** (`/guias/<slug>/`, listing `/guias/`, categories
   `/guias/categoria/<slug>/`) with author, categories, excerpt and SEO fields.
-- **Radares** (`home.Radar`): the cards on the home page and `/radares/`. A new
-  row appears automatically; "En desarrollo" radars never show figures.
 - Visibility: only `status = Publicado` with `published_at <= now` is public,
   in the footer and in `/sitemap.xml`. Drafts 404 publicly; staff with change
   permission can preview them (marked `noindex`). A future `published_at`
