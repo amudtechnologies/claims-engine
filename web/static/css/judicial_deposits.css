@@ -96,7 +96,19 @@ a.radar-card::after { display: none; }
 .radar-card-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; margin: 0; padding-top: 12px; border-top: 1px solid var(--hair); }
 .radar-card-stats dd { margin: 0; font-size: 1rem; font-weight: 700; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .radar-card-stats dt { margin-top: 2px; font-size: 0.72rem; line-height: 1.35; color: var(--ink-softer); }
-.radar-card .radar-cta { margin-top: 2px; }
+/* Make the whole card read as clickable: a full-width action strip at the
+   bottom, and a hover/focus state on the entire card. */
+a.radar-card { overflow: hidden; transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease; }
+a.radar-card:hover, a.radar-card:focus-visible { background: var(--white); border-color: var(--teal); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+a.radar-card:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+.radar-card-action { display: flex; align-items: center; justify-content: space-between; margin: 4px -22px -20px; padding: 14px 22px; font-size: 0.9rem; font-weight: 600; color: var(--teal-ink); background: var(--panel); border-top: 1px solid var(--hair); transition: background 0.15s ease, color 0.15s ease; }
+.radar-card-arrow { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--white); border: 1px solid var(--hair-strong); transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease; }
+a.radar-card:hover .radar-card-action, a.radar-card:focus-visible .radar-card-action { background: var(--teal); color: var(--navy); }
+a.radar-card:hover .radar-card-arrow, a.radar-card:focus-visible .radar-card-arrow { transform: translateX(3px); border-color: var(--navy); }
+@media (prefers-reduced-motion: reduce) {
+  a.radar-card, a.radar-card:hover { transform: none; }
+  a.radar-card:hover .radar-card-arrow { transform: none; }
+}
 
 /* Figures stay on one line; smaller on phones so the long COP total fits. */
 .jd-stats .stat-num { white-space: nowrap; }
