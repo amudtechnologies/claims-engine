@@ -112,4 +112,5 @@ class ResultsTests(TestCase):
         self.assertContains(response, "Reclamable")
         self.assertContains(response, "NIT 900123456")
         self.assertNotContains(response, "Más radares")
+        self.assertNotContains(response, "is-active")  # results is not a nav section
         self.assertNotContains(response, "Qué puede hacer ahora")
