@@ -37,8 +37,12 @@ class RadarRegistryTests(TestCase):
 
     def test_radares_page_lists_registered_radars(self):
         response = self.client.get("/radares/")
-        self.assertContains(response, "Depósitos judiciales")
-        self.assertContains(response, "Activo")
+        # The radar draws its own card (same overview as its landing page):
+        # title, legal-terms strip, CTA and figures, with its own stylesheet.
+        self.assertContains(response, "Depósitos Judiciales")
+        self.assertContains(response, "20 días hábiles")
+        self.assertContains(response, "Consultar ahora")
+        self.assertContains(response, "css/judicial_deposits.css")
 
     def test_new_radar_shows_without_figures_when_in_development(self):
         with mock.patch.dict(radars._REGISTRY, clear=False):

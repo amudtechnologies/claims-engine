@@ -1,5 +1,5 @@
 .jd-intro { padding-top: clamp(56px, 8vw, 100px); padding-bottom: clamp(16px, 2vw, 32px); }
-.jd-intro h1 {
+.jd-title {
   margin: 0 0 20px 0;
   font-size: clamp(2.1rem, 3.4vw + 0.6rem, 3.2rem);
   line-height: 1.1;
@@ -7,9 +7,9 @@
   letter-spacing: -0.02em;
   color: var(--ink);
 }
-.jd-intro .lede { margin-bottom: 12px; }
+.jd-overview .lede { margin-bottom: 12px; }
 .jd-explainer { margin: 0 0 28px 0; font-size: 0.98rem; line-height: 1.6; color: var(--ink-soft); max-width: 62ch; }
-.jd-intro .btn { margin-bottom: 8px; }
+.jd-overview .btn { margin-bottom: 8px; }
 
 .jd-stats-block { margin-top: 36px; padding-top: 36px; border-top: 1px solid var(--hair); }
 .jd-stats-title { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 20px; }
@@ -58,3 +58,36 @@
      wrapping once four stats of different digit-lengths share a row. */
   .jd-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 24px 16px; }
 }
+
+/* FACT STRIP — legal terms on this radar's landing page */
+.fact-strip { display: flex; flex-wrap: wrap; margin: 0 0 24px 0; padding: 0 22px; background: var(--surface); border: 1px solid var(--hair); border-radius: var(--r-md); }
+.fact-item {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  flex: 1 1 280px;
+  padding: 13px 0;
+  font-size: 0.84rem;
+  color: var(--ink-softer);
+  border-top: 1px solid var(--hair);
+}
+.fact-item:nth-child(-n+3) { border-top: none; }
+.fact-item .dot { width: 6px; height: 6px; border-radius: 50%; flex: none; background: var(--accent); position: relative; top: -1px; }
+.fact-num { font-weight: 700; color: var(--ink); flex: none; }
+
+@media (max-width: 640px) {
+  .fact-item { flex-basis: 100%; }
+  .fact-item:nth-child(-n+3) { border-top: 1px solid var(--hair); }
+  .fact-item:first-child { border-top: none; }
+}
+
+
+/* The same overview inside its card on /radares/: a smaller heading. */
+.radar-overview { padding: clamp(20px, 3vw, 28px); }
+.radar-overview .hero-stats { gap: 16px 28px; }
+.radar-overview .jd-title { font-size: clamp(1.6rem, 2vw + 0.8rem, 2.2rem); }
+.radar-overview .fact-strip { margin-bottom: 24px; }
+
+/* Figures stay on one line; smaller on phones so the long COP total fits. */
+.jd-stats .stat-num { white-space: nowrap; }
+@media (max-width: 480px) { .jd-stats .stat-num { font-size: 1.05rem; } }

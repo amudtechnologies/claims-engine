@@ -8,7 +8,7 @@ from . import radar
 class LandingTests(TestCase):
     def test_landing_renders_without_a_party_search(self):
         response = self.client.get("/depositos-judiciales/")
-        self.assertContains(response, "Dinero olvidado en procesos judiciales")
+        self.assertContains(response, "Depósitos Judiciales")
         self.assertNotContains(response, "RESULTADO PARA ESTA BÚSQUEDA")
 
     def test_legacy_nit_query_redirects_to_detail(self):
@@ -55,3 +55,23 @@ class RadarContractTests(TestCase):
     def test_card_stats_empty_when_unsynced(self):
         with mock.patch("judicial_deposits.radar.core_cache.is_synced", return_value=False):
             self.assertEqual(radar.card_stats(), [])
+
+    def test_card_stats_match_the_landing_figures(self):
+        with (
+            mock.patch("judicial_deposits.radar.core_cache.is_synced", return_value=True),
+            mock.patch("judicial_deposits.radar.party_search") as ps,
+        ):
+            ps.latest_published_period.return_value = "2026-2"
+            ps.total_court_count.return_value = 4598
+            ps.total_party_count.return_value = 1_270_000
+            ps.total_claim_amount_cop.return_value = 970_428_695_188
+            stats = radar.card_stats()
+        self.assertEqual(
+            stats,
+            [
+                ("2017–2026", "Historial de datos públicos"),
+                ("4.598", "Despachos judiciales analizados"),
+                ("1,27M+", "Empresas y personas identificadas"),
+                ("$ 970.428.695.188", "Valor total de los depósitos encontrados a la fecha"),
+            ],
+        )

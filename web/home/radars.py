@@ -47,6 +47,10 @@ class RadarSpec:
     is_available: Callable[[], bool] = lambda: True
     # Optional real figures for the /radares/ card: [(value, label), ...].
     card_stats: Callable[[], list[tuple[str, str]]] | None = None
+    # Optional partial rendered inside the radar's /radares/ card, and the
+    # stylesheet (static path) the shell loads on that page to style it.
+    card_template: str | None = None
+    stylesheet: str | None = None
     status: str = "active"  # "active" | "in_development"
     cta_label: str = "Conocer el radar"
 

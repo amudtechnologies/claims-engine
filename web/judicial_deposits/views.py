@@ -3,7 +3,7 @@ from urllib.parse import quote
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
-from . import core_cache, party_search
+from . import core_cache, party_search, radar
 
 
 def index(request):
@@ -23,19 +23,9 @@ def index(request):
             "qué son, cuánto tiempo tiene para reclamarlos y cómo hacerlo."
         ),
     }
+    context["stats"] = radar.card_stats()
     if core_cache.is_synced():
         context["observation_count"] = party_search.total_observation_count()
-        context["court_count"] = party_search.total_court_count()
-
-        party_count = party_search.total_party_count()
-        if party_count:
-            context["party_count_millions"] = round(party_count / 1_000_000, 3)
-
-        context["total_amount_cop"] = party_search.total_claim_amount_cop()
-
-        latest_period = party_search.latest_published_period()
-        if latest_period:
-            context["latest_year"] = latest_period.split("-")[0]
     return render(request, "judicial_deposits/index.html", context)
 
 

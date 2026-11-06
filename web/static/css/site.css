@@ -366,29 +366,6 @@ a.radar-list-item:hover::after {
 .jd-tag--closed { color: var(--ink-softer); background: var(--mist); }
 .jd-tag--pending { color: var(--ink-soft); background: transparent; border: 1px solid var(--gold); }
 
-/* FACT STRIP (shared: home methodology strip + radar page legal terms) */
-.fact-strip { display: flex; flex-wrap: wrap; margin: 0 0 24px 0; padding: 0 22px; background: var(--surface); border: 1px solid var(--hair); border-radius: var(--r-md); }
-.fact-item {
-  display: flex;
-  align-items: baseline;
-  gap: 9px;
-  flex: 1 1 280px;
-  padding: 13px 0;
-  font-size: 0.84rem;
-  color: var(--ink-softer);
-  border-top: 1px solid var(--hair);
-}
-.fact-item:nth-child(-n+3) { border-top: none; }
-.fact-item .dot { width: 6px; height: 6px; border-radius: 50%; flex: none; background: var(--accent); position: relative; top: -1px; }
-.fact-num { font-weight: 700; color: var(--ink); flex: none; }
-
-@media (max-width: 640px) {
-  .fact-item { flex-basis: 100%; }
-  .fact-item:nth-child(-n+3) { border-top: 1px solid var(--hair); }
-  .fact-item:first-child { border-top: none; }
-}
-
-
 /* RADARS INDEX (/radares/) */
 .radars-index { padding-top: clamp(56px, 8vw, 100px); padding-bottom: clamp(56px, 8vw, 100px); }
 .radars-index h1 { margin: 0 0 18px 0; font-size: clamp(2rem, 3vw + 0.6rem, 2.8rem); line-height: 1.1; font-weight: 600; letter-spacing: -0.02em; }

@@ -13,22 +13,7 @@
       <a href="{% url 'home:radares' %}">Radar de Acreencias</a> <span aria-hidden="true">/</span> Depósitos judiciales
     </nav>
     <div class="eyebrow mono"><span class="dot"></span>RADAR ACTIVO</div>
-    <h1 class="serif">Dinero olvidado en procesos judiciales</h1>
-    <p class="lede">Existen depósitos judiciales que permanecen sin ser reclamados durante años. La ley establece un plazo para que sus beneficiarios los reclamen y, una vez vencido, los recursos prescriben de pleno derecho a favor de la Nación.</p>
-
-    {% include "_legal_facts.html" %}
-
-    <a href="{% url 'home:index' %}#buscar" class="btn btn-primary">Consultar ahora</a>
-
-    <div class="jd-stats-block">
-      <div class="jd-stats-title">EL RADAR DE DEPÓSITOS JUDICIALES EN CIFRAS</div>
-      <div class="hero-stats jd-stats">
-        <div class="stat"><div class="stat-num mono">2017–{{ latest_year|default:"2026" }}</div><div class="stat-label">Historial de datos públicos</div></div>
-        <div class="stat"><div class="stat-num mono">{% if court_count %}<span class="js-counter" data-target="{{ court_count }}">{{ court_count|es_co_number }}</span>{% else %}—{% endif %}</div><div class="stat-label">Despachos judiciales analizados</div></div>
-        <div class="stat"><div class="stat-num mono">{% if party_count_millions %}<span class="js-counter" data-target="{{ party_count_millions|stringformat:'.3f' }}" data-decimals="2">{{ party_count_millions|es_co_number:2 }}</span>M+{% else %}—{% endif %}</div><div class="stat-label">Empresas y personas identificadas</div></div>
-        <div class="stat"><div class="stat-num mono">{% if total_amount_cop %}$ <span class="js-counter" data-target="{{ total_amount_cop }}">{{ total_amount_cop|es_co_number }}</span>{% else %}—{% endif %}</div><div class="stat-label">Valor total de los depósitos encontrados a la fecha</div></div>
-      </div>
-    </div>
+    {% include "judicial_deposits/_overview.html" with heading_tag="h1" %}
   </div>
 </section>
 

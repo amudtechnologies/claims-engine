@@ -1,0 +1,20 @@
+{# Shared by the radar's landing page (heading_tag h1) and its /radares/ card (h2). #}
+<div class="jd-overview">
+  <{{ heading_tag|default:"h1" }} class="serif jd-title">Depósitos Judiciales</{{ heading_tag|default:"h1" }}>
+  <p class="lede">Existen depósitos judiciales que permanecen sin ser reclamados durante años. La ley establece un plazo para que sus beneficiarios los reclamen y, una vez vencido, los recursos prescriben de pleno derecho a favor de la Nación.</p>
+
+  {% include "judicial_deposits/_legal_facts.html" %}
+
+  <a href="{% url 'home:index' %}#buscar" class="btn btn-primary">Consultar ahora</a>
+
+  {% if stats %}
+  <div class="jd-stats-block">
+    <div class="jd-stats-title">EL RADAR DE DEPÓSITOS JUDICIALES EN CIFRAS</div>
+    <div class="hero-stats jd-stats">
+      {% for value, label in stats %}
+      <div class="stat"><div class="stat-num mono">{{ value }}</div><div class="stat-label">{{ label }}</div></div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>

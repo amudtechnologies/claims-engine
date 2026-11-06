@@ -35,11 +35,23 @@ def search(raw_document_number: str) -> RadarMatch | None:
 
 
 def card_stats() -> list[tuple[str, str]]:
+    """The same four figures as this radar's landing page ("en cifras")."""
     if not core_cache.is_synced():
         return []
+    latest_period = party_search.latest_published_period()
+    latest_year = latest_period.split("-")[0] if latest_period else "2026"
+    party_count = party_search.total_party_count()
     return [
-        (cop(party_search.total_claim_amount_cop()), "Valor total en el histórico 2017–2026"),
-        (es_co_number(party_search.total_observation_count()), "Observaciones registradas"),
+        (f"2017–{latest_year}", "Historial de datos públicos"),
+        (es_co_number(party_search.total_court_count()), "Despachos judiciales analizados"),
+        (
+            f"{es_co_number(party_count / 1_000_000, 2)}M+" if party_count else "—",
+            "Empresas y personas identificadas",
+        ),
+        (
+            cop(party_search.total_claim_amount_cop()),
+            "Valor total de los depósitos encontrados a la fecha",
+        ),
     ]
 
 
@@ -63,4 +75,6 @@ spec = RadarSpec(
     search=search,
     is_available=core_cache.is_synced,
     card_stats=card_stats,
+    card_template="judicial_deposits/_overview.html",
+    stylesheet="css/judicial_deposits.css",
 )
