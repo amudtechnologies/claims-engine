@@ -469,3 +469,6 @@ a.radar-list-item:hover::after {
 @media (max-width: 480px) {
   .footer-grid { grid-template-columns: 1fr; }
 }
+
+/* /radares/: radars as a grid of small cards */
+.radars-index .radar-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }

@@ -75,6 +75,6 @@ spec = RadarSpec(
     search=search,
     is_available=core_cache.is_synced,
     card_stats=card_stats,
-    card_template="judicial_deposits/_overview.html",
+    card_template="judicial_deposits/_card.html",
     stylesheet="css/judicial_deposits.css",
 )

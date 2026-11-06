@@ -41,7 +41,11 @@ class RadarRegistryTests(TestCase):
         # title, legal-terms strip, CTA and figures, with its own stylesheet.
         self.assertContains(response, "Depósitos Judiciales")
         self.assertContains(response, "20 días hábiles")
-        self.assertContains(response, "Consultar ahora")
+        self.assertContains(
+            response, 'href="/depositos-judiciales/" class="radar-list-item radar-card"'
+        )
+        self.assertNotContains(response, "Consultar ahora")  # a card, not the landing block
+        self.assertNotContains(response, "Compact version")  # template comment never leaks
         self.assertContains(response, "css/judicial_deposits.css")
 
     def test_new_radar_shows_without_figures_when_in_development(self):

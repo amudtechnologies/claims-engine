@@ -82,11 +82,21 @@
 }
 
 
-/* The same overview inside its card on /radares/: a smaller heading. */
-.radar-overview { padding: clamp(20px, 3vw, 28px); }
-.radar-overview .hero-stats { gap: 16px 28px; }
-.radar-overview .jd-title { font-size: clamp(1.6rem, 2vw + 0.8rem, 2.2rem); }
-.radar-overview .fact-strip { margin-bottom: 24px; }
+/* COMPACT CARD on /radares/ (judicial_deposits/_card.html) */
+.radar-card { display: flex; flex-direction: column; gap: 12px; padding: 20px 22px; }
+a.radar-card { padding-right: 22px; }
+a.radar-card::after { display: none; }
+.radar-card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.radar-card-title { margin: 0; font-size: 1.15rem; font-weight: 700; letter-spacing: -0.015em; color: var(--ink); }
+.radar-card-desc { margin: 0; font-size: 0.86rem; line-height: 1.5; color: var(--ink-soft); }
+.radar-card .fact-strip { flex-direction: column; margin: 0; padding: 4px 14px; background: var(--panel); }
+.radar-card .fact-item { flex: none; padding: 7px 0; font-size: 0.78rem; border-top: 1px solid var(--hair); }
+.radar-card .fact-item:first-child { border-top: none; }
+.radar-card .fact-item:nth-child(-n+3):not(:first-child) { border-top: 1px solid var(--hair); }
+.radar-card-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; margin: 0; padding-top: 12px; border-top: 1px solid var(--hair); }
+.radar-card-stats dd { margin: 0; font-size: 1rem; font-weight: 700; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.radar-card-stats dt { margin-top: 2px; font-size: 0.72rem; line-height: 1.35; color: var(--ink-softer); }
+.radar-card .radar-cta { margin-top: 2px; }
 
 /* Figures stay on one line; smaller on phones so the long COP total fits. */
 .jd-stats .stat-num { white-space: nowrap; }

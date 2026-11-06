@@ -17,7 +17,7 @@
       {% for spec, stats in radars %}
         {% if spec.card_template %}
         {# The radar draws its own card content; `stats` is in scope for it. #}
-        <article class="radar-list-item radar-overview">{% include spec.card_template with heading_tag="h2" %}</article>
+        <a href="{% url spec.landing_url_name %}" class="radar-list-item radar-card">{% include spec.card_template %}</a>
         {% else %}
         {% if spec.is_active %}<a href="{% url spec.landing_url_name %}" class="radar-list-item">{% else %}<div class="radar-list-item radar-list-item--soon">{% endif %}
           <div class="radar-list-item-main">
