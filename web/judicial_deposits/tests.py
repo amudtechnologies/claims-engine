@@ -12,6 +12,12 @@ class LandingTests(TestCase):
         for section_id in ("como-funciona", "por-que-amud", "transparencia", "preguntas"):
             self.assertContains(response, f'id="{section_id}"')
         self.assertContains(response, 'href="/#buscar" class="btn btn-primary btn-lg"')
+        # No search form here: every "Consultar" button goes to the home search.
+        self.assertNotContains(response, 'action="/resultados/"')
+        self.assertNotContains(response, 'href="#consultar"')
+        # The product demo is always labelled as fictitious data.
+        self.assertContains(response, "Demostración · Datos ficticios")
+        self.assertNotContains(response, "pequeña comisión")
         self.assertNotContains(response, "RESULTADO DE SU CONSULTA")
 
     def test_legacy_nit_query_redirects_to_detail(self):

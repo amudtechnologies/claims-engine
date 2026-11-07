@@ -29,8 +29,8 @@ def index(request):
         "page_title": "Dinero que ya tiene dueño. Consulte si está a su nombre — Amud Technologies",
         "page_description": (
             "Consulte gratis con su NIT o cédula si hay depósitos judiciales sin "
-            "reclamar a nombre de su empresa o el suyo propio. Fuentes públicas "
-            "oficiales y acompañamiento legal."
+            "reclamar a nombre de su empresa o el suyo propio. Fuentes oficiales "
+            "y acompañamiento legal."
         ),
         # The "Radares" section (#radares): one card per registered radar.
         # Only active radars are shown — no "En desarrollo" placeholders.

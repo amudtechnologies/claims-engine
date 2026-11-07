@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   {# page_title / page_description are set per-view (see home/views.py) — the single source for <title>, the meta description, and the OG/Twitter tags below, so the three never drift apart. #}
   <title>{{ page_title|default:"Amud Technologies" }}</title>
-  <meta name="description" content="{{ page_description|default:'Amud Technologies detecta dinero que ya tiene dueño en fuentes públicas colombianas.' }}">
+  <meta name="description" content="{{ page_description|default:'Amud Technologies detecta dinero que ya tiene dueño en fuentes oficiales colombianas.' }}">
   {% block robots_meta %}{% endblock %}
   {% block extra_head %}{% endblock %}
   <link rel="canonical" href="{% block canonical %}{{ request.scheme }}://{{ request.get_host }}{{ request.path }}{% endblock %}">
@@ -22,11 +22,11 @@
   <meta property="og:locale" content="es_CO">
   <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
   <meta property="og:title" content="{{ page_title|default:'Amud Technologies' }}">
-  <meta property="og:description" content="{{ page_description|default:'Amud Technologies detecta dinero que ya tiene dueño en fuentes públicas colombianas.' }}">
+  <meta property="og:description" content="{{ page_description|default:'Amud Technologies detecta dinero que ya tiene dueño en fuentes oficiales colombianas.' }}">
   <meta property="og:image" content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/apple-touch-icon.png' %}{% endblock %}">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="{{ page_title|default:'Amud Technologies' }}">
-  <meta name="twitter:description" content="{{ page_description|default:'Amud Technologies detecta dinero que ya tiene dueño en fuentes públicas colombianas.' }}">
+  <meta name="twitter:description" content="{{ page_description|default:'Amud Technologies detecta dinero que ya tiene dueño en fuentes oficiales colombianas.' }}">
 
   <script type="application/ld+json">
   {
@@ -35,7 +35,7 @@
     "name": "Amud Technologies",
     "url": "{{ request.scheme }}://{{ request.get_host }}/",
     "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'img/apple-touch-icon.png' %}",
-    "description": "Amud Technologies cruza fuentes públicas oficiales de Colombia para identificar dinero que ya tiene un dueño identificable.",
+    "description": "Amud Technologies cruza fuentes oficiales de Colombia para identificar dinero que ya tiene un dueño identificable.",
     "areaServed": "CO"
   }
   </script>
@@ -47,7 +47,8 @@
 
   <div class="masthead">
     <div class="wrap masthead-inner mono">
-      <span>FUENTES PÚBLICAS OFICIALES · COLOMBIA</span>
+      <span>DATOS CON PROPÓSITO · COLOMBIA</span>
+      <span>MONITOREAMOS FUENTES OFICIALES</span>
     </div>
   </div>
 

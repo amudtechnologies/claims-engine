@@ -168,3 +168,65 @@ a.radar-card:hover .radar-card-arrow, a.radar-card:focus-visible .radar-card-arr
 .jd-cta-inner { text-align: center; }
 .jd-cta-title { margin: 0 0 14px 0; font-size: clamp(1.7rem, 2vw + 1rem, 2.4rem); line-height: 1.15; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); }
 .jd-cta-text { margin: 0 auto 28px; max-width: 52ch; font-size: 1.05rem; line-height: 1.6; color: var(--ink-soft); }
+
+.jd-stats-note { margin: 20px 0 0 0; max-width: 78ch; font-size: 0.78rem; line-height: 1.55; color: var(--ink-softer); }
+
+/* Pills: what is free vs. what is an additional service. */
+.jd-pill { display: inline-flex; align-items: center; height: 22px; padding: 0 9px; border-radius: 999px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+.jd-pill--free { background: var(--teal); color: var(--navy); }
+.jd-pill--paid { background: transparent; color: var(--ink-soft); border: 1px solid var(--hair-strong); }
+
+/* PRODUCT DEMO — fictitious data, styled after the real results page. */
+.jd-demo-layout { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 32px 56px; align-items: center; }
+.jd-demo-intro .jd-section-lede { margin-bottom: 0; }
+.jd-demo { background: var(--surface); border: 1px solid var(--hair); border-radius: var(--r-lg); box-shadow: var(--shadow-md); overflow: hidden; }
+.jd-demo-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--hair); }
+.jd-demo-dots { display: inline-flex; gap: 6px; }
+.jd-demo-dots span { width: 9px; height: 9px; border-radius: 50%; background: var(--hair-strong); }
+.jd-demo-badge { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #8a6a2f; background: rgba(197, 164, 109, 0.18); border: 1px solid rgba(197, 164, 109, 0.5); border-radius: 999px; padding: 3px 10px; }
+.jd-demo-body { padding: 22px 24px 24px; }
+.jd-demo-head { margin-bottom: 18px; }
+.jd-demo-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--ink); }
+.jd-demo-meta { margin-top: 2px; font-size: 0.8rem; color: var(--ink-softer); }
+.jd-demo-tier { display: flex; align-items: center; gap: 10px; margin: 0 0 14px 0; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-soft); }
+.jd-demo-summary { gap: 24px; margin-bottom: 16px; }
+.jd-demo-summary .jd-summary-num { font-size: 1.25rem; white-space: nowrap; }
+.jd-demo-roles { margin-bottom: 24px; }
+.jd-demo-record { position: relative; border: 1px dashed var(--hair-strong); border-radius: var(--r-md); overflow: hidden; }
+.jd-demo-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 20px; margin: 0; padding: 16px 18px; filter: blur(3px); user-select: none; }
+.jd-demo-fields dt { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-softer); }
+.jd-demo-fields dd { margin: 2px 0 0; font-size: 0.86rem; color: var(--ink); }
+.jd-demo-lock { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(255, 255, 255, 0.45); }
+.jd-demo-lock span { padding: 8px 14px; font-size: 0.82rem; font-weight: 600; color: var(--ink); background: var(--surface); border: 1px solid var(--hair-strong); border-radius: 999px; box-shadow: var(--shadow-sm); }
+@media (max-width: 900px) {
+  .jd-demo-layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .jd-demo-body { padding: 18px 16px 20px; }
+  .jd-demo-fields { grid-template-columns: 1fr; }
+  .jd-demo-summary { flex-direction: column; gap: 12px; }
+}
+
+/* FREE vs ADDITIONAL SERVICES */
+.jd-offer { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(16px, 2.5vw, 32px); align-items: stretch; }
+.jd-offer-card { display: flex; flex-direction: column; padding: 28px; background: var(--panel); border: 1px solid var(--hair); border-radius: var(--r-md); }
+.jd-offer-card--free { background: var(--surface); border: 2px solid var(--teal); }
+.jd-offer-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 12px; margin-bottom: 18px; }
+.jd-offer-title { margin: 0; font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--ink); }
+.jd-offer-list { list-style: none; margin: 0 0 24px 0; padding: 0; }
+.jd-offer-list li { position: relative; padding: 8px 0 8px 26px; font-size: 0.95rem; color: var(--ink-soft); border-top: 1px solid var(--hair); }
+.jd-offer-list li:first-child { border-top: none; }
+.jd-offer-list li::before { content: ""; position: absolute; left: 4px; top: 13px; width: 10px; height: 6px; border-left: 2px solid var(--teal-ink); border-bottom: 2px solid var(--teal-ink); transform: rotate(-45deg); }
+.jd-offer-btn { margin-top: auto; align-self: flex-start; }
+.jd-offer-services { list-style: none; margin: 0; padding: 0; counter-reset: svc; }
+.jd-offer-services li { counter-increment: svc; position: relative; padding: 12px 0 12px 40px; border-top: 1px solid var(--hair); }
+.jd-offer-services li:first-child { border-top: none; padding-top: 4px; }
+.jd-offer-services li::before { content: counter(svc); position: absolute; left: 0; top: 12px; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--navy); color: var(--white); font-size: 0.78rem; font-weight: 600; }
+.jd-offer-services li:first-child::before { top: 4px; }
+.jd-offer-service-name { display: block; font-weight: 600; color: var(--ink); font-size: 0.98rem; }
+.jd-offer-service-desc { display: block; margin-top: 2px; font-size: 0.9rem; line-height: 1.55; color: var(--ink-soft); }
+.jd-offer-note { margin: auto 0 0 0; padding-top: 16px; font-size: 0.8rem; color: var(--ink-softer); }
+@media (max-width: 800px) {
+  .jd-offer { grid-template-columns: 1fr; }
+  .jd-offer-card { padding: 22px; }
+}

@@ -26,6 +26,7 @@
         <div class="stat"><div class="stat-num mono">{{ value }}</div><div class="stat-label">{{ label }}</div></div>
         {% endfor %}
       </div>
+      <p class="jd-stats-note">Cifras acumuladas de las publicaciones desde 2017. El valor identificado no representa necesariamente dinero disponible para reclamar ni recursos que pertenezcan a quien consulta. Las partes corresponden a números de identificación distintos: una misma persona o empresa puede aparecer con más de uno.</p>
     </div>
     {% endif %}
   </div>
@@ -51,7 +52,7 @@
       <li class="jd-step">
         <span class="jd-step-num mono">01</span>
         <h3 class="jd-step-title">Encontramos e identificamos</h3>
-        <p class="jd-step-desc">Buscamos depósitos judiciales en fuentes de información pública, identificamos las partes involucradas y relacionamos cada registro con su respectivo proceso judicial, para descubrir oportunidades que podrían ser de su interés.</p>
+        <p class="jd-step-desc">Buscamos depósitos judiciales en fuentes oficiales, identificamos las partes involucradas y relacionamos cada registro con su respectivo proceso judicial, para descubrir oportunidades que podrían ser de su interés.</p>
       </li>
       <li class="jd-step">
         <span class="jd-step-num mono">02</span>
@@ -61,9 +62,105 @@
       <li class="jd-step">
         <span class="jd-step-num mono">03</span>
         <h3 class="jd-step-title">Le ayudamos a recuperar</h3>
-        <p class="jd-step-desc">Le acompañamos en la verificación de las oportunidades, la preparación de documentos y la gestión de las reclamaciones para ayudarle a recuperar su dinero. Cuando el juzgado ordene la entrega de los fondos, usted recibe lo recuperado menos una pequeña comisión acordada con usted. Si no se recupera nada, no nos debe nada.</p>
+        <p class="jd-step-desc">Le acompañamos en la verificación de las oportunidades, la preparación de documentos y la gestión de las reclamaciones para ayudarle a recuperar su dinero. Cuando el juzgado ordene la entrega de los fondos, usted recibe lo recuperado menos los honorarios previamente acordados. En esta modalidad, si no se recupera nada, no nos debe nada.</p>
       </li>
     </ol>
+  </div>
+</section>
+
+<section class="jd-section jd-section--panel" id="demostracion">
+  <div class="wrap jd-demo-layout">
+    <div class="jd-demo-intro">
+      <div class="eyebrow mono"><span class="dot"></span>Así se ven los resultados</div>
+      <h2 class="serif jd-section-title">Lo que verá al consultar</h2>
+      <p class="jd-section-lede">Un resumen gratuito de lo que encontramos para su número y, si le interesa, el detalle de cada depósito como servicio adicional.</p>
+    </div>
+
+    {# Product demo with fictitious data. Mirrors the real results page (_party_summary.html). #}
+    <div class="jd-demo" role="img" aria-label="Demostración de resultados con datos ficticios">
+      <div class="jd-demo-bar">
+        <span class="jd-demo-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span class="jd-demo-badge mono">Demostración · Datos ficticios</span>
+      </div>
+      <div class="jd-demo-body">
+        <div class="jd-demo-head">
+          <div class="jd-demo-name">Empresa Ejemplo S.A.S.</div>
+          <div class="jd-demo-meta mono">NIT XXX.XXX.XXX · Persona jurídica</div>
+        </div>
+
+        <div class="jd-demo-tier"><span class="jd-pill jd-pill--free">Gratis</span> Resumen agregado</div>
+        <div class="jd-party-summary jd-demo-summary">
+          <div class="jd-summary-item"><div class="jd-summary-num mono">7</div><div class="jd-summary-label">Depósitos encontrados</div></div>
+          <div class="jd-summary-item"><div class="jd-summary-num mono">$ 48.350.000</div><div class="jd-summary-label">Valor total publicado</div></div>
+          <div class="jd-summary-item"><div class="jd-summary-num mono">4</div><div class="jd-summary-label">Despachos judiciales</div></div>
+        </div>
+        <div class="jd-role-grid jd-demo-roles">
+          <div class="jd-role-card"><div class="jd-role-label">Como demandante</div><div class="jd-role-nums mono">5 hallazgos · $ 41.200.000</div></div>
+          <div class="jd-role-card"><div class="jd-role-label">Como demandado</div><div class="jd-role-nums mono">2 hallazgos · $ 7.150.000</div></div>
+        </div>
+
+        <div class="jd-demo-tier"><span class="jd-pill jd-pill--paid">Servicio adicional</span> Detalle de un depósito</div>
+        <div class="jd-demo-record">
+          <dl class="jd-demo-fields">
+            <div><dt>Depósito</dt><dd class="mono">4000XXXXXXXX</dd></div>
+            <div><dt>Valor</dt><dd class="mono">$ 12.800.000</dd></div>
+            <div><dt>Despacho</dt><dd>Juzgado Civil Municipal de Ejemplo</dd></div>
+            <div><dt>Fecha de constitución</dt><dd class="mono">XX/XX/20XX</dd></div>
+            <div><dt>Partes</dt><dd>Demandante: Empresa Ejemplo S.A.S. · Demandado: Persona Ejemplo</dd></div>
+            <div><dt>Proceso</dt><dd><span class="jd-tag jd-tag--pending">Por verificar</span></dd></div>
+          </dl>
+          <div class="jd-demo-lock" aria-hidden="true"><span>Disponible como servicio adicional</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="jd-section" id="servicios">
+  <div class="wrap">
+    <div class="eyebrow mono"><span class="dot"></span>Qué puede hacer con los resultados</div>
+    <h2 class="serif jd-section-title">Empiece gratis. Avance solo si le interesa</h2>
+    <p class="jd-section-lede">Cada servicio se solicita por separado. Adquirir información de un depósito no lo obliga a contratar la gestión de recuperación.</p>
+
+    <div class="jd-offer">
+      <div class="jd-offer-card jd-offer-card--free">
+        <div class="jd-offer-head">
+          <h3 class="jd-offer-title">Consulta gratuita</h3>
+          <span class="jd-pill jd-pill--free">Gratis · Sin registro</span>
+        </div>
+        <ul class="jd-offer-list">
+          <li>Cantidad de depósitos identificados</li>
+          <li>Valor acumulado publicado</li>
+          <li>Número de despachos judiciales relacionados</li>
+          <li>Distribución como demandante o demandado</li>
+          <li>Estado del plazo para reclamar</li>
+        </ul>
+        <a href="{% url 'home:index' %}#buscar" class="btn btn-primary jd-offer-btn">Consultar ahora</a>
+      </div>
+
+      <div class="jd-offer-card">
+        <div class="jd-offer-head">
+          <h3 class="jd-offer-title">Servicios adicionales</h3>
+          <span class="jd-pill jd-pill--paid">Condiciones propias</span>
+        </div>
+        <ol class="jd-offer-services">
+          <li>
+            <span class="jd-offer-service-name">Información individual</span>
+            <span class="jd-offer-service-desc">Acceso a registros individuales enriquecidos de los depósitos que le interesen.</span>
+          </li>
+          <li>
+            <span class="jd-offer-service-name">Investigación</span>
+            <span class="jd-offer-service-desc">Investigación de depósitos y procesos judiciales, e identificación y verificación de posibles beneficiarios.</span>
+          </li>
+          <li>
+            <span class="jd-offer-service-name">Gestión de recuperación</span>
+            <span class="jd-offer-service-desc">Preparación documental y acompañamiento en la reclamación, con honorarios por éxito previamente acordados.</span>
+          </li>
+        </ol>
+        <p class="jd-offer-note">Antes de iniciar cualquier servicio le informamos claramente sus condiciones.</p>
+      </div>
+    </div>
+
     <div class="jd-callout">
       <h3 class="jd-callout-title">¿No encuentra lo que busca? También le ayudamos a investigar</h3>
       <p class="jd-callout-text">Si conoce la existencia de un depósito judicial de su interés que no aparece en nuestros resultados, o si tiene procesos judiciales y no sabe si en ellos se constituyeron depósitos, le ayudamos a averiguarlo.</p>
@@ -79,11 +176,11 @@
     <div class="jd-reasons">
       <div class="jd-reason">
         <h3 class="jd-reason-title">Detectamos los depósitos judiciales por usted</h3>
-        <p class="jd-reason-desc">Monitoreamos las fuentes de forma automática y continua. Usted no tiene que revisar listados ni hacer seguimiento.</p>
+        <p class="jd-reason-desc">Monitoreamos las fuentes de forma automática y continua.</p>
       </div>
       <div class="jd-reason">
         <h3 class="jd-reason-title">Fuentes oficiales</h3>
-        <p class="jd-reason-desc">Trabajamos únicamente con información pública oficial. No inventamos ni estimamos cifras.</p>
+        <p class="jd-reason-desc">Trabajamos únicamente con información pública de fuentes oficiales. No inventamos ni estimamos cifras.</p>
       </div>
       <div class="jd-reason">
         <h3 class="jd-reason-title">Histórico unificado e información enriquecida</h3>
@@ -98,8 +195,8 @@
         <p class="jd-reason-desc">Preparamos los documentos y gestionamos la reclamación. Usted solo revisa y aprueba.</p>
       </div>
       <div class="jd-reason">
-        <h3 class="jd-reason-title">Solo cobramos si usted recupera</h3>
-        <p class="jd-reason-desc">Nuestra comisión se paga únicamente cuando se recupera el dinero. Si no se recupera nada, usted no paga nada.</p>
+        <h3 class="jd-reason-title">Honorarios por éxito en la recuperación</h3>
+        <p class="jd-reason-desc">En la gestión de recuperación, nuestros honorarios previamente acordados se pagan únicamente cuando se recupera el dinero. Si no se recupera nada, no nos debe nada.</p>
       </div>
     </div>
   </div>
@@ -130,7 +227,7 @@
     <div class="jd-faq">
       <details>
         <summary>¿Cómo encontraron dinero a mi nombre?</summary>
-        <p>Consultamos y procesamos información pública publicada por la Rama Judicial de Colombia, incluyendo los listados de depósitos judiciales susceptibles de prescripción. Mediante tecnología de búsqueda, normalización y análisis de datos, identificamos registros que podrían estar relacionados con personas o empresas.</p>
+        <p>Consultamos y procesamos información pública de fuentes oficiales, publicada por la Rama Judicial de Colombia, incluyendo los listados de depósitos judiciales susceptibles de prescripción. Mediante tecnología de búsqueda, normalización y análisis de datos, identificamos registros que podrían estar relacionados con personas o empresas.</p>
       </details>
       <details>
         <summary>¿Qué son los depósitos judiciales?</summary>
@@ -159,7 +256,7 @@
       </details>
       <details>
         <summary>¿Qué servicios ofrece Amud Technologies?</summary>
-        <p>Utilizamos tecnología para transformar información pública en oportunidades identificables y accionables.</p>
+        <p>Utilizamos tecnología para transformar información pública de fuentes oficiales en oportunidades identificables y accionables.</p>
         <p>En el caso de los depósitos judiciales, podemos ayudarle a localizar registros potencialmente relacionados con usted, analizar la información disponible, identificar los despachos judiciales correspondientes y facilitar el proceso de verificación y reclamación.</p>
       </details>
       <details>
