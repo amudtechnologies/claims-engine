@@ -88,6 +88,7 @@
 .radar-card { display: flex; flex-direction: column; gap: 12px; padding: 20px 22px; }
 a.radar-card { padding-right: 22px; }
 a.radar-card::after { display: none; }
+.radar-card-body, .radar-card-main { display: flex; flex-direction: column; gap: 12px; }
 .radar-card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .radar-card-title { margin: 0; font-size: 1.15rem; font-weight: 700; letter-spacing: -0.015em; color: var(--ink); }
 .radar-card-desc { margin: 0; font-size: 0.86rem; line-height: 1.5; color: var(--ink-soft); }
@@ -101,6 +102,13 @@ a.radar-card::after { display: none; }
 /* Make the whole card read as clickable: a full-width action strip at the
    bottom, and a hover/focus state on the entire card. */
 a.radar-card { overflow: hidden; transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease; }
+/* Horizontal card on wide screens: overview on the left, figures on the
+   right, action strip across the bottom. Stacks back on narrow screens. */
+@media (min-width: 860px) {
+  .radar-card-body { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 28px; align-items: center; }
+  .radar-card-stats { padding: 0 0 0 28px; border-top: none; border-left: 1px solid var(--hair); gap: 20px 24px; align-self: stretch; align-content: center; }
+  .radar-card-stats dd { font-size: 1.15rem; }
+}
 a.radar-card:hover, a.radar-card:focus-visible { background: var(--white); border-color: var(--teal); box-shadow: var(--shadow-md); transform: translateY(-2px); }
 a.radar-card:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
 .radar-card-action { display: flex; align-items: center; justify-content: space-between; margin: 4px -22px -20px; padding: 14px 22px; font-size: 0.9rem; font-weight: 600; color: var(--teal-ink); background: var(--panel); border-top: 1px solid var(--hair); transition: background 0.15s ease, color 0.15s ease; }

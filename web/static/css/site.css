@@ -472,5 +472,5 @@ a.radar-list-item:hover::after {
   .footer-grid { grid-template-columns: 1fr; }
 }
 
-/* #radares: radars as a grid of small cards */
-.radars-index .radar-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+/* #radares: one full-width (horizontal) card per radar */
+.radars-index .radar-list { display: grid; grid-template-columns: 1fr; gap: 16px; }

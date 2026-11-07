@@ -1,14 +1,18 @@
 {% comment %}Compact version of this radar's landing page, for its card in the home #radares section.
 The shell wraps it in a link to the landing, so it contains no links.{% endcomment %}
+<div class="radar-card-body">
+<div class="radar-card-main">
 <div class="radar-card-head">
   <h2 class="radar-card-title">Depósitos judiciales</h2>
   <span class="results-status results-status--active"><span class="dot"></span>{{ spec.status_label }}</span>
 </div>
 <p class="radar-card-desc">{{ spec.problem }}</p>
 {% include "judicial_deposits/_legal_facts.html" %}
+</div>
 {% if stats %}
 <dl class="radar-card-stats">
   {% for value, label in stats %}<div><dd>{{ value }}</dd><dt>{{ label }}</dt></div>{% endfor %}
 </dl>
 {% endif %}
+</div>
 <span class="radar-card-action">Ver el radar <span class="radar-card-arrow" aria-hidden="true">&rarr;</span></span>
