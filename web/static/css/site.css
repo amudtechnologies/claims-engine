@@ -371,10 +371,10 @@ a.radar-list-item:hover::after {
 .radars-index .lede { margin-bottom: 8px; max-width: 62ch; }
 
 /* PROOF */
-.proof { background: var(--navy); color: var(--on-navy); padding-top: clamp(64px, 8vw, 100px); padding-bottom: clamp(64px, 8vw, 100px); }
+.proof { background: var(--panel); color: var(--ink); padding-top: clamp(64px, 8vw, 100px); padding-bottom: clamp(64px, 8vw, 100px); }
 .proof-inner { text-align: center; max-width: 720px; margin: 0 auto; }
-.proof-num { font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 600; letter-spacing: -0.02em; color: var(--teal); line-height: 1; margin-bottom: 18px; }
-.proof-text { margin: 0; font-size: 1.05rem; line-height: 1.55; color: var(--on-navy-soft); }
+.proof-num { font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 600; letter-spacing: -0.02em; color: var(--teal-ink); line-height: 1; margin-bottom: 18px; }
+.proof-text { margin: 0; font-size: 1.05rem; line-height: 1.55; color: var(--ink-soft); }
 
 
 /* FOOTER */

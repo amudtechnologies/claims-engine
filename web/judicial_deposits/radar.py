@@ -45,11 +45,11 @@ def card_stats() -> list[tuple[str, str]]:
         (es_co_number(party_search.total_court_count()), "Despachos judiciales analizados"),
         (
             f"{es_co_number(party_count / 1_000_000, 2)}M+" if party_count else "—",
-            "Empresas y personas identificadas",
+            "Partes identificadas",
         ),
         (
             cop(party_search.total_claim_amount_cop()),
-            "Valor total de los depósitos encontrados a la fecha",
+            "Valor total de los depósitos identificados a la fecha",
         ),
     ]
 

@@ -1,4 +1,4 @@
-.jd-intro { padding-top: clamp(56px, 8vw, 100px); padding-bottom: clamp(16px, 2vw, 32px); }
+.jd-intro { padding-top: clamp(56px, 8vw, 100px); padding-bottom: clamp(40px, 5vw, 64px); }
 .jd-title {
   margin: 0 0 20px 0;
   font-size: clamp(2.1rem, 3.4vw + 0.6rem, 3.2rem);
@@ -7,9 +7,7 @@
   letter-spacing: -0.02em;
   color: var(--ink);
 }
-.jd-overview .lede { margin-bottom: 12px; }
-.jd-explainer { margin: 0 0 28px 0; font-size: 0.98rem; line-height: 1.6; color: var(--ink-soft); max-width: 62ch; }
-.jd-overview .btn { margin-bottom: 8px; }
+.jd-intro .lede { margin-bottom: 24px; max-width: 62ch; }
 
 .jd-stats-block { margin-top: 36px; padding-top: 36px; border-top: 1px solid var(--hair); }
 .jd-stats-title { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 20px; }
@@ -35,7 +33,6 @@
 .jd-role-card { padding: 14px 16px; background: var(--surface); border: 1px solid var(--hair); border-radius: 8px; }
 .jd-role-label { font-size: 0.78rem; font-weight: 600; color: var(--ink-soft); margin-bottom: 6px; }
 .jd-role-hint { display: block; font-weight: 400; font-size: 0.72rem; margin-top: 2px; }
-.fact-source { font-size: 0.75rem; color: var(--ink-soft); margin: -12px 0 24px 0; }
 .jd-role-nums { font-size: 0.92rem; color: var(--ink); }
 
 .jd-panel-footnote { display: flex; gap: 24px; flex-wrap: wrap; font-size: 0.84rem; color: var(--ink-softer); }
@@ -123,3 +120,51 @@ a.radar-card:hover .radar-card-arrow, a.radar-card:focus-visible .radar-card-arr
 /* Figures stay on one line; smaller on phones so the long COP total fits. */
 .jd-stats .stat-num { white-space: nowrap; }
 @media (max-width: 480px) { .jd-stats .stat-num { font-size: 1.05rem; } }
+
+
+/* LANDING SECTIONS — how it works, why Amud, transparency, FAQ, CTA */
+.jd-section { padding-top: var(--space-5); padding-bottom: var(--space-5); }
+.jd-section--panel { background: var(--panel); }
+.jd-section-title { margin: 0 0 32px 0; font-size: clamp(1.6rem, 1.8vw + 1rem, 2.2rem); line-height: 1.15; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); max-width: 28ch; }
+
+.jd-section-lede { margin: -14px 0 48px 0; font-size: 1.05rem; line-height: 1.65; color: var(--ink-soft); max-width: 60ch; }
+
+.jd-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(16px, 2.5vw, 32px); }
+@media (max-width: 800px) { .jd-steps { grid-template-columns: 1fr; } }
+.jd-step { padding: 28px; background: var(--panel); border: 1px solid var(--hair); border-radius: var(--r-md); }
+.jd-step-num { display: inline-grid; place-items: center; width: 40px; height: 40px; margin-bottom: 26px; border-radius: 50%; background: var(--navy); color: var(--white); font-size: 0.9rem; font-weight: 600; }
+.jd-step .jd-step-title { margin-bottom: 14px; font-size: 1.15rem; }
+.jd-step .jd-step-desc { font-size: 0.95rem; line-height: 1.65; }
+.jd-callout { margin-top: clamp(24px, 3vw, 32px); padding: 22px 28px; background: var(--surface); border: 1px solid var(--hair); border-left: 3px solid var(--teal); border-radius: var(--r-md); }
+.jd-callout-title { margin: 0 0 6px 0; font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; color: var(--ink); }
+.jd-callout-text { margin: 0; font-size: 0.95rem; line-height: 1.6; color: var(--ink-soft); max-width: 72ch; }
+.jd-step-title, .jd-reason-title { margin: 0 0 8px 0; font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; color: var(--ink); }
+.jd-step-desc, .jd-reason-desc { margin: 0; font-size: 0.9rem; line-height: 1.6; color: var(--ink-soft); }
+
+.jd-reasons { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px 32px; }
+@media (max-width: 800px) { .jd-reasons { grid-template-columns: 1fr; gap: 28px; } }
+.jd-reason { padding-top: 16px; border-top: 2px solid var(--teal); }
+
+.jd-transparency { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 16px 56px; align-items: start; }
+.jd-transparency-body p { margin: 0 0 16px 0; font-size: 1rem; line-height: 1.65; color: var(--ink-soft); max-width: 60ch; }
+.jd-transparency-body .btn-link { margin-top: 4px; }
+.jd-transparency-subtitle { margin: 28px 0 10px 0; font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; color: var(--ink); }
+.jd-transparency-body .jd-transparency-note { margin: 28px 0 0 0; padding-top: 16px; border-top: 1px solid var(--hair); font-size: 0.82rem; line-height: 1.55; color: var(--ink-softer); }
+@media (max-width: 800px) {
+  .jd-transparency { grid-template-columns: 1fr; }
+  .jd-transparency .jd-section-title { margin-bottom: 8px; }
+}
+
+.jd-faq { max-width: 760px; border-top: 1px solid var(--hair-strong); }
+.jd-faq details { border-bottom: 1px solid var(--hair-strong); }
+.jd-faq summary { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 0; font-size: 1rem; font-weight: 600; color: var(--ink); cursor: pointer; list-style: none; }
+.jd-faq summary::-webkit-details-marker { display: none; }
+.jd-faq summary::after { content: "+"; flex: none; font-size: 1.3rem; font-weight: 400; line-height: 1; color: var(--teal-ink); transition: transform 0.15s ease; }
+.jd-faq details[open] summary::after { transform: rotate(45deg); }
+.jd-faq summary:hover { color: var(--accent-text); }
+.jd-faq details p { margin: 0 0 18px 0; font-size: 0.95rem; line-height: 1.65; color: var(--ink-soft); max-width: 64ch; }
+
+.jd-cta { background: #e6f4f1; padding-top: var(--space-5); padding-bottom: var(--space-5); }
+.jd-cta-inner { text-align: center; }
+.jd-cta-title { margin: 0 0 14px 0; font-size: clamp(1.7rem, 2vw + 1rem, 2.4rem); line-height: 1.15; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); }
+.jd-cta-text { margin: 0 auto 28px; max-width: 52ch; font-size: 1.05rem; line-height: 1.6; color: var(--ink-soft); }

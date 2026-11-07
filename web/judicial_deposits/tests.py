@@ -8,7 +8,10 @@ from . import radar
 class LandingTests(TestCase):
     def test_landing_renders_without_a_party_search(self):
         response = self.client.get("/depositos-judiciales/")
-        self.assertContains(response, "Depósitos judiciales sin reclamar")
+        self.assertContains(response, '<h1 class="serif jd-title">Depósitos judiciales</h1>')
+        for section_id in ("como-funciona", "por-que-amud", "transparencia", "preguntas"):
+            self.assertContains(response, f'id="{section_id}"')
+        self.assertContains(response, 'href="/#buscar" class="btn btn-primary btn-lg"')
         self.assertNotContains(response, "RESULTADO DE SU CONSULTA")
 
     def test_legacy_nit_query_redirects_to_detail(self):
@@ -71,7 +74,7 @@ class RadarContractTests(TestCase):
             [
                 ("2017–2026", "Historial de datos públicos"),
                 ("4.598", "Despachos judiciales analizados"),
-                ("1,27M+", "Empresas y personas identificadas"),
-                ("$ 970.428.695.188", "Valor total de los depósitos encontrados a la fecha"),
+                ("1,27M+", "Partes identificadas"),
+                ("$ 970.428.695.188", "Valor total de los depósitos identificados a la fecha"),
             ],
         )
