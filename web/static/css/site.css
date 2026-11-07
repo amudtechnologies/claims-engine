@@ -247,7 +247,7 @@ h1, h2, h3 { text-wrap: balance; }
 .hero .eyebrow { color: var(--teal); }
 .hero h1 {
   margin: 0 0 22px 0;
-  font-size: clamp(2.2rem, 3.6vw + 0.8rem, 3.6rem);
+  font-size: clamp(2rem, 3vw + 0.7rem, 3rem);
   line-height: 1.08;
   font-weight: 700;
   letter-spacing: -0.03em;
@@ -368,7 +368,6 @@ a.radar-list-item:hover::after {
 
 /* RADARS INDEX (home #radares section) */
 .radars-index { padding-top: clamp(56px, 8vw, 100px); padding-bottom: clamp(56px, 8vw, 100px); }
-.radars-index-title { margin: 0 0 18px 0; font-size: clamp(2rem, 3vw + 0.6rem, 2.8rem); line-height: 1.1; font-weight: 600; letter-spacing: -0.02em; }
 .radars-index .lede { margin-bottom: 8px; max-width: 62ch; }
 
 /* PROOF */
