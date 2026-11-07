@@ -26,7 +26,7 @@ class HomeTests(TestCase):
     def test_home_renders_search(self):
         response = self.client.get("/")
         self.assertContains(response, 'action="/resultados/"')
-        self.assertContains(response, "sin reclamar a su nombre. Lo detectamos primero")
+        self.assertContains(response, "Lo&nbsp;detectamos primero.")
 
 
 class RadarRegistryTests(TestCase):
