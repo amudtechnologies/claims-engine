@@ -112,5 +112,5 @@ class ResultsTests(TestCase):
         self.assertContains(response, "Reclamable")
         self.assertContains(response, "NIT 900123456")
         self.assertNotContains(response, "Más radares")
-        self.assertContains(response, 'href="/radares/" class="is-active"')
+        self.assertContains(response, 'href="/" class="is-active"')
         self.assertNotContains(response, "Qué puede hacer ahora")

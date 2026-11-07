@@ -61,8 +61,8 @@ def results(request):
 
     normalized_document_number = "".join(c for c in raw_document_number if c.isdigit())
     context = {
-        # Results come from the radars, so the "Radares" nav item is the active one.
-        "active_nav": "radares",
+        # The search starts from the home hero, so "Inicio" stays the active nav item.
+        "active_nav": "home",
         "page_title": "Resultados de su consulta — Amud Technologies",
         "page_description": (
             "Resultados de la búsqueda por número de identificación en los "
