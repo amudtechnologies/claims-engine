@@ -58,8 +58,8 @@ spec = RadarSpec(
     slug="depositos-judiciales",
     name="Depósitos judiciales",
     problem=(
-        "Dinero depositado en un proceso judicial que pasa a la Nación si quien "
-        "tiene derecho no lo reclama a tiempo."
+        "Dinero constituido en procesos judiciales que prescribe a favor de la "
+        "Nación si no se reclama dentro del plazo legal."
     ),
     identifies=(
         "Depósitos que la Rama Judicial publica como no reclamados, con el "
