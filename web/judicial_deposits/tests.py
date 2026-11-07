@@ -8,8 +8,8 @@ from . import radar
 class LandingTests(TestCase):
     def test_landing_renders_without_a_party_search(self):
         response = self.client.get("/depositos-judiciales/")
-        self.assertContains(response, "Depósitos Judiciales")
-        self.assertNotContains(response, "RESULTADO PARA ESTA BÚSQUEDA")
+        self.assertContains(response, "Depósitos judiciales sin reclamar")
+        self.assertNotContains(response, "RESULTADO DE SU CONSULTA")
 
     def test_legacy_nit_query_redirects_to_detail(self):
         response = self.client.get("/depositos-judiciales/?nit=900123456")

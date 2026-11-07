@@ -12,7 +12,7 @@
     <nav class="radar-breadcrumb mono">
       <a href="{% url 'home:radares' %}">Radar de Acreencias</a> <span aria-hidden="true">/</span> Depósitos judiciales
     </nav>
-    <div class="eyebrow mono"><span class="dot"></span>RADAR ACTIVO</div>
+    <div class="eyebrow mono"><span class="dot"></span>Radar activo</div>
     {% include "judicial_deposits/_overview.html" with heading_tag="h1" %}
   </div>
 </section>
@@ -24,7 +24,7 @@
     {% else %}
       <div class="proof-num mono">—</div>
     {% endif %}
-    <p class="proof-text">Observaciones de dinero olvidado en procesos judiciales</p>
+    <p class="proof-text">Registros de depósitos sin reclamar en las publicaciones de la Rama Judicial</p>
   </div>
 </section>
 

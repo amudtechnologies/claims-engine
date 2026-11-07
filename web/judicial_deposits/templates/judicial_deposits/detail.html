@@ -19,22 +19,22 @@
       <p><strong>La consulta no está disponible en este momento.</strong> Inténtelo de nuevo en unos minutos.</p>
     {% elif party_result %}
     <div class="jd-party">
-      <div class="eyebrow mono"><span class="dot"></span>RESULTADO PARA ESTA BÚSQUEDA</div>
+      <div class="eyebrow mono"><span class="dot"></span>RESULTADO DE SU CONSULTA</div>
       {% if party_result.party_name %}
         <h2 class="jd-party-name serif">{{ party_result.party_name }}</h2>
       {% elif party_result.source_declared_name %}
         <h2 class="jd-party-name serif">{{ party_result.source_declared_name }}</h2>
       {% else %}
-        <h2 class="jd-party-name serif">Resultados de la búsqueda</h2>
+        <h2 class="jd-party-name serif">Resultados de su consulta</h2>
       {% endif %}
       <p class="jd-party-meta">
-        {{ party_result.document_type|document_number_label }} {{ party_result.document_number }}{% if party_result.document_type %} · {{ party_result.document_type|document_type_label }}{% endif %}{% if party_result.rues_active is not None %} · {% if party_result.rues_active %}Activo en RUES{% else %}Inactivo en RUES{% endif %}{% endif %}
+        {{ party_result.document_type|document_number_label }} {{ party_result.document_number }}{% if party_result.document_type %} · {{ party_result.document_type|document_type_label }}{% endif %}{% if party_result.rues_active is not None %} · {% if party_result.rues_active %}Activa en el registro mercantil (RUES){% else %}Inactiva en el registro mercantil (RUES){% endif %}{% endif %}
       </p>
       {% if not party_result.party_name and not party_result.source_declared_name %}
-        <p class="jd-party-note">Este número aparece en nuestros registros. Todavía no verificamos el nombre asociado. Eso no significa que el resultado sea incorrecto, solo que la verificación está en curso.</p>
+        <p class="jd-party-note">Aún no tenemos el nombre asociado a este número. El resultado se basa en el número que publica la fuente oficial.</p>
       {% endif %}
       {% if party_result.document_type == "natural_person" %}
-        <p class="jd-party-note">Esta consulta está pensada para que usted verifique su propia información pública — no la use para consultar a terceros sin su autorización.</p>
+        <p class="jd-party-note">Esta consulta sirve para revisar su propia información o la de la empresa que representa. No la use para consultar a otras personas sin su autorización.</p>
       {% endif %}
 
       {% include "judicial_deposits/_party_summary.html" with summary=party_result title="Histórico completo (Todos los periodos)" show_last_period=True %}
@@ -45,15 +45,15 @@
         {% else %}
           {% include "judicial_deposits/_party_summary.html" with summary=party_last_active_period_result title="Último período en el que aparece · "|add:party_last_active_period status=party_last_active_period_status window=party_last_active_period_window %}
           {% if corpus_latest_period %}
-            <p class="jd-party-note">No aparece en el periodo más reciente · {{ corpus_latest_period }}</p>
+            <p class="jd-party-note">No figura en la publicación más reciente ({{ corpus_latest_period }})</p>
           {% endif %}
         {% endif %}
       {% endif %}
 
-      <p class="jd-disclaimer"><strong>Importante:</strong> La aparición en este radar indica que el depósito fue publicado por no haber sido reclamado oportunamente. Esta consulta no permite confirmar si fue reclamado dentro del plazo de 20 días hábiles establecido después de su publicación.</p>
+      <p class="jd-disclaimer"><strong>Importante:</strong> este depósito se publicó porque no se reclamó a tiempo. Con esta consulta no podemos confirmar si alguien lo reclamó en los 20 días hábiles siguientes a la publicación.</p>
     </div>
     {% else %}
-      <p><strong>No encontramos depósitos judiciales</strong> asociados a este número. Esto no descarta que exista, solo que no aparece en las publicaciones procesadas hasta ahora.</p>
+      <p><strong>No encontramos depósitos judiciales</strong> para este número. Eso no descarta que existan. Solo indica que no aparecen en las publicaciones revisadas hasta ahora.</p>
     {% endif %}
 
     <p><a href="{% url 'home:index' %}#buscar" class="btn btn-primary">Nueva consulta</a></p>

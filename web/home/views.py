@@ -25,11 +25,11 @@ def robots_txt(request):
 def index(request):
     context = {
         "active_nav": "home",
-        "page_title": "Dinero que ya tiene dueño, identificado antes que nadie — Amud Technologies",
+        "page_title": "Dinero que ya tiene dueño. Consulte si está a su nombre — Amud Technologies",
         "page_description": (
-            "Amud Technologies identifica acreencias y oportunidades patrimoniales "
-            "de empresas en Colombia — y también de personas naturales — empezando "
-            "por depósitos judiciales sin reclamar. Consulte gratis con su NIT o cédula."
+            "Consulte gratis con su NIT o cédula si hay depósitos judiciales sin "
+            "reclamar a nombre de su empresa o el suyo propio. Fuentes públicas "
+            "oficiales y acompañamiento legal."
         ),
     }
     return render(request, "home/index.html", context)
@@ -40,11 +40,11 @@ def radares(request):
     RadarSpec (home/radars.py); this page only lists what is registered."""
     context = {
         "active_nav": "radares",
-        "page_title": "Radares activos y en desarrollo — Amud Technologies",
+        "page_title": "Radares: las fuentes que revisamos — Amud Technologies",
         "page_description": (
-            "Conozca los radares de Amud Technologies: fuentes públicas "
-            "colombianas que cruzamos para identificar dinero, derechos y "
-            "activos asociados a una empresa o persona natural."
+            "Conozca las fuentes públicas oficiales que revisamos para "
+            "identificar dinero y derechos económicos a nombre de una empresa "
+            "o una persona."
         ),
         "radars": [
             (spec, spec.card_stats() if spec.card_stats else [])

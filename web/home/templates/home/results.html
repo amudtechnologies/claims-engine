@@ -20,14 +20,14 @@
   <section class="results-empty">
     <div class="wrap">
       <p><strong>La consulta no está disponible en este momento.</strong></p>
-      <p>El caché local de datos aún no se ha sincronizado. Inténtelo de nuevo en unos minutos.</p>
+      <p>Estamos actualizando la información. Inténtelo de nuevo en unos minutos.</p>
     </div>
   </section>
 {% elif document_number_looks_invalid %}
   <section class="results-empty">
     <div class="wrap">
       <p><strong>Revise el número ingresado.</strong></p>
-      <p>«{{ raw_document_number }}» no tiene el formato de un número de identificación válido. Ingrese un NIT o una cédula.</p>
+      <p>«{{ raw_document_number }}» no parece un NIT ni una cédula. Revíselo y escriba solo el número.</p>
     </div>
   </section>
 {% elif matches %}
@@ -38,31 +38,31 @@
       {% elif identity.source_declared_name %}
         <h1 class="serif">Resultados para {{ identity.source_declared_name }}</h1>
       {% else %}
-        <h1 class="serif">Resultados de la búsqueda</h1>
+        <h1 class="serif">Resultados de su consulta</h1>
       {% endif %}
       <p class="results-meta">
-        {{ identity.document_type|document_number_label }} {{ identity.document_number }}{% if identity.document_type %} · {{ identity.document_type|document_type_label }}{% endif %}{% if identity.rues_active is not None %} · {% if identity.rues_active %}Activo en RUES{% else %}Inactivo en RUES{% endif %}{% endif %}
-        <br>Búsqueda realizada el {{ searched_at|date:"j \d\e F \d\e Y" }}
+        {{ identity.document_type|document_number_label }} {{ identity.document_number }}{% if identity.document_type %} · {{ identity.document_type|document_type_label }}{% endif %}{% if identity.rues_active is not None %} · {% if identity.rues_active %}Activa en el registro mercantil (RUES){% else %}Inactiva en el registro mercantil (RUES){% endif %}{% endif %}
+        <br>Consulta realizada el {{ searched_at|date:"j \d\e F \d\e Y" }}
       </p>
       {% if not identity.party_name and not identity.source_declared_name %}
-        <p class="results-privacy-note">Este número aparece en nuestros registros. Todavía no verificamos el nombre asociado. Eso no significa que el resultado sea incorrecto, solo que la verificación está en curso.</p>
+        <p class="results-privacy-note">Aún no tenemos el nombre asociado a este número. El resultado se basa en el número que publica la fuente oficial.</p>
       {% endif %}
       {% if identity.document_type == "natural_person" %}
-        <p class="results-privacy-note">Esta consulta está pensada para que usted verifique su propia información pública — no la use para consultar a terceros sin su autorización.</p>
+        <p class="results-privacy-note">Esta consulta sirve para revisar su propia información o la de la empresa que representa. No la use para consultar a otras personas sin su autorización.</p>
       {% endif %}
     </div>
   </section>
 
   <section class="results-table-section">
     <div class="wrap">
-      <div class="results-table-title">Resumen por radar</div>
+      <div class="results-table-title">Hallazgos por fuente</div>
       <div class="results-table-wrap">
         <table class="results-table">
           <thead>
             <tr>
               <th>Radar</th>
               <th>Hallazgos</th>
-              <th>Valor estimado</th>
+              <th>Valor publicado</th>
               <th>Estado</th>
             </tr>
           </thead>
@@ -77,8 +77,8 @@
 {% else %}
   <section class="results-empty">
     <div class="wrap">
-      <p><strong>No encontramos información</strong> asociada al número {{ normalized_document_number }} en los radares activos.</p>
-      <p>Esto no descarta que exista, solo que no aparece en las fuentes que hemos procesado hasta ahora.</p>
+      <p><strong>No encontramos registros</strong> para {{ normalized_document_number }} en las fuentes que revisamos.</p>
+      <p>Eso no descarta que exista dinero a su nombre. Solo indica que no aparece en lo publicado hasta ahora.</p>
     </div>
   </section>
 {% endif %}

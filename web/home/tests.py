@@ -26,7 +26,7 @@ class HomeTests(TestCase):
     def test_home_renders_search(self):
         response = self.client.get("/")
         self.assertContains(response, 'action="/resultados/"')
-        self.assertContains(response, "Puede que tengas")
+        self.assertContains(response, "Puede haber")
 
 
 class RadarRegistryTests(TestCase):
@@ -39,12 +39,13 @@ class RadarRegistryTests(TestCase):
         response = self.client.get("/radares/")
         # The radar draws its own card (same overview as its landing page):
         # title, legal-terms strip, CTA and figures, with its own stylesheet.
-        self.assertContains(response, "Depósitos Judiciales")
+        self.assertContains(response, "Depósitos judiciales")
         self.assertContains(response, "20 días hábiles")
         self.assertContains(
             response, 'href="/depositos-judiciales/" class="radar-list-item radar-card"'
         )
-        self.assertNotContains(response, "Consultar ahora")  # a card, not the landing block
+        # A card, not the landing block.
+        self.assertNotContains(response, "Consultar mi NIT o cédula")
         self.assertNotContains(response, "Compact version")  # template comment never leaks
         self.assertContains(response, "css/judicial_deposits.css")
 
@@ -109,7 +110,7 @@ class ResultsTests(TestCase):
             response = self.client.get("/resultados/?nit=900123456")
         self.assertContains(response, "ACME SAS")
         self.assertContains(response, "$ 5.000.000")
-        self.assertContains(response, "Reclamable")
+        self.assertContains(response, "Aún puede reclamarse")
         self.assertContains(response, "NIT 900123456")
         self.assertNotContains(response, "Más radares")
         self.assertContains(response, 'href="/" class="is-active"')

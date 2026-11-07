@@ -5,12 +5,12 @@
     <span class="results-row-caret" aria-hidden="true">&rsaquo;</span>
   </td>
   <td class="mono" data-label="Hallazgos">{{ match.finding_count }}</td>
-  <td class="mono" data-label="Valor estimado">{{ match.total_amount_cop|cop }}</td>
+  <td class="mono" data-label="Valor publicado">{{ match.total_amount_cop|cop }}</td>
   <td data-label="Estado">
     <span class="results-table-status-cell">
       <span class="results-status results-status--active"><span class="dot"></span>{{ spec.status_label }}</span>
-      {% if match.extra.claim_status == "reclamable" %}<span class="jd-tag jd-tag--open">Reclamable</span>
-      {% elif match.extra.claim_status == "no_reclamable" %}<span class="jd-tag jd-tag--closed">No reclamable</span>
+      {% if match.extra.claim_status == "reclamable" %}<span class="jd-tag jd-tag--open">Aún puede reclamarse</span>
+      {% elif match.extra.claim_status == "no_reclamable" %}<span class="jd-tag jd-tag--closed">Plazo vencido</span>
       {% elif match.extra.claim_status == "activo" %}<span class="jd-tag jd-tag--pending">Vigente</span>{% endif %}
     </span>
   </td>

@@ -58,16 +58,16 @@ spec = RadarSpec(
     slug="depositos-judiciales",
     name="Depósitos judiciales",
     problem=(
-        "Dinero constituido en procesos judiciales que prescribe a favor de la "
-        "Nación si no se reclama dentro del plazo legal."
+        "Dinero depositado en un proceso judicial que pasa a la Nación si quien "
+        "tiene derecho no lo reclama a tiempo."
     ),
     identifies=(
-        "Depósitos publicados por la Rama Judicial como no reclamados, con su "
-        "despacho, valor y número de identificación de las partes."
+        "Depósitos que la Rama Judicial publica como no reclamados, con el "
+        "juzgado, el valor y la identificación de las partes."
     ),
     audience=(
-        "Empresas, firmas y entidades que gestionan recuperaciones; "
-        "también personas naturales."
+        "Empresas y personas, y también los profesionales que gestionan "
+        "recuperaciones."
     ),
     landing_url_name="judicial_deposits:index",
     results_row_template="judicial_deposits/_results_row.html",
