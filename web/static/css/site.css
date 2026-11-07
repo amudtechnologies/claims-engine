@@ -308,7 +308,7 @@ h1, h2, h3 { text-wrap: balance; }
 .results-status--pending .dot { background: var(--ink-softer); }
 .results-status--pending { color: var(--ink-softer); }
 
-/* RADAR LIST (shared: homepage preview + /radares/ index — the platform's
+/* RADAR LIST (shared: home #radares section — the platform's
    family of radars, presented as a list of siblings rather than one radar
    standing in for the whole product). Cards, not a table: works unshrunk
    on a phone, and reads the same at any width. */
@@ -366,9 +366,9 @@ a.radar-list-item:hover::after {
 .jd-tag--closed { color: var(--ink-softer); background: var(--mist); }
 .jd-tag--pending { color: var(--ink-soft); background: transparent; border: 1px solid var(--gold); }
 
-/* RADARS INDEX (/radares/) */
+/* RADARS INDEX (home #radares section) */
 .radars-index { padding-top: clamp(56px, 8vw, 100px); padding-bottom: clamp(56px, 8vw, 100px); }
-.radars-index h1 { margin: 0 0 18px 0; font-size: clamp(2rem, 3vw + 0.6rem, 2.8rem); line-height: 1.1; font-weight: 600; letter-spacing: -0.02em; }
+.radars-index h2 { margin: 0 0 18px 0; font-size: clamp(2rem, 3vw + 0.6rem, 2.8rem); line-height: 1.1; font-weight: 600; letter-spacing: -0.02em; }
 .radars-index .lede { margin-bottom: 8px; max-width: 62ch; }
 
 /* PROOF */
@@ -472,5 +472,5 @@ a.radar-list-item:hover::after {
   .footer-grid { grid-template-columns: 1fr; }
 }
 
-/* /radares/: radars as a grid of small cards */
+/* #radares: radars as a grid of small cards */
 .radars-index .radar-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }

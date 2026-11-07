@@ -84,7 +84,7 @@
 }
 
 
-/* COMPACT CARD on /radares/ (judicial_deposits/_card.html) */
+/* COMPACT CARD in the home #radares section (judicial_deposits/_card.html) */
 .radar-card { display: flex; flex-direction: column; gap: 12px; padding: 20px 22px; }
 a.radar-card { padding-right: 22px; }
 a.radar-card::after { display: none; }

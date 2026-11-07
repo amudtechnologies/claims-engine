@@ -9,7 +9,7 @@ from .models import Article, Category, Page
 class StaticSitemap(Sitemap):
 
     def items(self):
-        items = [("home:index", 1.0, "weekly"), ("home:radares", 0.6, "monthly")]
+        items = [("home:index", 1.0, "weekly")]
         # Each active radar's landing page comes from its own registration.
         items += [(r.landing_url_name, 0.9, "weekly") for r in radars.all_radars() if r.is_active]
         if settings.CMS_ARTICLES_ENABLED and Article.objects.live().exists():

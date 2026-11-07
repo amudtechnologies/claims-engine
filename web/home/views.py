@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.utils import timezone
 
 from . import radars
@@ -31,27 +32,21 @@ def index(request):
             "reclamar a nombre de su empresa o el suyo propio. Fuentes públicas "
             "oficiales y acompañamiento legal."
         ),
+        # The "Radares" section (#radares): one card per registered radar.
+        # Only active radars are shown — no "En desarrollo" placeholders.
+        "radars": [
+            (spec, spec.card_stats() if spec.card_stats else [])
+            for spec in radars.all_radars()
+            if spec.is_active
+        ],
     }
     return render(request, "home/index.html", context)
 
 
 def radares(request):
-    """The radar family index. Each radar is its own app that registers a
-    RadarSpec (home/radars.py); this page only lists what is registered."""
-    context = {
-        "active_nav": "radares",
-        "page_title": "Radares: las fuentes que revisamos — Amud Technologies",
-        "page_description": (
-            "Conozca las fuentes públicas oficiales que revisamos para "
-            "identificar dinero y derechos económicos a nombre de una empresa "
-            "o una persona."
-        ),
-        "radars": [
-            (spec, spec.card_stats() if spec.card_stats else [])
-            for spec in radars.all_radars()
-        ],
-    }
-    return render(request, "home/radares.html", context)
+    """The radar index used to be its own page; it is now the #radares
+    section of the home page. Kept as a permanent redirect for old links."""
+    return redirect(reverse("home:index") + "#radares", permanent=True)
 
 
 def results(request):

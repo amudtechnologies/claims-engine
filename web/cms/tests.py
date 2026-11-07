@@ -85,7 +85,7 @@ class PageTests(TestCase):
             Page(title="x", slug="radares").full_clean()
 
     def test_does_not_shadow_fixed_routes(self):
-        self.assertEqual(self.client.get("/radares/").status_code, 200)
+        self.assertEqual(self.client.get("/radares/").status_code, 301)
         self.assertEqual(self.client.get("/depositos-judiciales/").status_code, 200)
 
     def test_slug_change_creates_301_and_avoids_chains(self):

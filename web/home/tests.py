@@ -35,8 +35,9 @@ class RadarRegistryTests(TestCase):
         self.assertTrue(spec.is_active)
         self.assertEqual(spec.landing_url_name, "judicial_deposits:index")
 
-    def test_radares_page_lists_registered_radars(self):
-        response = self.client.get("/radares/")
+    def test_home_radars_section_lists_active_radars(self):
+        response = self.client.get("/")
+        self.assertContains(response, 'id="radares"')
         # The radar draws its own card (same overview as its landing page):
         # title, legal-terms strip, CTA and figures, with its own stylesheet.
         self.assertContains(response, "Depósitos judiciales")
@@ -48,14 +49,19 @@ class RadarRegistryTests(TestCase):
         self.assertNotContains(response, "Consultar mi NIT o cédula")
         self.assertNotContains(response, "Compact version")  # template comment never leaks
         self.assertContains(response, "css/judicial_deposits.css")
+        # Nav and footer scroll to the section instead of opening a page.
+        self.assertContains(response, 'href="/#radares"', count=2)
 
-    def test_new_radar_shows_without_figures_when_in_development(self):
+    def test_radares_url_redirects_to_home_section(self):
+        response = self.client.get("/radares/")
+        self.assertRedirects(response, "/#radares", status_code=301, fetch_redirect_response=False)
+
+    def test_in_development_radar_not_listed(self):
         with mock.patch.dict(radars._REGISTRY, clear=False):
             radars.register(fake_spec())
-            response = self.client.get("/radares/")
-        self.assertContains(response, "Radar X")
-        self.assertContains(response, "En desarrollo")
-        self.assertNotContains(self.client.get("/radares/"), "Radar X")
+            response = self.client.get("/")
+        self.assertNotContains(response, "Radar X")
+        self.assertNotContains(response, "En desarrollo")
 
     def test_active_radars_sort_before_in_development(self):
         with mock.patch.dict(radars._REGISTRY, clear=False):

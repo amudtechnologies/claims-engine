@@ -155,7 +155,8 @@ Adding a radar means adding an app and registering it; the shell is not edited.
 
 - `home` — the shell and the company page. Hero with the document-number search
   (NIT or cédula, `home/_search_form.html`). It only *aggregates* radars: the
-  `/radares/` index lists whatever is registered, and `/resultados/`
+  home page's `#radares` section (the old `/radares/` URL redirects there) lists
+  every active registered radar as a card, and `/resultados/`
   (`home/views.py`) asks every available radar to search the number and renders
   each radar's own results row. Identity (name, document type, RUES status) is
   `core/party` data, the same whichever radar reports it. `home` never imports a

@@ -3,6 +3,7 @@
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  {% for spec, stats in radars %}{% if spec.stylesheet %}<link rel="stylesheet" href="{% static spec.stylesheet %}">{% endif %}{% endfor %}
 {% endblock %}
 
 {% block content %}
@@ -40,5 +41,46 @@
     </div>
   </div>
 </section>
+
+{% if radars %}
+<section class="radars-index" id="radares">
+  <div class="wrap">
+    <div class="eyebrow mono"><span class="dot"></span>Fuentes que revisamos</div>
+    <h2 class="serif">Radares</h2>
+    <p class="lede">Un radar es una revisión periódica de una fuente pública oficial. Cada uno busca un tipo distinto de dinero o derecho económico que podría estar a su nombre.</p>
+
+    <div class="radar-list">
+      {% for spec, stats in radars %}
+        {% if spec.card_template %}
+        {# The radar draws its own card content; `stats` is in scope for it. #}
+        <a href="{% url spec.landing_url_name %}" class="radar-list-item radar-card">{% include spec.card_template %}</a>
+        {% else %}
+        <a href="{% url spec.landing_url_name %}" class="radar-list-item">
+          <div class="radar-list-item-main">
+            <span class="radar-list-item-name">{{ spec.name }}</span>
+            <span class="results-status results-status--active"><span class="dot"></span>{{ spec.status_label }}</span>
+          </div>
+          <p class="radar-list-item-desc">{{ spec.problem }}</p>
+          <dl class="radar-facts">
+            <div><dt>Qué identifica</dt><dd>{{ spec.identifies }}</dd></div>
+            <div><dt>Para quién</dt><dd>{{ spec.audience }}</dd></div>
+          </dl>
+          {% if stats %}
+          <div class="radar-list-item-stats">
+            {% for value, label in stats %}
+            <div>
+              <div class="radar-list-item-stat-num mono">{{ value }}</div>
+              <div class="radar-list-item-stat-label">{{ label }}</div>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
 
 {% endblock %}

@@ -64,7 +64,7 @@
       <input type="checkbox" id="nav-toggle" class="nav-toggle-input">
       <nav class="nav-links">
         <a href="{% url 'home:index' %}" class="{% if active_nav == 'home' %}is-active{% endif %}">Inicio</a>
-        <a href="{% url 'home:radares' %}" class="{% if active_nav == 'radares' or active_nav == 'judicial_deposits' %}is-active{% endif %}">Radares</a>
+        <a href="{% url 'home:index' %}#radares" class="{% if active_nav == 'judicial_deposits' %}is-active{% endif %}">Radares</a>
         {% if articles_enabled %}<a href="{% url 'cms:article_list' %}" class="{% if active_nav == 'articles' %}is-active{% endif %}">Aprenda</a>{% endif %}
       </nav>
       <div class="nav-right">
@@ -99,7 +99,7 @@
         <h2 class="footer-col-title">Amud Technologies</h2>
         <ul>
           <li><a href="{% url 'home:index' %}">Inicio</a></li>
-          <li><a href="{% url 'home:radares' %}">Radares</a></li>
+          <li><a href="{% url 'home:index' %}#radares">Radares</a></li>
           {% if articles_enabled %}<li><a href="{% url 'cms:article_list' %}">Aprenda</a></li>{% endif %}
         </ul>
       </nav>

@@ -3,7 +3,7 @@
 Each radar is its own Django app and owns everything about itself — landing
 page, detail pages, search implementation, templates, styles, admin, tests.
 It plugs into the shell by registering a `RadarSpec` from its
-`AppConfig.ready()`. The shell only aggregates: the `/radares/` index and the
+`AppConfig.ready()`. The shell only aggregates: the home page's `#radares` section and the
 consolidated `/resultados/` page, which asks every available radar to search
 the document number and renders each radar's own results row.
 """
@@ -42,9 +42,9 @@ class RadarSpec:
     results_row_template: str
     search: Callable[[str], RadarMatch | None]
     is_available: Callable[[], bool] = lambda: True
-    # Optional real figures for the /radares/ card: [(value, label), ...].
+    # Optional real figures for the home #radares card: [(value, label), ...].
     card_stats: Callable[[], list[tuple[str, str]]] | None = None
-    # Optional partial rendered inside the radar's /radares/ card, and the
+    # Optional partial rendered inside the radar's home #radares card, and the
     # stylesheet (static path) the shell loads on that page to style it.
     card_template: str | None = None
     stylesheet: str | None = None
