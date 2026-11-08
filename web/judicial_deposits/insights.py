@@ -117,6 +117,11 @@ class Chart:
     summary: str = ""
 
     @property
+    def highlighted(self) -> str | None:
+        """The label of the highlighted bar (a publication period), if any."""
+        return next((bar.label for bar in self.bars if bar.highlight), None)
+
+    @property
     def total_count(self) -> int:
         return sum(bar.count for bar in self.bars)
 

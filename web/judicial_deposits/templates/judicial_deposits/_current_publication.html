@@ -1,54 +1,22 @@
-{% load home_extras %}
-{# The page's lead block: this party in the corpus-wide latest publication. Never hidden — a party absent from it still gets the block, saying so. No charts here: it leads straight to the collection request. #}
-<section class="jd-block jd-block--current{% if current.claimable %} is-claimable{% endif %}" aria-labelledby="jd-current-title">
+{# The page's lead block: this party in the corpus-wide latest publication. Never hidden — a party absent from it still gets the block, saying so, followed by the same block for the last publication it does appear in. #}
+<section class="jd-block jd-block--current{% if current.claimable %} is-claimable{% elif not current %} is-absent{% endif %}" aria-labelledby="jd-current-title">
   <div class="jd-panel-title">
     <h3 id="jd-current-title" class="jd-block-title">Última publicación · {{ latest_period }}</h3>
-    {% if current.status == "reclamable" %}<span class="jd-tag jd-tag--open">Reclamable</span>
-    {% elif current.status == "no_reclamable" %}<span class="jd-tag jd-tag--closed">Plazo vencido</span>
-    {% elif current.status == "activo" %}<span class="jd-tag jd-tag--pending">Vigente</span>
-    {% endif %}
+    {% include "judicial_deposits/_publication_status_tag.html" with pub=current %}
   </div>
-
   {% if current %}
-    {% if current.claimable %}
-      <p class="jd-deadline mono">Hasta el {{ current.window.closes_on|date:"d/m/Y" }} · queda{{ current.business_days_left|pluralize:",n" }} {{ current.business_days_left }} día{{ current.business_days_left|pluralize }} hábil{{ current.business_days_left|pluralize:"es" }}</p>
-    {% elif current.window %}
-      <p class="jd-deadline jd-deadline--closed mono">Venció el {{ current.window.closes_on|date:"d/m/Y" }}</p>
-    {% endif %}
-
-    <div class="jd-party-summary">
-      <div class="jd-summary-item">
-        <div class="jd-summary-num mono">{{ current.summary.deposit_count|es_co_number }}</div>
-        <div class="jd-summary-label">Depósitos encontrados</div>
-      </div>
-      <div class="jd-summary-item">
-        <div class="jd-summary-num mono">{{ current.summary.total_amount_cop|cop }}</div>
-        <div class="jd-summary-label">Valor total publicado</div>
-      </div>
-    </div>
-
-    {% if current.claimable %}
-      <div class="jd-claim-cta">
-        <a href="{{ detail_url }}&amp;solicitud=collection#solicitud" class="btn btn-primary btn-lg" data-request-type="collection">Quiero recuperarlo</a>
-        <p class="jd-claim-cta-fees">Honorarios solo si recuperamos. Sin costo inicial.</p>
-        <p class="jd-claim-cta-includes">Le entregamos el número de cada depósito, el juzgado y el radicado, y gestionamos el cobro.</p>
-      </div>
-    {% endif %}
-
-    <p class="jd-block-note">
-      Estos depósitos aparecen porque no se habían reclamado.
-      {% if current.claimable %}Aún está a tiempo hasta el {{ current.window.closes_on|date:"d/m/Y" }}.
-      {% elif current.window %}El plazo para reclamarlos venció el {{ current.window.closes_on|date:"d/m/Y" }}.{% endif %}
-    </p>
-
-    {% include "judicial_deposits/_role_cards.html" with summary=current.summary %}
-
-    {% if current_charts %}
-      <div class="jd-charts jd-charts--compact{% if not current.claimable %} is-muted{% endif %}">
-        {% for chart in current_charts %}{% include "judicial_deposits/_chart.html" with chart_scope="current" %}{% endfor %}
-      </div>
-    {% endif %}
+    {% include "judicial_deposits/_publication_body.html" with pub=current pub_charts=current_charts chart_scope="current" %}
   {% else %}
     <p class="jd-absent">No aparece en la publicación vigente ({{ latest_period }})</p>
   {% endif %}
 </section>
+
+{% if last_appearance %}
+<section class="jd-block jd-block--past" aria-labelledby="jd-last-title">
+  <div class="jd-panel-title">
+    <h3 id="jd-last-title" class="jd-block-title">Última publicación en la que aparece · {{ last_appearance.period }}</h3>
+    {% include "judicial_deposits/_publication_status_tag.html" with pub=last_appearance %}
+  </div>
+  {% include "judicial_deposits/_publication_body.html" with pub=last_appearance pub_charts=last_appearance_charts chart_scope="last" %}
+</section>
+{% endif %}

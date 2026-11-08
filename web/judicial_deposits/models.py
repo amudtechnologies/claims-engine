@@ -22,8 +22,10 @@ class ClaimWindow(models.Model):
 
 
 class ServiceRequest(models.Model):
-    """A visitor asking us to collect ("Quiero recuperarlo") or verify
-    ("Solicitar verificación") what this radar found for a document number.
+    """A visitor asking us to collect or verify what this radar found for a
+    document number. No page offers this request any more (commercial work
+    is out of scope for now — see CLAUDE.md "Current phase"); the table is
+    kept, admin-only, for the requests already received.
     The claimable figures are recomputed server-side when the request is
     saved, never taken from the form, and kept as they stood at that moment.
 

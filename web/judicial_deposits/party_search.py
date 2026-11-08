@@ -195,7 +195,8 @@ def business_days_left(closes_on: date, today: date | None = None) -> int:
 
 @dataclass(frozen=True)
 class CurrentPublication:
-    """A party in the corpus-wide latest publication (`latest_published_period`).
+    """A party in one publication period — the corpus-wide latest one
+    (`current_publication`), or the last one it appears in (`publication`).
     `status` is `claim_status`'s value; `claimable` only when that is
     "reclamable" — the one state in which there is something to claim now."""
 
@@ -215,24 +216,30 @@ class CurrentPublication:
         return business_days_left(self.window.closes_on)
 
 
+def publication(result: PartySearchResult, period: str | None) -> CurrentPublication | None:
+    """The party's slice of one publication period — figures, claim window
+    and status — or None when it doesn't appear in it."""
+    if not period:
+        return None
+    summary = result.for_period(period)
+    if summary is None:
+        return None
+    window = claim_window(period)
+    return CurrentPublication(
+        period=period,
+        summary=summary,
+        window=window,
+        status=claim_status(window, result.source_for_period(period)),
+    )
+
+
 def current_publication(
     result: PartySearchResult, latest_period: str | None
 ) -> CurrentPublication | None:
     """The party's slice of the latest publication, or None when it doesn't
     appear in it. Shared by /resultados/ (radar.search) and this radar's
     detail page, so both show the same figures and deadline."""
-    if not latest_period:
-        return None
-    summary = result.for_period(latest_period)
-    if summary is None:
-        return None
-    window = claim_window(latest_period)
-    return CurrentPublication(
-        period=latest_period,
-        summary=summary,
-        window=window,
-        status=claim_status(window, result.source_for_period(latest_period)),
-    )
+    return publication(result, latest_period)
 
 
 def normalize_document_number(raw_value: str) -> str:

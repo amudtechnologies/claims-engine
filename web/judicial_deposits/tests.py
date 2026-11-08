@@ -4,7 +4,7 @@ from unittest import mock, skipUnless
 from django.test import TestCase, override_settings
 
 from . import core_cache, insights, party_search, radar
-from .models import ClaimWindow, ServiceRequest
+from .models import ClaimWindow
 from .party_search import Deposit, PartySearchResult
 from .templatetags.jd_charts import axis_ticks, cop_short
 
@@ -232,7 +232,7 @@ def _result(deposits):
 
 class DetailPageTests(TestCase):
     """The detail page's three latest-publication states, its layout and
-    the request form, against a mocked party (no core cache needed)."""
+    the page chrome, against a mocked party (no core cache needed)."""
 
     def setUp(self):
         ClaimWindow.objects.create(
@@ -272,15 +272,19 @@ class DetailPageTests(TestCase):
         self.assertLess(html.index("Última publicación · 2026-2"), html.index("Histórico completo"))
         self.assertContains(response, "Hasta el 17/11/2026 · quedan 6 días hábiles")
         self.assertContains(response, 'jd-tag--open">Reclamable<')
-        self.assertContains(response, "Quiero recuperarlo")
-        self.assertContains(response, "Honorarios solo si recuperamos. Sin costo inicial.")
-        self.assertContains(
-            response,
-            "Le entregamos el número de cada depósito, el juzgado y el radicado, y "
-            "gestionamos el cobro.",
-        )
+        self.assertNotContains(response, "is-absent")
         self.assertContains(response, "Aún está a tiempo hasta el 17/11/2026.")
-        self.assertContains(response, "Solicitar verificación")
+        # Informational only: no collection/verification request, no sales copy.
+        for commercial in (
+            "Quiero recuperarlo",
+            "Solicitar verificación",
+            "Honorarios",
+            "gestionamos el cobro",
+            "<form",
+            "<dialog",
+        ):
+            self.assertNotContains(response, commercial)
+        self.assertEqual(self._request("post").status_code, 200)
         self.assertContains(
             response,
             "No podemos confirmar si estos depósitos se reclamaron dentro del plazo de su "
@@ -292,16 +296,44 @@ class DetailPageTests(TestCase):
         response = self._request(today=date(2026, 11, 18))
         self.assertContains(response, 'jd-tag--closed">Plazo vencido<')
         self.assertContains(response, "El plazo para reclamarlos venció el 17/11/2026.")
-        self.assertNotContains(response, 'data-request-type="collection"')
         self.assertNotContains(response, "días hábiles")
-        self.assertContains(response, "Solicitar verificación")
 
     def test_absent_from_latest_publication_state(self):
-        response = self._request(latest="2027-1")
+        response = self._request(today=date(2026, 11, 18), latest="2027-1")
+        html = response.content.decode()
         self.assertContains(response, "Última publicación · 2027-1")
         self.assertContains(response, "No aparece en la publicación vigente (2027-1)")
-        self.assertNotContains(response, 'data-request-type="collection"')
-        self.assertContains(response, "Histórico completo")
+        self.assertContains(response, 'class="jd-block jd-block--current is-absent"')
+        # Then the last publication it does appear in, then the history.
+        last = html.index("Última publicación en la que aparece · 2026-2")
+        self.assertLess(html.index("No aparece en la publicación vigente"), last)
+        self.assertLess(last, html.index("Histórico completo"))
+        last_block = html[last : html.index("Histórico completo")]
+        self.assertIn('jd-tag--closed">Plazo vencido<', last_block)
+        self.assertIn('<div class="jd-summary-num mono">2</div>', last_block)
+        self.assertIn('<div class="jd-summary-num mono">$ 500</div>', last_block)
+        self.assertIn("El plazo para reclamarlos venció el 17/11/2026.", last_block)
+        self.assertIn("Como demandante", last_block)
+
+    def test_last_appearance_charts_and_wording(self):
+        self.result = _result(
+            [_deposit("2025-2", 2_000) for _ in range(5)]
+            + [_deposit("2026-2", 1_000 + i) for i in range(10)]
+        )
+        response = self._request(today=date(2026, 11, 18), latest="2027-1")
+        html = response.content.decode()
+        last_block = html[
+            html.index("Última publicación en la que aparece ·") : html.index("Histórico completo")
+        ]
+        self.assertIn("jd-charts jd-charts--compact is-muted", last_block)
+        self.assertIn('id="jd-chart-last-previous-period-title"', last_block)
+        self.assertIn("Frente a 2025-2: valor +0,4 %, depósitos +100,0 %", last_block)
+        # 2026-2 is highlighted there, but it isn't the current publication.
+        self.assertIn("resaltada la publicación (2026-2)", last_block)
+        self.assertNotIn("(vigente)", last_block)
+
+    def test_present_in_latest_publication_has_no_last_appearance_block(self):
+        self.assertNotContains(self._request(), "Última publicación en la que aparece ·")
 
     def test_page_chrome(self):
         response = self._request()
@@ -336,77 +368,15 @@ class DetailPageTests(TestCase):
         self.assertContains(response, "Aparece en 1 de 4 publicaciones")
         # Collapsed by default, like the landing's FAQ: nothing renders open.
         self.assertContains(response, '<details class="jd-chart jd-chart--vertical">')
-        self.assertEqual(response.content.decode().count('<details class="jd-chart '), 4)
+        # 4 in the history + 4 compact ones for the last publication it appears
+        # in (2025-1: it isn't in the latest one).
+        self.assertEqual(response.content.decode().count('<details class="jd-chart '), 8)
         self.assertNotContains(response, "<details open")
         self.assertNotContains(response, 'class="jd-chart jd-chart--vertical" open')
         self.assertContains(response, "Ver datos")
         self.assertContains(response, 'role="img"')
         self.assertNotContains(response, "Juzgado 7")
         self.assertContains(response, "10 · $ 10.045")
-
-    def _form(self, **overrides):
-        data = {
-            "request_type": "collection",
-            "name": "Ana Pérez",
-            "email": "ana@example.co",
-            "phone": "300 123 4567",
-            "relationship": "holder",
-            "data_processing_consent": "on",
-        }
-        data.update(overrides)
-        return data
-
-    def test_collection_request_is_saved_with_the_claimable_figures(self):
-        response = self._request("post", data=self._form())
-        self.assertRedirects(
-            response,
-            DETAIL_URL + "&solicitud=enviada#solicitud-enviada",
-            fetch_redirect_response=False,
-        )
-        saved = ServiceRequest.objects.get()
-        self.assertEqual(
-            (
-                saved.document_number,
-                saved.radar,
-                saved.request_type,
-                saved.claimable_count,
-                saved.claimable_amount_cop,
-            ),
-            ("890300279", "depositos-judiciales", "collection", 2, 500),
-        )
-        self.assertIsNotNone(saved.created_at)
-        confirmation = self._request(url=DETAIL_URL + "&solicitud=enviada")
-        self.assertContains(confirmation, "Recibimos su solicitud.")
-
-    def test_verification_request_when_nothing_is_claimable(self):
-        response = self._request(
-            "post", latest="2027-1", data=self._form(request_type="verification")
-        )
-        self.assertEqual(response.status_code, 302)
-        saved = ServiceRequest.objects.get()
-        self.assertEqual(
-            (saved.request_type, saved.claimable_count, saved.claimable_amount_cop),
-            ("verification", 0, 0),
-        )
-
-    def test_form_requires_fields_and_consent(self):
-        response = self._request(
-            "post", data=self._form(name="", email="no", phone="", data_processing_consent="")
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(ServiceRequest.objects.exists())
-        self.assertContains(response, "Escriba su nombre.")
-        self.assertContains(response, "Escriba un correo válido.")
-        self.assertContains(response, "Escriba un teléfono de contacto.")
-        self.assertContains(response, "Debe autorizar el tratamiento de sus datos")
-        self.assertContains(response, "data-open-on-load")
-        self.assertContains(response, 'href="/politica-de-tratamiento-de-datos-personales/"')
-
-    def test_collection_refused_once_the_window_closed(self):
-        response = self._request("post", today=date(2026, 11, 18), data=self._form())
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(ServiceRequest.objects.exists())
-        self.assertContains(response, "Ya no hay depósitos vigentes para cobrar")
 
     def _current_with_findings(self, count):
         self.result = _result(
@@ -422,12 +392,11 @@ class DetailPageTests(TestCase):
         response = self._request()
         self.assertNotContains(response, "jd-charts--compact")
 
-    def test_current_publication_charts_under_the_button_and_note(self):
+    def test_current_publication_charts_under_the_note(self):
         self._current_with_findings(10)
         response = self._request()
         html = response.content.decode()
         compact = html.index("jd-charts jd-charts--compact")
-        self.assertLess(html.index('data-request-type="collection"'), compact)
         self.assertLess(html.index("Aún está a tiempo hasta el 17/11/2026."), compact)
         self.assertLess(compact, html.index("Histórico completo"))
         self.assertLess(
@@ -613,10 +582,8 @@ class RealCacheTests(TestCase):
         self.assertContains(response, '<div class="jd-summary-num mono">$ 232.457.445</div>')
         # The same 6 business days as /resultados/.
         self.assertContains(response, "Hasta el 17/11/2026 · quedan 6 días hábiles")
-        self.assertContains(response, 'data-request-type="collection">Quiero recuperarlo')
         self.assertContains(response, '<div class="jd-summary-num mono">7.980</div>')
         self.assertContains(response, '<div class="jd-summary-num mono">$ 3.701.871.805</div>')
-        self.assertContains(response, "Solicitar verificación")
         self.assertContains(response, "BANCO DE OCCIDENTE</h2>")
         # Every chart's table totals the history.
         self.assertEqual(html.count('<td class="mono">7.980</td>'), 4)

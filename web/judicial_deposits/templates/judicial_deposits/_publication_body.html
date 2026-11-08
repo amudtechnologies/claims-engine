@@ -1,0 +1,32 @@
+{% load home_extras %}
+{# One publication's slice for this party (`pub`, a party_search.CurrentPublication): deadline, figures, note, role cards and the compact charts (`pub_charts`, ids under `chart_scope`). #}
+{% if pub.claimable %}
+  <p class="jd-deadline mono">Hasta el {{ pub.window.closes_on|date:"d/m/Y" }} · queda{{ pub.business_days_left|pluralize:",n" }} {{ pub.business_days_left }} día{{ pub.business_days_left|pluralize }} hábil{{ pub.business_days_left|pluralize:"es" }}</p>
+{% elif pub.window %}
+  <p class="jd-deadline jd-deadline--closed mono">Venció el {{ pub.window.closes_on|date:"d/m/Y" }}</p>
+{% endif %}
+
+<div class="jd-party-summary">
+  <div class="jd-summary-item">
+    <div class="jd-summary-num mono">{{ pub.summary.deposit_count|es_co_number }}</div>
+    <div class="jd-summary-label">Depósitos encontrados</div>
+  </div>
+  <div class="jd-summary-item">
+    <div class="jd-summary-num mono">{{ pub.summary.total_amount_cop|cop }}</div>
+    <div class="jd-summary-label">Valor total publicado</div>
+  </div>
+</div>
+
+<p class="jd-block-note">
+  Estos depósitos aparecen porque no se habían reclamado.
+  {% if pub.claimable %}Aún está a tiempo hasta el {{ pub.window.closes_on|date:"d/m/Y" }}.
+  {% elif pub.window %}El plazo para reclamarlos venció el {{ pub.window.closes_on|date:"d/m/Y" }}.{% endif %}
+</p>
+
+{% include "judicial_deposits/_role_cards.html" with summary=pub.summary %}
+
+{% if pub_charts %}
+  <div class="jd-charts jd-charts--compact{% if not pub.claimable %} is-muted{% endif %}">
+    {% for chart in pub_charts %}{% include "judicial_deposits/_chart.html" %}{% endfor %}
+  </div>
+{% endif %}

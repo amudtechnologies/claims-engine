@@ -4,8 +4,6 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 
 from . import core_cache, insights, party_search, radar
-from .forms import ServiceRequestForm
-from .models import ServiceRequest
 
 
 def _service_ld(request) -> dict:
@@ -67,22 +65,19 @@ def index(request):
 
 def detail(request):
     """This radar's detail for one document number: the latest publication
-    (deadline and the collection request), then the full history with its
-    aggregate charts and the verification request. Both requests post back
-    here and land on this same page."""
+    (or, when absent from it, the last one it appears in), then the full
+    history with its aggregate charts. Informational only — no collection
+    or verification request (commercial work is out of scope for now)."""
     raw_document_number = request.GET.get("nit", "").strip()
     if not raw_document_number:
         return redirect("judicial_deposits:index")
 
-    detail_url = f"{reverse('judicial_deposits:detail')}?nit={quote(raw_document_number)}"
     context = {
         "active_nav": "judicial_deposits",
         "page_title": "Depósitos judiciales de su consulta — Amud Technologies",
         "page_description": "Detalle de la consulta en el radar de depósitos judiciales.",
         "raw_document_number": raw_document_number,
-        "detail_url": detail_url,
         "results_url": f"{reverse('home:results')}?nit={quote(raw_document_number)}",
-        "request_sent": request.GET.get("solicitud") == "enviada",
     }
     if not core_cache.is_synced():
         context["cache_unavailable"] = True
@@ -104,39 +99,14 @@ def detail(request):
         if current
         else None
     )
+    # Absent from the latest publication: the last one it does appear in
+    # gets the same block (figures, deadline, roles, compact charts) next.
+    if current is None and party_result.last_period:
+        last_appearance = party_search.publication(party_result, party_result.last_period)
+        context["last_appearance"] = last_appearance
+        context["last_appearance_charts"] = insights.current_publication_charts(
+            party_result.deposits, periods, last_appearance.period
+        )
     context["charts"] = insights.history_charts(party_result.deposits, periods, latest_period)
 
-    requested_type = request.GET.get("solicitud")
-    form = None
-    if request.method == "POST":
-        form = ServiceRequestForm(request.POST)
-        if form.is_valid():
-            request_type = form.cleaned_data["request_type"]
-            claimable = current is not None and current.claimable
-            if request_type == ServiceRequest.RequestType.COLLECTION and not claimable:
-                form.add_error(None, "Ya no hay depósitos vigentes para cobrar en esta consulta.")
-            else:
-                service_request = form.save(commit=False)
-                service_request.document_number = party_result.document_number
-                service_request.radar = radar.spec.slug
-                service_request.claimable_count = (
-                    current.summary.deposit_count if claimable else 0
-                )
-                service_request.claimable_amount_cop = (
-                    current.summary.total_amount_cop if claimable else 0
-                )
-                service_request.save()
-                # TODO: notify the team by email about the new request — no
-                # outgoing mail is configured yet; requests are read in the admin.
-                return redirect(f"{detail_url}&solicitud=enviada#solicitud-enviada")
-        requested_type = form.data.get("request_type")
-    if requested_type not in ServiceRequest.RequestType.values:
-        requested_type = None
-    context["form"] = form or ServiceRequestForm(
-        initial={"request_type": requested_type or ServiceRequest.RequestType.VERIFICATION}
-    )
-    # Server-side open state: re-shows the form after a validation error, and
-    # opens it for ?solicitud=<type> links when JavaScript is off.
-    context["form_open"] = requested_type is not None
-    context["form_is_collection"] = requested_type == ServiceRequest.RequestType.COLLECTION
     return render(request, "judicial_deposits/detail.html", context)

@@ -38,15 +38,8 @@
         <p class="jd-party-note">Esta consulta sirve para revisar su propia información o la de la empresa que representa. No la use para consultar a otras personas sin su autorización.</p>
       {% endif %}
 
-      {% if request_sent %}
-        <div id="solicitud-enviada" class="jd-confirmation" role="status" tabindex="-1">
-          <strong>Recibimos su solicitud.</strong> Le escribiremos al correo que nos indicó para continuar.
-        </div>
-      {% endif %}
-
       {% include "judicial_deposits/_current_publication.html" %}
       {% include "judicial_deposits/_history.html" with summary=party_result %}
-      {% include "judicial_deposits/_request_form.html" %}
     </div>
     {% else %}
       <p><strong>No encontramos depósitos judiciales</strong> para este número. Eso no descarta que existan. Solo indica que no aparecen en las publicaciones revisadas hasta ahora.</p>
@@ -59,8 +52,4 @@
     {% endif %}
   </div>
 </section>
-{% endblock %}
-
-{% block extra_js %}
-  {% if party_result %}<script src="{% static 'js/service_request.js' %}" defer></script>{% endif %}
 {% endblock %}
