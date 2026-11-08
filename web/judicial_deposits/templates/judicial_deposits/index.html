@@ -1,5 +1,7 @@
 {% extends "base.html" %}
-{% load static home_extras %}
+{% load static home_extras cms_extras %}
+
+{% block structured_data %}{% ld_json service_ld %}{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/judicial_deposits.css' %}">
@@ -9,9 +11,7 @@
 
 <section class="jd-intro">
   <div class="wrap">
-    <nav class="radar-breadcrumb mono">
-      <a href="{% url 'home:index' %}#radares">Radar de Acreencias</a> <span aria-hidden="true">/</span> Depósitos judiciales
-    </nav>
+    {% breadcrumbs crumbs %}
     <div class="eyebrow mono"><span class="dot"></span>Radar activo</div>
     <h1 class="serif jd-title">Depósitos judiciales</h1>
     <p class="lede">Un depósito judicial es dinero que se consigna en una cuenta del Banco Agrario a órdenes de un juzgado, dentro de un proceso, y que debe entregarse a quien tenga derecho a él. Si no se reclama dentro de los plazos legales, prescribe a favor de la Nación.</p>
@@ -235,6 +235,10 @@
         <p>Pueden originarse en embargos, consignaciones, garantías, remates y otras actuaciones judiciales. En determinadas circunstancias, estos recursos pueden permanecer sin ser reclamados por sus beneficiarios.</p>
       </details>
       <details>
+        <summary>¿Depósito judicial y título judicial son lo mismo?</summary>
+        <p>Se refieren a lo mismo. El depósito es el dinero consignado a órdenes del juzgado; el título de depósito judicial es el documento que lo representa y cuyo pago ordena el juez. Por eso, en juzgados y trámites es común escuchar «títulos judiciales».</p>
+      </details>
+      <details>
         <summary>¿Por qué hay dinero sin reclamar?</summary>
         <p>Un depósito judicial puede permanecer sin reclamar por diferentes razones: desconocimiento de su existencia, falta de información sobre el proceso, cambios en los datos de los beneficiarios, procesos antiguos o dificultades para identificar a quién corresponde el dinero.</p>
         <p>En muchos casos, las personas o empresas que podrían tener derecho sobre estos recursos simplemente no saben que existen.</p>
@@ -287,6 +291,8 @@
     </div>
   </div>
 </section>
+
+{% related_guides radar_slug %}
 
 <section class="jd-cta">
   <div class="wrap jd-cta-inner">

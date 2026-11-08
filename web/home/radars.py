@@ -48,6 +48,9 @@ class RadarSpec:
     # stylesheet (static path) the shell loads on that page to style it.
     card_template: str | None = None
     stylesheet: str | None = None
+    # URL names of the radar's per-query pages (they carry a document number
+    # in the query string): robots.txt disallows them, like /resultados/.
+    private_url_names: tuple[str, ...] = ()
     status: str = "active"  # "active" | "in_development"
     cta_label: str = "Conocer el radar"
 

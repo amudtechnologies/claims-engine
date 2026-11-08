@@ -6,6 +6,31 @@ from django.urls import reverse
 from . import core_cache, party_search, radar
 
 
+def _service_ld(request) -> dict:
+    """schema.org Service for this landing — only what the page itself shows:
+    the radar, its provider, Colombia, and the free aggregated lookup."""
+    site = request.build_absolute_uri("/")
+    return {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": "Radar de depósitos judiciales",
+        "serviceType": "Identificación de depósitos judiciales sin reclamar",
+        "description": radar.spec.problem,
+        "url": request.build_absolute_uri(reverse("judicial_deposits:index")),
+        "provider": {"@id": site + "#organization"},
+        "areaServed": {"@type": "Country", "name": "Colombia"},
+        "offers": {
+            "@type": "Offer",
+            "name": "Consulta gratuita",
+            "description": (
+                "Resumen agregado de los depósitos identificados para un NIT o una cédula."
+            ),
+            "price": "0",
+            "priceCurrency": "COP",
+        },
+    }
+
+
 def index(request):
     """Landing page for the radar: what it is, the legal terms, aggregate figures."""
     legacy_document_number = request.GET.get("nit", "").strip()
@@ -17,13 +42,20 @@ def index(request):
     context = {
         "active_nav": "judicial_deposits",
         "page_title": (
-            "¿Tiene un depósito judicial sin reclamar? Consulte gratis — Amud Technologies"
+            "Depósitos judiciales sin reclamar: consulte por NIT o cédula — Amud Technologies"
         ),
         "page_description": (
-            "Consulte gratis con su NIT o cédula si aparece en depósitos "
-            "judiciales sin reclamar publicados por la Rama Judicial. Qué son, "
+            "Consulte gratis con su NIT o cédula si aparece en los listados de "
+            "depósitos judiciales sin reclamar de la Rama Judicial. Qué son, "
             "qué plazos aplican y cómo reclamarlos."
         ),
+        "crumbs": [
+            ("Inicio", reverse("home:index")),
+            ("Radares", reverse("home:index") + "#radares"),
+            (radar.spec.name, None),
+        ],
+        "service_ld": _service_ld(request),
+        "radar_slug": radar.spec.slug,
     }
     context["stats"] = radar.card_stats()
     if core_cache.is_synced():

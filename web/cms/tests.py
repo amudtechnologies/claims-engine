@@ -208,7 +208,8 @@ class ArticleTests(TestCase):
 
     def test_nav_and_footer_link_to_articles(self):
         html = self.client.get("/").content.decode()
-        self.assertEqual(html.count('href="/guias/"'), 2)
+        # Nav, footer, and the home "Nuestro diferencial" section.
+        self.assertEqual(html.count('href="/guias/"'), 3)
         self.assertIn(">Aprenda</a>", html)
 
     def test_empty_list_is_noindex_and_not_in_sitemap(self):
@@ -276,3 +277,52 @@ class RobotsTests(TestCase):
         body = self.client.get("/robots.txt").content.decode()
         self.assertIn("Disallow: /management/", body)
         self.assertIn("Sitemap:", body)
+
+    def test_robots_blocks_per_query_result_pages(self):
+        body = self.client.get("/robots.txt").content.decode()
+        self.assertIn("Disallow: /resultados/", body)
+        # Declared by the radar (RadarSpec.private_url_names), not by the shell.
+        self.assertIn("Disallow: /depositos-judiciales/resultado/", body)
+
+
+class SeoLinkingTests(TestCase):
+    def setUp(self):
+        Article.objects.all().delete()
+        Category.objects.all().delete()
+
+    def test_page_description_falls_back_to_body(self):
+        make_page("metodologia", body="<p>Cómo procesamos <strong>fuentes oficiales</strong>.</p>")
+        response = self.client.get("/metodologia/")
+        self.assertContains(
+            response, 'name="description" content="Cómo procesamos fuentes oficiales."'
+        )
+
+    def test_article_in_radar_category_links_to_radar_landing(self):
+        cat = Category.objects.create(name="Depósitos judiciales", slug="depositos-judiciales")
+        make_article("que-es").categories.add(cat)
+        response = self.client.get("/guias/que-es/")
+        self.assertContains(response, "Radar relacionado")
+        self.assertContains(response, 'href="/depositos-judiciales/" class="btn-link"')
+        self.assertContains(response, "Siga leyendo", count=0)  # no related articles here
+        self.assertContains(response, "#organization")
+
+    def test_radar_landing_lists_guides_of_its_category(self):
+        cat = Category.objects.create(name="Depósitos judiciales", slug="depositos-judiciales")
+        make_article("como-reclamar", title="Cómo reclamar").categories.add(cat)
+        make_article("borrador", status=Status.DRAFT).categories.add(cat)
+        response = self.client.get("/depositos-judiciales/")
+        self.assertContains(response, "Guías relacionadas")
+        self.assertContains(response, 'href="/guias/como-reclamar/"')
+        self.assertNotContains(response, 'href="/guias/borrador/"')
+
+    def test_radar_landing_without_guides_has_no_section(self):
+        self.assertNotContains(self.client.get("/depositos-judiciales/"), "Guías relacionadas")
+
+
+class NotFoundTests(TestCase):
+    def test_404_is_branded_and_noindex(self):
+        response = self.client.get("/no-existe-esta-pagina/")
+        self.assertEqual(response.status_code, 404)
+        self.assertContains(response, "No encontramos esta página", status_code=404)
+        self.assertContains(response, "noindex", status_code=404)
+        self.assertContains(response, 'action="/resultados/"', status_code=404)

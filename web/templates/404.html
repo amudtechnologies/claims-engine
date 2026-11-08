@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Página no encontrada — Amud Technologies{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/results.css' %}">{% endblock %}
+{% block robots_meta %}<meta name="robots" content="noindex,follow">{% endblock %}
+
+{% block content %}
+<section class="results-empty">
+  <div class="wrap">
+    <h1 class="serif">No encontramos esta página</h1>
+    <p>Es posible que la dirección haya cambiado o que la página ya no exista.</p>
+    <div class="hero-search">{% include "home/_search_form.html" %}</div>
+    <p>
+      <a href="{% url 'home:index' %}" class="btn-link">Ir al inicio</a>
+      {% for radar in site_radars %} · <a href="{% url radar.landing_url_name %}" class="btn-link">{{ radar.name }}</a>{% endfor %}
+      {% if articles_enabled %} · <a href="{% url 'cms:article_list' %}" class="btn-link">Aprenda</a>{% endif %}
+    </p>
+  </div>
+</section>
+{% endblock %}

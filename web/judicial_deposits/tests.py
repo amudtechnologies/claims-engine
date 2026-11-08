@@ -19,6 +19,10 @@ class LandingTests(TestCase):
         self.assertContains(response, "Demostración · Datos ficticios")
         self.assertNotContains(response, "pequeña comisión")
         self.assertNotContains(response, "RESULTADO DE SU CONSULTA")
+        # Structured data matches what the page shows: the service and its trail.
+        self.assertContains(response, '"@type": "Service"')
+        self.assertContains(response, "BreadcrumbList")
+        self.assertContains(response, "título judicial")
 
     def test_legacy_nit_query_redirects_to_detail(self):
         response = self.client.get("/depositos-judiciales/?nit=900123456")

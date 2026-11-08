@@ -14,7 +14,7 @@
     {% breadcrumbs crumbs %}
     <h1 class="serif">{{ article.title }}</h1>
     <p class="article-meta mono">
-      {% if article.published_at %}<time datetime="{{ article.published_at|date:'c' }}">{{ article.published_at|date:"j \d\e F \d\e Y" }}</time> · {% endif %}{{ article.author_display }}
+      {% if article.published_at %}<time datetime="{{ article.published_at|date:'c' }}">{{ article.published_at|date:"j \d\e F \d\e Y" }}</time> · {% endif %}{% if was_updated %}Actualizado el <time datetime="{{ article.updated_at|date:'c' }}">{{ article.updated_at|date:"j \d\e F \d\e Y" }}</time> · {% endif %}{{ article.author_display }}
     </p>
     {% if categories %}
     <ul class="chips article-cats" aria-label="Categorías">{% for c in categories %}<li><a class="chip" href="{{ c.get_absolute_url }}">{{ c.name }}</a></li>{% endfor %}</ul>
@@ -22,6 +22,14 @@
     {% if article.featured_image %}<img class="prose-hero-img" src="{{ article.featured_image.url }}" alt="{{ article.title }}" width="1200" height="630">{% endif %}
     <div class="prose">{{ article.body|safe }}</div>
     {% include "cms/_share.html" with url=canonical_url title=article.title %}
+    {% for radar in related_radars %}
+    <aside class="article-radar" aria-label="Radar relacionado">
+      <div class="eyebrow mono"><span class="dot"></span>Radar relacionado</div>
+      <p class="article-radar-name serif">{{ radar.name }}</p>
+      <p class="article-radar-desc">{{ radar.problem }}</p>
+      <a href="{% url radar.landing_url_name %}" class="btn-link">Conozca el radar de {{ radar.name|lower }}</a>
+    </aside>
+    {% endfor %}
     <p class="article-note">Este contenido es informativo y no constituye asesoría jurídica.</p>
   </div>
 </article>
@@ -29,7 +37,7 @@
 {% if related_articles %}
 <section class="article-related">
   <div class="wrap prose-wrap">
-    <div class="eyebrow mono"><span class="dot"></span>Sigue leyendo</div>
+    <div class="eyebrow mono"><span class="dot"></span>Siga leyendo</div>
     <ul class="article-list article-list--compact">
       {% for a in related_articles %}<li><a href="{{ a.get_absolute_url }}">{{ a.title }}</a></li>{% endfor %}
     </ul>

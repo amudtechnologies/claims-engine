@@ -1,6 +1,7 @@
 import json
 
 from django import template
+from django.conf import settings
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
@@ -44,3 +45,20 @@ def breadcrumbs(context, crumbs):
             "itemListElement": items,
         },
     }
+
+
+@register.inclusion_tag("cms/_related_guides.html")
+def related_guides(category_slug, limit=3):
+    """Live articles in the category whose slug is `category_slug` — a radar
+    landing passes its own slug, so a category named after a radar links its
+    guides from it. Renders nothing when there are none (or /guias/ is off)."""
+    from ..models import Article
+
+    articles = []
+    if settings.CMS_ARTICLES_ENABLED:
+        articles = list(
+            Article.objects.live()
+            .filter(categories__slug=category_slug, categories__is_active=True)
+            .distinct()[:limit]
+        )
+    return {"articles": articles, "category_slug": category_slug}

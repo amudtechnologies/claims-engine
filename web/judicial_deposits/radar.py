@@ -76,4 +76,5 @@ spec = RadarSpec(
     card_stats=card_stats,
     card_template="judicial_deposits/_card.html",
     stylesheet="css/judicial_deposits.css",
+    private_url_names=("judicial_deposits:detail",),
 )

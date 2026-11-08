@@ -1,11 +1,11 @@
 {% load static %}<!doctype html>
-<html lang="es">
+<html lang="es-CO">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   {# page_title / page_description are set per-view (see home/views.py) — the single source for <title>, the meta description, and the OG/Twitter tags below, so the three never drift apart. #}
-  <title>{{ page_title|default:"Amud Technologies" }}</title>
-  <meta name="description" content="{{ page_description|default:'Amud Technologies detecta dinero que ya tiene dueño en fuentes oficiales colombianas.' }}">
+  <title>{% block title %}{{ page_title|default:"Amud Technologies" }}{% endblock %}</title>
+  <meta name="description" content="{{ page_description|default:'Amud Technologies transforma información pública de fuentes oficiales en Colombia en oportunidades: dinero, acreencias y activos que podrían pertenecerle.' }}">
   {% block robots_meta %}{% endblock %}
   {% block extra_head %}{% endblock %}
   <link rel="canonical" href="{% block canonical %}{{ request.scheme }}://{{ request.get_host }}{{ request.path }}{% endblock %}">
@@ -22,23 +22,30 @@
   <meta property="og:locale" content="es_CO">
   <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
   <meta property="og:title" content="{{ page_title|default:'Amud Technologies' }}">
-  <meta property="og:description" content="{{ page_description|default:'Amud Technologies detecta dinero que ya tiene dueño en fuentes oficiales colombianas.' }}">
+  <meta property="og:description" content="{{ page_description|default:'Amud Technologies transforma información pública de fuentes oficiales en Colombia en oportunidades: dinero, acreencias y activos que podrían pertenecerle.' }}">
   <meta property="og:image" content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/apple-touch-icon.png' %}{% endblock %}">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="{{ page_title|default:'Amud Technologies' }}">
-  <meta name="twitter:description" content="{{ page_description|default:'Amud Technologies detecta dinero que ya tiene dueño en fuentes oficiales colombianas.' }}">
+  <meta name="twitter:description" content="{{ page_description|default:'Amud Technologies transforma información pública de fuentes oficiales en Colombia en oportunidades: dinero, acreencias y activos que podrían pertenecerle.' }}">
 
+  {# One Organization node, referenced by "@id" from every other page's
+     structured data (WebSite on home, Service on radar landings, Article
+     publisher) so search and answer engines resolve a single entity. #}
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": "{{ request.scheme }}://{{ request.get_host }}/#organization",
     "name": "Amud Technologies",
+    "alternateName": "AmudTech",
     "url": "{{ request.scheme }}://{{ request.get_host }}/",
-    "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'img/apple-touch-icon.png' %}",
-    "description": "Amud Technologies cruza fuentes oficiales de Colombia para identificar dinero que ya tiene un dueño identificable.",
-    "areaServed": "CO"
+    "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'img/favicon-192.png' %}",
+    "description": "Amud Technologies es una empresa privada e independiente de tecnología que procesa información pública de fuentes oficiales de Colombia para identificar dinero, acreencias y activos que podrían pertenecer a personas y empresas.",{% if company_profile.email %}
+    "email": "{{ company_profile.email }}",{% endif %}
+    "areaServed": {"@type": "Country", "name": "Colombia"}
   }
   </script>
+  {% block structured_data %}{% endblock %}
 
   <link rel="stylesheet" href="{% static 'css/site.css' %}">
   {% block extra_css %}{% endblock %}
@@ -104,6 +111,14 @@
           {% if articles_enabled %}<li><a href="{% url 'cms:article_list' %}">Aprenda</a></li>{% endif %}
         </ul>
       </nav>
+      {% if site_radars %}
+      <nav class="footer-col" aria-label="Radares">
+        <h2 class="footer-col-title">Radares</h2>
+        <ul>
+          {% for radar in site_radars %}<li><a href="{% url radar.landing_url_name %}">{{ radar.name }}</a></li>{% endfor %}
+        </ul>
+      </nav>
+      {% endif %}
       {% if footer_pages %}
       <nav class="footer-col" aria-label="Información legal e institucional">
         <h2 class="footer-col-title">Información</h2>

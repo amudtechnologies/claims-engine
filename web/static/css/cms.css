@@ -53,3 +53,7 @@
 .article-card .chips { position: relative; z-index: 1; margin-top: auto; padding-top: 6px; }
 .pager { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 32px; font-size: 0.9rem; }
 .results-empty-note { color: var(--ink-soft); }
+
+.article-radar { margin-top: 32px; padding: 22px 28px; background: var(--panel); border: 1px solid var(--hair); border-left: 3px solid var(--teal); border-radius: var(--r-md); }
+.article-radar-name { margin: 0 0 6px 0; font-size: 1.15rem; font-weight: 600; color: var(--ink); }
+.article-radar-desc { margin: 0 0 12px 0; font-size: 0.95rem; line-height: 1.6; color: var(--ink-soft); }

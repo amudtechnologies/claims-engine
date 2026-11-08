@@ -28,6 +28,21 @@ class HomeTests(TestCase):
         self.assertContains(response, 'action="/resultados/"')
         self.assertContains(response, "Lo&nbsp;detectamos y le ayudamos a recuperarlo.")
 
+    def test_home_carries_company_concept_and_site_schema(self):
+        response = self.client.get("/")
+        for section_id in ("que-hacemos", "como-trabajamos", "diferencia"):
+            self.assertContains(response, f'id="{section_id}"')
+        self.assertContains(response, '"@type": "WebSite"')
+        self.assertContains(response, '"@type": "Organization"')
+        # The home description is the company's, not one radar's.
+        self.assertNotContains(response, 'name="description" content="Consulte gratis')
+
+    def test_footer_lists_active_radar_landings(self):
+        response = self.client.get("/")
+        self.assertContains(
+            response, '<li><a href="/depositos-judiciales/">Depósitos judiciales</a></li>'
+        )
+
 
 class RadarRegistryTests(TestCase):
     def test_judicial_deposits_registers_itself(self):

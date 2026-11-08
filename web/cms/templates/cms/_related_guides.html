@@ -1,0 +1,12 @@
+{% if articles %}
+<section class="related-guides" aria-labelledby="related-guides-title">
+  <div class="wrap">
+    <div class="eyebrow mono"><span class="dot"></span>Aprenda</div>
+    <h2 id="related-guides-title" class="serif related-guides-title">Guías relacionadas</h2>
+    <ul class="related-guides-list">
+      {% for a in articles %}<li><a href="{{ a.get_absolute_url }}">{{ a.title }}</a>{% if a.excerpt %}<p>{{ a.excerpt|truncatewords:24 }}</p>{% endif %}</li>{% endfor %}
+    </ul>
+    <a href="/guias/categoria/{{ category_slug }}/" class="btn-link">Ver todas las guías</a>
+  </div>
+</section>
+{% endif %}

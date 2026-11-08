@@ -6,10 +6,20 @@ from django.core.paginator import Paginator
 from django.http import FileResponse, Http404, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.utils.html import strip_tags
+from django.utils.text import Truncator
+from home import radars
 
 from .models import Article, Category, Page, Redirect
 
 ARTICLES_PER_PAGE = 9
+
+
+def _summary(html: str, limit: int = 155) -> str:
+    """Plain-text opening of an HTML body, for a meta description the editor
+    left blank — so pages don't all fall back to the same site-wide text."""
+    text = " ".join(strip_tags(html).split())
+    return Truncator(text).chars(limit)
 
 
 def _can_preview(request, model) -> bool:
@@ -45,7 +55,7 @@ def page_detail(request, slug):
         {
             "page": page,
             "page_title": f"{page.seo_title} — Amud Technologies",
-            "page_description": page.meta_description,
+            "page_description": page.meta_description or _summary(page.body),
             "crumbs": [("Inicio", reverse("home:index")), (page.title, None)],
             "is_preview": not page.is_live,
         },
@@ -65,6 +75,12 @@ def article_detail(request, slug):
         if categories
         else []
     )
+    # A category named after a radar (same slug) ties the guide to that
+    # radar's landing, so informational reading leads to the product.
+    category_slugs = {c.slug for c in categories}
+    related_radars = [
+        r for r in radars.all_radars() if r.is_active and r.slug in category_slugs
+    ]
     canonical_url = request.build_absolute_uri(article.get_absolute_url())
     article_ld = {
         "@context": "https://schema.org",
@@ -74,7 +90,11 @@ def article_detail(request, slug):
         "mainEntityOfPage": canonical_url,
         "author": {"@type": "Organization" if not article.author else "Person",
                    "name": article.author_display},
-        "publisher": {"@type": "Organization", "name": "Amud Technologies"},
+        "publisher": {
+            "@type": "Organization",
+            "@id": request.build_absolute_uri("/") + "#organization",
+            "name": "Amud Technologies",
+        },
         "datePublished": article.published_at.isoformat() if article.published_at else None,
         "dateModified": article.updated_at.isoformat(),
     }
@@ -87,6 +107,12 @@ def article_detail(request, slug):
             "article": article,
             "categories": categories,
             "related_articles": related,
+            "related_radars": related_radars,
+            # Shown only when the article changed after the day it was published.
+            "was_updated": bool(
+                article.published_at
+                and article.updated_at.date() > article.published_at.date()
+            ),
             "canonical_url": canonical_url,
             "article_ld": article_ld,
             "crumbs": [
@@ -148,10 +174,11 @@ def article_list(request, category_slug=None):
         title = category.meta_title or f"{category.name}: guías y explicaciones"
         description = category.meta_description or category.description
     else:
-        title = "Guías sobre depósitos judiciales, acreencias y derechos económicos"
+        title = "Guías sobre acreencias, dinero sin reclamar y depósitos judiciales"
         description = (
-            "Explicaciones claras sobre depósitos judiciales, acreencias y derechos "
-            "económicos en Colombia: qué son, cómo funcionan y qué puede hacer."
+            "Explicaciones claras sobre acreencias, dinero sin reclamar, depósitos "
+            "judiciales y derechos económicos en Colombia: qué son, cómo funcionan "
+            "y qué puede hacer."
         )
     crumbs = [("Inicio", reverse("home:index"))]
     if category:

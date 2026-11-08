@@ -6,6 +6,21 @@
   {% for spec, stats in radars %}{% if spec.stylesheet %}<link rel="stylesheet" href="{% static spec.stylesheet %}">{% endif %}{% endfor %}
 {% endblock %}
 
+{% block structured_data %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": "{{ request.scheme }}://{{ request.get_host }}/#website",
+    "url": "{{ request.scheme }}://{{ request.get_host }}/",
+    "name": "Amud Technologies",
+    "alternateName": "AmudTech",
+    "inLanguage": "es-CO",
+    "publisher": {"@id": "{{ request.scheme }}://{{ request.get_host }}/#organization"}
+  }
+  </script>
+{% endblock %}
+
 {% block content %}
 
 <section class="hero">
@@ -81,5 +96,80 @@
   </div>
 </section>
 {% endif %}
+
+<section class="home-section home-section--panel" id="que-hacemos">
+  <div class="wrap">
+    <div class="eyebrow mono"><span class="dot"></span>Qué hacemos</div>
+    <h2 class="serif home-section-title">Transformamos información pública en oportunidades reales</h2>
+    <p class="home-section-lede">Amud Technologies es una plataforma de inteligencia patrimonial. Procesamos, relacionamos y enriquecemos información pública de fuentes oficiales para identificar dinero, acreencias y activos que podrían pertenecer a personas y empresas, y que muchas veces nadie sabe que existen.</p>
+    <div class="home-grid">
+      <div class="home-item">
+        <h3 class="home-item-title">Dinero sin reclamar</h3>
+        <p class="home-item-desc">Recursos que esperan a su beneficiario y que pueden perderse si nadie los reclama a tiempo.</p>
+      </div>
+      <div class="home-item">
+        <h3 class="home-item-title">Acreencias pendientes de cobro</h3>
+        <p class="home-item-desc">Dinero a favor de una persona o empresa, con un monto y un fundamento legal, que aún no se ha cobrado.</p>
+      </div>
+      <div class="home-item">
+        <h3 class="home-item-title">Activos y derechos económicos</h3>
+        <p class="home-item-desc">Bienes y derechos que pueden pasar desapercibidos para quienes podrían tener derecho sobre ellos.</p>
+      </div>
+      <div class="home-item">
+        <h3 class="home-item-title">Registros públicos dispersos</h3>
+        <p class="home-item-desc">Información de distintas fuentes oficiales que, al relacionarse y analizarse, revela oportunidades concretas.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="home-section" id="como-trabajamos">
+  <div class="wrap">
+    <div class="eyebrow mono"><span class="dot"></span>Cómo trabajamos</div>
+    <h2 class="serif home-section-title">De la información pública a un resultado concreto</h2>
+    <p class="home-section-lede">Los servicios disponibles dependen de cada radar. Usted decide hasta dónde avanzar: cada paso se solicita por separado.</p>
+    <ol class="home-steps">
+      <li class="home-step">
+        <span class="home-step-num mono">01</span>
+        <h3 class="home-item-title">Información agregada</h3>
+        <p class="home-item-desc">Un resumen de lo que encontramos para un NIT o una cédula: cantidades, valores y fuentes.</p>
+      </li>
+      <li class="home-step">
+        <span class="home-step-num mono">02</span>
+        <h3 class="home-item-title">Registros individuales enriquecidos</h3>
+        <p class="home-item-desc">El detalle de cada registro, relacionado con información adicional de las partes.</p>
+      </li>
+      <li class="home-step">
+        <span class="home-step-num mono">03</span>
+        <h3 class="home-item-title">Investigación y verificación</h3>
+        <p class="home-item-desc">Revisamos el origen de cada oportunidad e identificamos y verificamos a sus posibles beneficiarios.</p>
+      </li>
+      <li class="home-step">
+        <span class="home-step-num mono">04</span>
+        <h3 class="home-item-title">Acompañamiento y gestión</h3>
+        <p class="home-item-desc">Preparamos los documentos y le acompañamos en la gestión para hacer efectiva la oportunidad.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="home-section home-section--panel" id="diferencia">
+  <div class="wrap home-split">
+    <div>
+      <div class="eyebrow mono"><span class="dot"></span>Nuestro diferencial</div>
+      <h2 class="serif home-section-title">Tecnología e inteligencia de datos, no solo trámites</h2>
+    </div>
+    <div class="home-split-body">
+      <p>No somos una firma jurídica tradicional ni una empresa de cobranza. Nuestro diferencial está en la tecnología: monitoreamos fuentes oficiales de forma continua, unificamos publicaciones de distintos periodos y formatos, y relacionamos cada registro con sus posibles beneficiarios. La gestión de una reclamación es un servicio adicional que usted decide si solicita.</p>
+      <ul class="home-principles">
+        <li><strong>Un hallazgo no es un derecho comprobado.</strong> Cada oportunidad identificada debe verificarse antes de reclamarla.</li>
+        <li><strong>Solo fuentes oficiales.</strong> Trabajamos con información pública. No inventamos ni estimamos cifras.</li>
+        <li><strong>Sin intermediarios obligatorios.</strong> Usted siempre puede reclamar directamente ante la autoridad o entidad correspondiente.</li>
+        <li><strong>Independientes.</strong> Somos una empresa privada. No pertenecemos al Estado ni representamos a ninguna entidad pública.</li>
+      </ul>
+      {% if articles_enabled %}<a href="{% url 'cms:article_list' %}" class="btn-link">Aprenda sobre acreencias y dinero sin reclamar</a>{% endif %}
+    </div>
+  </div>
+</section>
 
 {% endblock %}

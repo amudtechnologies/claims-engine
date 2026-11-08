@@ -7,15 +7,19 @@ from . import radars
 
 
 def robots_txt(request):
-    """Excludes /resultados/ from crawling — it's a personalized, per-query
-    utility page (also marked noindex in its own template), never a page a
-    search result should point to. See docs/project-context.md's SEO
-    strategy: this is both a thin-content and a privacy consideration, since
-    a crawled URL could otherwise carry a real document number. The sitemap
-    itself is django.contrib.sitemaps (cms/sitemaps.py), wired in urls.py."""
+    """Excludes the per-query result pages (/resultados/ and each radar's own
+    detail page) from crawling — personalized utility pages, also marked
+    noindex in their templates, never a page a search result should point to.
+    This is both a thin-content and a privacy consideration, since a crawled
+    URL could otherwise carry a real document number (see
+    docs/seo-strategy.md). The sitemap itself is django.contrib.sitemaps
+    (cms/sitemaps.py), wired in urls.py."""
+    private_paths = [reverse("home:results")] + [
+        reverse(name) for spec in radars.all_radars() for name in spec.private_url_names
+    ]
     lines = [
         "User-agent: *",
-        "Disallow: /resultados/",
+        *(f"Disallow: {path}" for path in private_paths),
         "Disallow: /management/",
         "",
         f"Sitemap: {request.scheme}://{request.get_host()}/sitemap.xml",
@@ -26,11 +30,14 @@ def robots_txt(request):
 def index(request):
     context = {
         "active_nav": "home",
-        "page_title": "Dinero que ya tiene dueño. Consulte si está a su nombre — Amud Technologies",
+        # The home page carries the company concept (money, claims and assets
+        # found in public data); each radar landing owns its own product
+        # queries, so the two don't compete for the same terms.
+        "page_title": "Dinero, acreencias y activos sin reclamar a su nombre — Amud Technologies",
         "page_description": (
-            "Consulte gratis con su NIT o cédula si hay depósitos judiciales sin "
-            "reclamar a nombre de su empresa o el suyo propio. Fuentes oficiales "
-            "y acompañamiento legal."
+            "Identificamos dinero, acreencias y activos que podrían ser suyos o "
+            "de su empresa, a partir de fuentes oficiales de Colombia. Consulte "
+            "con su NIT o cédula."
         ),
         # The "Radares" section (#radares): one card per registered radar.
         # Only active radars are shown — no "En desarrollo" placeholders.
