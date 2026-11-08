@@ -13,12 +13,21 @@ def search(raw_document_number: str) -> RadarMatch | None:
     result = party_search.search_party(raw_document_number)
     if result is None:
         return None
-    claim_status = None
-    if result.last_period:
-        window = party_search.claim_window(result.last_period)
-        claim_status = party_search.claim_status(
-            window, result.source_for_period(result.last_period)
-        )
+    # Same figures as the detail page's "Última publicación" panel (both come
+    # from `party_search.current_publication`): claimable only when the party
+    # is in the corpus-wide latest publication and its window is still open.
+    current = party_search.current_publication(
+        result, party_search.latest_published_period()
+    )
+    claim_status = current.status if current else None
+    claimable = None
+    if current and current.claimable:
+        claimable = {
+            "count": current.summary.deposit_count,
+            "amount_cop": current.summary.total_amount_cop,
+            "closes_on": current.window.closes_on,
+            "business_days_left": current.business_days_left,
+        }
     detail_url = reverse("judicial_deposits:detail")
     return RadarMatch(
         document_number=result.document_number,
@@ -29,7 +38,7 @@ def search(raw_document_number: str) -> RadarMatch | None:
         finding_count=result.deposit_count,
         total_amount_cop=result.total_amount_cop,
         detail_url=f"{detail_url}?nit={quote(result.document_number)}",
-        extra={"claim_status": claim_status},
+        extra={"claim_status": claim_status, "claimable": claimable},
     )
 
 

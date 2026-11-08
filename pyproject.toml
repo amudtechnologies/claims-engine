@@ -16,6 +16,7 @@ dependencies = [
     "duckdb>=1.5.5",
     "fastexcel>=0.20.2",
     "gunicorn>=23.0.0",
+    "holidays>=0.108",
     "httpx>=0.28.1",
     "nh3>=0.3.7",
     "pandera>=0.32.1",

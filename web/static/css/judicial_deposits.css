@@ -39,14 +39,129 @@
 
 .jd-party-note { margin: -8px 0 20px 0; font-size: 0.84rem; color: var(--ink-softer); }
 
-.jd-disclaimer {
-  margin-top: 4px;
-  padding-top: 16px;
-  border-top: 1px dashed var(--hair-strong);
-  font-size: 0.78rem;
-  line-height: 1.55;
-  color: var(--ink-softer);
+/* DETAIL PAGE — latest publication first (the lead block), then history. */
+.jd-detail { padding-top: clamp(24px, 4vw, 40px); }
+.jd-back { margin: 0 0 16px 0; font-size: 0.88rem; font-weight: 600; }
+.jd-back a { color: var(--ink-soft); }
+.jd-back a:hover { color: var(--accent-text); }
+
+.jd-block { margin-bottom: 24px; padding: 22px 24px; background: var(--ground); border: 1px solid var(--hair); border-radius: var(--r-md); }
+.jd-block-title { margin: 0; font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; }
+.jd-block--current { background: rgba(32, 182, 165, 0.08); border-color: rgba(32, 182, 165, 0.45); border-left: 4px solid var(--teal); }
+.jd-block--current .jd-panel-title { color: var(--accent-text); }
+.jd-block--current .jd-summary-num { font-size: 1.9rem; }
+.jd-deadline { margin: -6px 0 20px 0; font-size: 1.02rem; font-weight: 600; color: var(--ink); }
+.jd-deadline--closed { color: var(--ink-softer); font-weight: 500; }
+.jd-absent { margin: 0; font-size: 1rem; font-weight: 600; color: var(--ink-soft); }
+
+.jd-claim-cta { margin: 4px 0 20px 0; }
+.jd-claim-cta .btn { margin-bottom: 12px; }
+.jd-claim-cta-fees { margin: 0 0 4px 0; font-size: 0.88rem; color: var(--ink-softer); }
+.jd-claim-cta-includes { margin: 0; font-size: 0.88rem; color: var(--ink-soft); max-width: 62ch; }
+
+.jd-block-note { margin: 16px 0 0 0; padding-top: 14px; border-top: 1px dashed var(--hair-strong); font-size: 0.8rem; line-height: 1.55; color: var(--ink-softer); }
+.jd-block-actions { margin: 16px 0 0 0; }
+.jd-detail-actions { margin: 8px 0 24px 0; }
+.jd-source { margin: 0; padding-top: 16px; border-top: 1px solid var(--hair); font-size: 0.8rem; line-height: 1.55; color: var(--ink-softer); }
+.jd-source a { color: var(--ink-soft); text-decoration: underline; text-decoration-color: var(--hair-strong); text-underline-offset: 3px; }
+
+.jd-confirmation { margin-bottom: 20px; padding: 14px 18px; background: var(--surface); border: 1px solid var(--teal); border-radius: var(--r-sm); font-size: 0.92rem; color: var(--ink); }
+.jd-confirmation:focus { outline: 2px solid var(--teal); outline-offset: 2px; }
+
+/* HISTORY CHARTS — one series each, brand teal; mobile one per row, desktop 2×2. */
+/* Accordion, same interaction as the landing's FAQ (.jd-faq): one row per
+   chart, closed by default, "+" turning into "×" when open. */
+.jd-charts { margin-bottom: 20px; border-top: 1px solid var(--hair-strong); }
+.jd-chart { min-width: 0; border-bottom: 1px solid var(--hair-strong); }
+.jd-chart-toggle { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px 0; cursor: pointer; list-style: none; }
+.jd-chart-toggle::-webkit-details-marker { display: none; }
+.jd-chart-toggle::after { content: "+"; flex: none; font-size: 1.3rem; font-weight: 400; line-height: 1; color: var(--teal-ink); transition: transform 0.15s ease; }
+.jd-chart[open] > .jd-chart-toggle::after { transform: rotate(45deg); }
+.jd-chart-toggle:hover .jd-chart-title { color: var(--accent-text); }
+.jd-chart-title { font-size: 0.92rem; font-weight: 600; color: var(--ink); }
+.jd-chart-figure { margin: 0; padding: 0 0 18px 0; }
+.jd-chart-summary { margin: 0 0 14px 0; font-size: 0.8rem; color: var(--ink-softer); }
+.jd-chart-plot { position: relative; }
+
+.jd-tip {
+  position: absolute; z-index: 2; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+  display: none; padding: 6px 9px; white-space: nowrap; font-size: 0.74rem; line-height: 1.4;
+  color: var(--white); background: var(--navy); border-radius: 6px; pointer-events: none;
 }
+
+/* Vertical columns (per publication) */
+.jd-vplot { display: grid; grid-template-columns: auto 1fr; gap: 8px; }
+.jd-vaxis { position: relative; height: 160px; min-width: 2.2em; }
+.jd-vtick { position: absolute; right: 0; transform: translateY(50%); font-size: 0.68rem; color: var(--ink-softer); font-variant-numeric: tabular-nums; }
+.jd-vbody { position: relative; height: 160px; display: flex; align-items: flex-end; gap: 2px; border-bottom: 1px solid var(--hair-strong); margin-bottom: 44px; }
+.jd-vgrid { position: absolute; left: 0; right: 0; height: 0; border-top: 1px solid var(--hair); }
+.jd-vslot { position: relative; flex: 1 1 0; min-width: 0; height: 100%; display: flex; align-items: flex-end; justify-content: center; }
+.jd-vbar { display: block; width: 100%; max-width: 24px; background: var(--teal); border-radius: 4px 4px 0 0; }
+.jd-vslot.is-current .jd-vbar { background: var(--teal-ink); }
+.jd-vlabel { position: absolute; top: calc(100% + 6px); left: 50%; transform: translateX(-50%) rotate(180deg); writing-mode: vertical-rl; font-size: 0.66rem; color: var(--ink-softer); white-space: nowrap; }
+.jd-vslot.is-current .jd-vlabel { color: var(--ink); font-weight: 700; }
+.jd-vslot .jd-tip { bottom: calc(100% + 4px); }
+.jd-vslot:hover .jd-tip { display: block; }
+.jd-vslot:hover .jd-vbar { filter: brightness(0.92); }
+
+/* Horizontal bars (amount range, department, specialty) */
+.jd-hplot { display: grid; grid-template-columns: minmax(6.5em, max-content) 1fr auto; column-gap: 10px; row-gap: 6px; align-items: center; }
+.jd-hrow { display: contents; }
+.jd-hlabel { font-size: 0.78rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.jd-htrack { position: relative; display: block; height: 18px; }
+.jd-hbar { display: block; height: 100%; max-height: 24px; min-width: 0; background: var(--teal); border-radius: 0 4px 4px 0; }
+.jd-hrow.is-current .jd-hbar { background: var(--teal-ink); }
+.jd-hrow.is-current .jd-hlabel { color: var(--ink); font-weight: 700; }
+.jd-hvalue { font-size: 0.74rem; color: var(--ink); white-space: nowrap; text-align: right; }
+.jd-hrow:hover .jd-hbar { filter: brightness(0.92); }
+.jd-haxis .jd-htrack { height: 16px; border-top: 1px solid var(--hair-strong); }
+.jd-htick { position: absolute; top: 3px; transform: translateX(-50%); font-size: 0.66rem; color: var(--ink-softer); white-space: nowrap; }
+.jd-htick:first-child { transform: none; }
+.jd-htick:last-child { transform: translateX(-100%); }
+/* On a phone the track is too narrow for tick labels; every bar already
+   carries its value, and "Ver datos" has the rest. */
+@media (max-width: 560px) { .jd-haxis { display: none; } }
+
+/* Compact pair inside the "Última publicación" block: thinner bars, tighter
+   rows; muted (gray, no brand teal) once the claim window has closed. */
+.jd-charts--compact { margin: 20px 0 0 0; }
+.jd-block--current .jd-role-grid { margin-top: 20px; }
+.jd-block--current .jd-role-grid:last-child { margin-bottom: 0; }
+.jd-charts--compact .jd-chart-toggle { padding: 11px 0; }
+.jd-charts--compact .jd-hplot { row-gap: 3px; }
+.jd-charts--compact .jd-htrack { height: 12px; }
+.jd-charts--compact .jd-hlabel, .jd-charts--compact .jd-hvalue { font-size: 0.72rem; }
+.jd-charts--compact .jd-haxis .jd-htrack { height: 14px; }
+.jd-charts.is-muted .jd-hbar { background: var(--ink-softer); opacity: 0.45; }
+.jd-charts.is-muted .jd-chart-title { color: var(--ink-soft); }
+
+.jd-chart-data { margin-top: 10px; font-size: 0.8rem; }
+.jd-chart-data summary { cursor: pointer; color: var(--ink-soft); font-weight: 600; }
+.jd-chart-data table { width: 100%; margin-top: 8px; border-collapse: collapse; }
+.jd-chart-data th, .jd-chart-data td { padding: 5px 6px; border-bottom: 1px solid var(--hair); text-align: left; font-weight: 400; }
+.jd-chart-data td { text-align: right; white-space: nowrap; }
+.jd-chart-data thead th { font-weight: 600; color: var(--ink-soft); }
+.jd-chart-data thead th:not(:first-child) { text-align: right; }
+.jd-chart-data tfoot th, .jd-chart-data tfoot td { font-weight: 600; border-bottom: none; }
+
+/* REQUEST FORM (modal; inline when rendered open without JavaScript) */
+.jd-request { width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 32px); padding: 0; border: 1px solid var(--hair); border-radius: var(--r-md); background: var(--surface); color: var(--ink); box-shadow: var(--shadow-md); }
+.jd-request:not([open]) { display: none; }
+.jd-request::backdrop { background: rgba(16, 31, 53, 0.55); }
+.jd-request-form { padding: 22px 24px; }
+.jd-request-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.jd-request-title { margin: 0; font-size: 1.15rem; font-weight: 600; }
+.jd-request-close { font-size: 1.6rem; line-height: 1; color: var(--ink-softer); padding: 4px 8px; }
+.jd-field { margin: 0 0 14px 0; padding: 0; border: 0; min-width: 0; }
+.jd-field > label, .jd-field legend { display: block; margin-bottom: 6px; padding: 0; font-size: 0.84rem; font-weight: 600; color: var(--ink-soft); }
+.jd-field input[type="text"], .jd-field input[type="email"] { width: 100%; height: 42px; padding: 0 12px; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--hair-strong); border-radius: var(--r-sm); }
+.jd-field input:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
+.jd-choice { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 6px; font-size: 0.88rem; color: var(--ink); }
+.jd-choice input { margin-top: 3px; flex: none; }
+.jd-field--consent .jd-choice { font-size: 0.82rem; color: var(--ink-soft); }
+.jd-field--consent a { text-decoration: underline; }
+.jd-field-error, .jd-form-errors p { margin: 4px 0 0 0; font-size: 0.8rem; color: #a3261b; }
+.jd-form-errors { margin-bottom: 14px; }
 
 @media (max-width: 700px) {
   .jd-role-grid { grid-template-columns: 1fr; }

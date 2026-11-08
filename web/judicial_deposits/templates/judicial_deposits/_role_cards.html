@@ -1,0 +1,12 @@
+{% load home_extras %}
+{# Procedural role split (a fact from the source, never economic role) for `summary`, a PartySearchResult. #}
+  <div class="jd-role-grid">
+    <div class="jd-role-card">
+      <div class="jd-role-label">Como demandante <span class="jd-role-hint">quien inició el proceso</span></div>
+      <div class="jd-role-nums mono">{{ summary.plaintiff_count|es_co_number }} hallazgo{{ summary.plaintiff_count|pluralize }} · {{ summary.plaintiff_amount_cop|cop }}</div>
+    </div>
+    <div class="jd-role-card">
+      <div class="jd-role-label">Como demandado <span class="jd-role-hint">contra quien se inició el proceso</span></div>
+      <div class="jd-role-nums mono">{{ summary.defendant_count|es_co_number }} hallazgo{{ summary.defendant_count|pluralize }} · {{ summary.defendant_amount_cop|cop }}</div>
+    </div>
+  </div>

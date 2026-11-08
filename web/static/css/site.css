@@ -211,6 +211,8 @@ h1, h2, h3 { text-wrap: balance; }
 .btn-primary:hover { color: var(--ink); transform: translateY(-1px); box-shadow: var(--shadow-teal); }
 .btn-ghost { color: var(--on-navy); border-color: var(--hair-on-navy); background: rgba(255, 255, 255, 0.04); }
 .btn-ghost:hover { color: var(--on-navy); border-color: var(--teal); transform: translateY(-1px); }
+.btn-secondary { color: var(--ink); background: var(--surface); border-color: var(--hair-strong); }
+.btn-secondary:hover { color: var(--ink); border-color: var(--accent-text); }
 .btn-lg { height: 52px; padding: 0 26px; font-size: 1rem; }
 .btn-link {
   display: inline-flex;

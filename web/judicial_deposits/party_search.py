@@ -17,14 +17,16 @@ from __future__ import annotations
 
 import glob
 import json
+from collections import Counter
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, timedelta
 from typing import Literal
 
 import duckdb
+import holidays
 from django.utils import timezone
 
-from claims_engine.lineage import SOURCE_ACTIVE_DEPOSITS
+from claims_engine.lineage import SOURCE_ACTIVE_DEPOSITS, SOURCE_EXPIRING_DEPOSITS
 
 from . import core_cache
 from .models import ClaimWindow
@@ -43,6 +45,9 @@ class Deposit:
     period: str | None
     source: str | None
     source_declared_name: str | None
+    # `core/court.court_account`, the court's Banco Agrario account — its
+    # first five digits are the DANE code of the court's municipality.
+    court_account: str | None = None
 
 
 @dataclass(frozen=True)
@@ -102,11 +107,22 @@ class PartySearchResult:
         name is not "verified" the way a RUES match is. Picks the most
         recent period among deposits that actually carry one — a party can
         have claims from several deposits/periods, only some of which state
-        a name."""
+        a name.
+
+        Within that period the source spells the same party many ways
+        ("BANCO DE OCCIDENTE", "OCCIDENTE   BANCO DE", ...), so it takes the
+        most frequent spelling (whitespace collapsed), ties broken
+        alphabetically — a pure function of the deposits, never of the row
+        order DuckDB happens to return, so /resultados/ and the detail page
+        always show the same name."""
         named = [d for d in self.deposits if d.source_declared_name and d.period]
         if not named:
             return None
-        return max(named, key=lambda d: d.period).source_declared_name
+        latest = max(d.period for d in named)
+        spellings = Counter(
+            " ".join(d.source_declared_name.split()) for d in named if d.period == latest
+        )
+        return min(spellings, key=lambda name: (-spellings[name], name))
 
     def source_for_period(self, period: str) -> str | None:
         """The radar a period's deposits came from — a period is never mixed
@@ -157,6 +173,68 @@ def claim_status(window: ClaimWindow | None, source: str | None = None) -> str |
     return "reclamable" if timezone.localdate() <= window.closes_on else "no_reclamable"
 
 
+def business_days_left(closes_on: date, today: date | None = None) -> int:
+    """Business days from `today` through `closes_on`, both inclusive — a
+    window that closes today still has today left to claim. Counts Monday to
+    Friday, skipping Colombian public holidays (`holidays` applies Ley 51 de
+    1983's move-to-Monday rule).
+
+    Court closures beyond the national calendar (Holy Week, the year-end
+    vacancia judicial) aren't skipped: no claim window has crossed one yet.
+    """
+    today = today or timezone.localdate()
+    public_holidays = holidays.country_holidays("CO", years=range(today.year, closes_on.year + 1))
+    days = 0
+    current = today
+    while current <= closes_on:
+        if current.weekday() < 5 and current not in public_holidays:
+            days += 1
+        current += timedelta(days=1)
+    return days
+
+
+@dataclass(frozen=True)
+class CurrentPublication:
+    """A party in the corpus-wide latest publication (`latest_published_period`).
+    `status` is `claim_status`'s value; `claimable` only when that is
+    "reclamable" — the one state in which there is something to claim now."""
+
+    period: str
+    summary: PartySearchResult
+    window: ClaimWindow | None
+    status: str | None
+
+    @property
+    def claimable(self) -> bool:
+        return self.status == "reclamable"
+
+    @property
+    def business_days_left(self) -> int | None:
+        if not self.claimable:
+            return None
+        return business_days_left(self.window.closes_on)
+
+
+def current_publication(
+    result: PartySearchResult, latest_period: str | None
+) -> CurrentPublication | None:
+    """The party's slice of the latest publication, or None when it doesn't
+    appear in it. Shared by /resultados/ (radar.search) and this radar's
+    detail page, so both show the same figures and deadline."""
+    if not latest_period:
+        return None
+    summary = result.for_period(latest_period)
+    if summary is None:
+        return None
+    window = claim_window(latest_period)
+    return CurrentPublication(
+        period=latest_period,
+        summary=summary,
+        window=window,
+        status=claim_status(window, result.source_for_period(latest_period)),
+    )
+
+
 def normalize_document_number(raw_value: str) -> str:
     """Digits only — mirrors the pipeline's national-ID normalization rule."""
     return "".join(character for character in raw_value if character.isdigit())
@@ -189,6 +267,23 @@ def latest_published_period() -> str | None:
         f"SELECT MAX(period) FROM read_parquet('{core_cache.table_path('file')}')"
     ).fetchone()
     return row[0] if row else None
+
+
+def published_periods() -> list[str]:
+    """Every semester of the expiring-deposits publication, oldest first —
+    the x-axis of the per-publication chart, including the periods a given
+    party doesn't appear in."""
+    con = _connect()
+    rows = con.execute(
+        f"""
+        SELECT DISTINCT period
+        FROM read_parquet('{core_cache.table_path('file')}')
+        WHERE source = ? AND period IS NOT NULL
+        ORDER BY period
+        """,
+        [SOURCE_EXPIRING_DEPOSITS],
+    ).fetchall()
+    return [row[0] for row in rows]
 
 
 def total_observation_count() -> int:
@@ -306,6 +401,7 @@ def _fetch_deposits(con: duckdb.DuckDBPyConnection, party_id: str) -> list[Depos
         SELECT
             party_claims.claim_id,
             court_names.name AS court_office,
+            courts.court_account,
             party_claims.amount_cop,
             party_claims.origin_date,
             party_claims.procedural_role,
@@ -315,6 +411,7 @@ def _fetch_deposits(con: duckdb.DuckDBPyConnection, party_id: str) -> list[Depos
         FROM party_claims
         LEFT JOIN claim_periods USING (claim_id)
         LEFT JOIN court_names USING (court_id)
+        LEFT JOIN read_parquet('{core_cache.table_path('court')}') courts USING (court_id)
         """,
         [party_id],
     ).fetchall()
@@ -322,6 +419,7 @@ def _fetch_deposits(con: duckdb.DuckDBPyConnection, party_id: str) -> list[Depos
         Deposit(
             claim_id=claim_id,
             court_office=court_office,
+            court_account=court_account,
             amount_cop=amount_cop,
             constituted_on=origin_date,
             procedural_role=procedural_role,
@@ -332,6 +430,7 @@ def _fetch_deposits(con: duckdb.DuckDBPyConnection, party_id: str) -> list[Depos
         for (
             claim_id,
             court_office,
+            court_account,
             amount_cop,
             origin_date,
             procedural_role,

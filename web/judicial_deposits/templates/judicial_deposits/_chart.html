@@ -1,0 +1,61 @@
+{% load home_extras jd_charts %}{% chart_layout chart as layout %}
+{# One aggregate chart, plain HTML/CSS: only per-group totals reach the page, never deposits or court names. Collapsed by default, opened with a click like the landing's FAQ (.jd-faq). The plot is one role="img"; the "Ver datos" table is its text equivalent. #}
+<details class="jd-chart jd-chart--{{ chart.orientation }}">
+  <summary class="jd-chart-toggle"><span id="jd-chart-{{ chart_scope|default:"history" }}-{{ chart.slug }}-title" class="jd-chart-title">{{ chart.title }}</span></summary>
+  <figure class="jd-chart-figure" aria-labelledby="jd-chart-{{ chart_scope|default:"history" }}-{{ chart.slug }}-title">
+  {% if chart.summary %}<p class="jd-chart-summary">{{ chart.summary }}{% if latest_period %} · resaltada la publicación vigente ({{ latest_period }}){% endif %}</p>{% endif %}
+
+  <div class="jd-chart-plot" role="img" aria-label="{{ chart.title }}: gráfico de barras por {{ chart.dimension|lower }}, según {{ layout.measure_label }}. Total {{ layout.total_label }}. Los valores de cada barra están en la tabla «Ver datos».">
+    {% if chart.orientation == "vertical" %}
+      <div class="jd-vplot">
+        <div class="jd-vaxis" aria-hidden="true">
+          {% for tick in layout.ticks %}<span class="jd-vtick" style="bottom: {{ tick.pct }}%">{{ tick.label }}</span>{% endfor %}
+        </div>
+        <div class="jd-vbody">
+          {% for tick in layout.ticks %}<span class="jd-vgrid" style="bottom: {{ tick.pct }}%" aria-hidden="true"></span>{% endfor %}
+          {% for item in layout.bars %}
+            <div class="jd-vslot{% if item.bar.highlight %} is-current{% endif %}">
+              <span class="jd-vbar" style="height: {{ item.pct }}%"></span>
+              <span class="jd-tip">{{ item.bar.label }}<br>{{ item.bar.count|es_co_number }} depósito{{ item.bar.count|pluralize }} · {{ item.bar.amount_cop|cop }}</span>
+              <span class="jd-vlabel">{{ item.bar.label }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <div class="jd-hplot">
+        {% for item in layout.bars %}
+          <div class="jd-hrow{% if item.bar.highlight %} is-current{% endif %}">
+            <span class="jd-hlabel">{{ item.bar.label }}</span>
+            <span class="jd-htrack" title="{{ item.bar.label }}: {{ item.bar.count|es_co_number }} depósito{{ item.bar.count|pluralize }} · {{ item.bar.amount_cop|cop }}"><span class="jd-hbar" style="width: {{ item.pct }}%"></span></span>
+            <span class="jd-hvalue mono">{% if chart.measure == "amount" %}{{ item.bar.amount_cop|cop_short }} · {{ item.bar.count|es_co_number }}{% else %}{{ item.bar.count|es_co_number }} · {{ item.bar.amount_cop|cop_short }}{% endif %}</span>
+          </div>
+        {% endfor %}
+        <div class="jd-hrow jd-haxis" aria-hidden="true">
+          <span></span>
+          <span class="jd-htrack">{% for tick in layout.ticks %}<span class="jd-htick" style="left: {{ tick.pct }}%">{{ tick.label }}</span>{% endfor %}</span>
+          <span></span>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <details class="jd-chart-data">
+    <summary>Ver datos</summary>
+    <table>
+      <caption class="visually-hidden">{{ chart.title }}</caption>
+      <thead>
+        <tr><th scope="col">{{ chart.dimension }}</th><th scope="col">Depósitos</th><th scope="col">Valor</th></tr>
+      </thead>
+      <tbody>
+        {% for bar in chart.bars %}
+          <tr><th scope="row">{{ bar.label }}{% if bar.highlight %} (vigente){% endif %}</th><td class="mono">{{ bar.count|es_co_number }}</td><td class="mono">{{ bar.amount_cop|cop }}</td></tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr><th scope="row">Total</th><td class="mono">{{ chart.total_count|es_co_number }}</td><td class="mono">{{ chart.total_amount_cop|cop }}</td></tr>
+      </tfoot>
+    </table>
+  </details>
+</figure>
+</details>

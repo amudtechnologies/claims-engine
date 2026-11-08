@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static home_extras %}
 
-{% block robots_meta %}<meta name="robots" content="noindex,follow">{% endblock %}
+{% block robots_meta %}<meta name="robots" content="noindex,nofollow">{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/results.css' %}">
@@ -60,10 +60,11 @@
         <table class="results-table">
           <thead>
             <tr>
-              <th>Radar</th>
-              <th>Hallazgos</th>
-              <th>Valor publicado</th>
-              <th>Estado</th>
+              <th scope="col">Radar</th>
+              <th scope="col">Histórico</th>
+              <th scope="col">Reclamable ahora</th>
+              <th scope="col">Plazo</th>
+              <th scope="col"><span class="visually-hidden">Detalle</span></th>
             </tr>
           </thead>
           <tbody>
@@ -77,8 +78,14 @@
 {% else %}
   <section class="results-empty">
     <div class="wrap">
-      <p><strong>No encontramos registros</strong> para {{ normalized_document_number }} en las fuentes que revisamos.</p>
-      <p>Eso no descarta que exista dinero a su nombre. Solo indica que no aparece en lo publicado hasta ahora.</p>
+      <p><strong>No encontramos registros asociados a esta identificación en las fuentes que monitoreamos.</strong></p>
+      <p>Consultamos el número {{ normalized_document_number }}. Eso no descarta que exista dinero a su nombre. Solo indica que no aparece en lo publicado hasta ahora.</p>
+      <div class="results-empty-actions">
+        <a href="{% url 'home:index' %}#buscar" class="btn btn-primary">Nueva consulta</a>
+        {# TODO: alerts for future publications aren't built — interface placeholder only, nothing is submitted. #}
+        <button type="button" class="btn results-notify" disabled aria-describedby="results-notify-hint">Avisarme si aparezco en un próximo listado</button>
+      </div>
+      <p id="results-notify-hint" class="results-notify-hint">Próximamente.</p>
     </div>
   </section>
 {% endif %}

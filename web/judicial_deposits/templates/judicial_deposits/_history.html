@@ -1,0 +1,36 @@
+{% load home_extras %}
+<section class="jd-block jd-block--history" aria-labelledby="jd-history-title">
+  <div class="jd-panel-title">
+    <h3 id="jd-history-title" class="jd-block-title">Histórico completo (Todos los periodos)</h3>
+  </div>
+
+  <div class="jd-party-summary">
+    <div class="jd-summary-item">
+      <div class="jd-summary-num mono">{{ summary.deposit_count|es_co_number }}</div>
+      <div class="jd-summary-label">Depósitos encontrados</div>
+    </div>
+    <div class="jd-summary-item">
+      <div class="jd-summary-num mono">{{ summary.total_amount_cop|cop }}</div>
+      <div class="jd-summary-label">Valor total publicado</div>
+    </div>
+  </div>
+
+  {% include "judicial_deposits/_role_cards.html" %}
+
+  {% if charts %}
+    <div class="jd-charts">
+      {% for chart in charts %}{% include "judicial_deposits/_chart.html" %}{% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="jd-panel-footnote">
+    <span>{{ summary.court_office_count|es_co_number }} juzgado{{ summary.court_office_count|pluralize }} o despacho{{ summary.court_office_count|pluralize }} judicial{{ summary.court_office_count|pluralize:"es" }}</span>
+    <span>Última publicación en la que aparece: {{ summary.last_period }}</span>
+  </div>
+
+  <p class="jd-block-note">No podemos confirmar si estos depósitos se reclamaron dentro del plazo de su publicación.</p>
+
+  <p class="jd-block-actions">
+    <a href="{{ detail_url }}&amp;solicitud=verification#solicitud" class="btn btn-secondary" data-request-type="verification">Solicitar verificación</a>
+  </p>
+</section>

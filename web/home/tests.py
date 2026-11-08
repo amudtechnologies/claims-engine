@@ -1,3 +1,4 @@
+from datetime import date
 from unittest import mock
 
 from django.test import TestCase
@@ -105,21 +106,7 @@ class ResultsTests(TestCase):
             response = self.client.get("/resultados/?nit=12")
         self.assertContains(response, "Revise el número")
 
-    def test_results_render_each_radars_own_row(self):
-        CompanyProfile.objects.create(
-            name="Amud", nit="1", phone="1", email="info@example.co", address="x", description="d"
-        )
-        match = radars.RadarMatch(
-            document_number="900123456",
-            party_name="ACME SAS",
-            source_declared_name=None,
-            document_type="legal_entity",
-            rues_active=True,
-            finding_count=2,
-            total_amount_cop=5_000_000,
-            detail_url="/depositos-judiciales/resultado/?nit=900123456",
-            extra={"claim_status": "reclamable"},
-        )
+    def _render_results(self, match):
         spec = {r.slug: r for r in radars.all_radars()}["depositos-judiciales"]
         patched = fake_spec(
             slug=spec.slug,
@@ -127,13 +114,69 @@ class ResultsTests(TestCase):
             status="active",
             results_row_template=spec.results_row_template,
             search=lambda raw: match,
+            is_available=lambda: True,
         )
         with mock.patch.dict(radars._REGISTRY, {spec.slug: patched}, clear=True):
-            response = self.client.get("/resultados/?nit=900123456")
+            return self.client.get("/resultados/?nit=890300279")
+
+    def _match(self, claimable=None, claim_status="reclamable"):
+        return radars.RadarMatch(
+            document_number="890300279",
+            party_name="ACME SAS",
+            source_declared_name=None,
+            document_type="legal_entity",
+            rues_active=True,
+            finding_count=7980,
+            total_amount_cop=3_701_871_805,
+            detail_url="/depositos-judiciales/resultado/?nit=890300279",
+            extra={"claim_status": claim_status, "claimable": claimable},
+        )
+
+    def test_results_render_each_radars_own_row(self):
+        CompanyProfile.objects.create(
+            name="Amud", nit="1", phone="1", email="info@example.co", address="x", description="d"
+        )
+        claimable = {
+            "count": 320,
+            "amount_cop": 232_457_445,
+            "closes_on": date(2026, 11, 17),
+            "business_days_left": 6,
+        }
+        response = self._render_results(self._match(claimable))
         self.assertContains(response, "ACME SAS")
-        self.assertContains(response, "$ 5.000.000")
-        self.assertContains(response, "Aún puede reclamarse")
-        self.assertContains(response, "NIT 900123456")
-        self.assertNotContains(response, "Más radares")
-        self.assertContains(response, 'href="/" class="is-active"')
+        self.assertContains(response, "NIT 890300279")
+        # Historical and claimable-now figures are separate columns.
+        self.assertContains(response, "7.980 · $ 3.701.871.805")
+        self.assertContains(response, "320 · $ 232.457.445")
+        self.assertContains(
+            response,
+            'Hasta el 17/11/2026 '
+            '<span class="results-deadline-left">(quedan 6 días hábiles)</span>',
+        )
+        self.assertContains(response, "jd-tag--open\">Reclamable<")
+        self.assertNotContains(response, "Activo")
+        self.assertContains(response, 'aria-label="Ver detalle de Depósitos judiciales"')
+        self.assertNotContains(response, "Otros radares")
+        self.assertContains(response, "Valores tomados de datos públicos de la Rama Judicial")
+        self.assertContains(response, 'content="noindex,nofollow"')
+        # A per-query page: no nav item is active.
+        self.assertNotContains(response, 'class="is-active"')
         self.assertNotContains(response, "Qué puede hacer ahora")
+
+    def test_results_without_open_window_show_nothing_current(self):
+        response = self._render_results(self._match(claim_status="no_reclamable"))
+        self.assertContains(response, "7.980 · $ 3.701.871.805")
+        self.assertContains(response, "Nada vigente")
+        self.assertNotContains(response, "jd-tag--open")
+        self.assertNotContains(response, "días hábiles")
+
+    def test_results_without_any_match_show_empty_state(self):
+        response = self._render_results(None)
+        self.assertContains(
+            response,
+            "No encontramos registros asociados a esta identificación en las fuentes "
+            "que monitoreamos",
+        )
+        self.assertContains(response, "Nueva consulta")
+        self.assertContains(response, "Avisarme si aparezco en un próximo listado")
+        self.assertNotContains(response, "Otros radares")
