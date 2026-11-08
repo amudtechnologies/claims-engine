@@ -465,5 +465,5 @@ antes de registrar la página vista.
 | R5 | Imagen Open Graph | Requiere diseño |
 | R6 | Volumen de búsqueda de cada palabra clave | Requiere Keyword Planner / Semrush / Ahrefs |
 | R7 | Search Console, analítica, CrUX | Requieren acceso a la cuenta de Google y al DNS |
-| R8 | Forma principal de la marca en el texto visible («Amud Technologies» vs. «AmudTech») | Decisión de marca |
+| R8 | Forma de la marca en el texto visible | Resuelto: «Amud Technologies» en el texto; «AmudTech» solo como `alternateName` en el schema |
 | R9 | H2 del footer en el esquema de encabezados | Bajo impacto; requiere ajustar estilos |
