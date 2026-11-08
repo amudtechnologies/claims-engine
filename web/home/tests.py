@@ -34,6 +34,7 @@ class HomeTests(TestCase):
             self.assertContains(response, f'id="{section_id}"')
         self.assertContains(response, '"@type": "WebSite"')
         self.assertContains(response, '"@type": "Organization"')
+        self.assertNotContains(response, "One Organization node")  # template comment never leaks
         # The home description is the company's, not one radar's.
         self.assertNotContains(response, 'name="description" content="Consulte gratis')
 

@@ -28,9 +28,9 @@
   <meta name="twitter:title" content="{{ page_title|default:'Amud Technologies' }}">
   <meta name="twitter:description" content="{{ page_description|default:'Amud Technologies transforma información pública de fuentes oficiales en Colombia en oportunidades: dinero, acreencias y activos que podrían pertenecerle.' }}">
 
-  {# One Organization node, referenced by "@id" from every other page's
+  {% comment %}One Organization node, referenced by "@id" from every other page's
      structured data (WebSite on home, Service on radar landings, Article
-     publisher) so search and answer engines resolve a single entity. #}
+     publisher) so search and answer engines resolve a single entity.{% endcomment %}
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
