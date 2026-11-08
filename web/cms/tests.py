@@ -208,8 +208,7 @@ class ArticleTests(TestCase):
 
     def test_nav_and_footer_link_to_articles(self):
         html = self.client.get("/").content.decode()
-        # Nav, footer, and the home "Nuestro diferencial" section.
-        self.assertEqual(html.count('href="/guias/"'), 3)
+        self.assertEqual(html.count('href="/guias/"'), 2)
         self.assertIn(">Aprenda</a>", html)
 
     def test_empty_list_is_noindex_and_not_in_sitemap(self):

@@ -65,7 +65,7 @@ medición de campo (CrUX) disponible sin Search Console/PageSpeed; ver §10.
 | # | Hallazgo | Estado |
 |---|---|---|
 | A1 | **Canibalización home ↔ radar.** La meta description de la home hablaba solo de «depósitos judiciales sin reclamar», igual que la landing del radar. La home no comunicaba el concepto de la empresa | **Corregido**: nuevo title/description de empresa; los términos del producto quedan para la landing |
-| A2 | **Home con poco contenido**: hero + tarjeta del radar. Un solo H1 y un H2 (el nombre del radar). Nada explicaba qué es Amud, qué busca, cómo trabaja ni en qué se diferencia de una firma jurídica | **Corregido**: tres secciones nuevas (§4) |
+| A2 | **Home con poco contenido**: hero + tarjeta del radar. Un solo H1 y un H2 (el nombre del radar). Nada explicaba qué es Amud, qué busca, cómo trabaja ni en qué se diferencia de una firma jurídica | **Corregido**: dos secciones nuevas (§4) |
 | A3 | Sin enlaces del contenido educativo al producto ni del producto al contenido educativo | **Corregido**: bloque «Radar relacionado» en artículos y «Guías relacionadas» en la landing, ambos automáticos por slug de categoría |
 | A4 | El footer no enlazaba ninguna landing de radar | **Corregido**: columna «Radares», generada desde el registro de radares |
 | A5 | Breadcrumb de la landing («Radar de Acreencias / …») distinto del de la página de detalle («Radares / …») y sin marcado | **Corregido**: «Inicio / Radares / Depósitos judiciales» con `BreadcrumbList` |
@@ -164,7 +164,7 @@ informativa («qué es», «cómo», «cuánto tiempo») y enlazan a la landing.
 | Cambio | Archivos |
 |---|---|
 | Home: title y description de empresa (antes, del radar) | `web/home/views.py` |
-| Home: tres secciones nuevas — «Qué hacemos» (concepto + tipos de oportunidad), «Cómo trabajamos» (los cuatro niveles de servicio), «Nuestro diferencial» (tecnología vs. firma jurídica; hallazgo ≠ derecho comprobado; fuentes oficiales; sin intermediarios obligatorios; independencia del Estado). Textos tomados de la descripción de la empresa y del copy ya existente, en usted. Hero, buscador y tarjetas sin cambios | `web/home/templates/home/index.html`, `web/static/css/home.css` |
+| Home: dos secciones nuevas — «Qué hacemos» (concepto + tipos de oportunidad) y «Cómo trabajamos» (los cuatro niveles de servicio). Textos tomados de la descripción de la empresa y del copy ya existente, en usted. Hero, buscador y tarjetas sin cambios | `web/home/templates/home/index.html`, `web/static/css/home.css` |
 | Schema `Organization` con `@id`, `alternateName: AmudTech`, `email` (si está en el perfil), `areaServed` | `web/templates/base.html` |
 | Schema `WebSite` en la home (sin `SearchAction`: Google retiró el cuadro de búsqueda de sitelinks y los resultados son `noindex`) | `web/home/templates/home/index.html` |
 | Schema `Service` en la landing de depósitos (proveedor por `@id`, Colombia, oferta de consulta gratuita a 0 COP), solo con lo que la página muestra | `web/judicial_deposits/views.py` |
@@ -366,8 +366,8 @@ orden de efecto esperado:
    activos») en la home, Nosotros, el schema `Organization` y el perfil de la
    empresa del footer. Implementado en la home y el schema; falta Nosotros.
 2. **Qué no es Amud**, dicho explícitamente (no es el Estado, no es una firma
-   jurídica tradicional, no se necesita para reclamar). Implementado en la home
-   y la landing.
+   jurídica tradicional, no se necesita para reclamar). Presente en la landing
+   de depósitos; falta en Nosotros (§5.1).
 3. **Metodología y límites de los datos** (§5.2): contenido verificable que
    los motores citan.
 4. **Datos originales con fecha** (§6 C): la razón principal por la que un
@@ -391,8 +391,8 @@ no técnica.
 | Fuentes oficiales | Landing enlaza a la Rama Judicial | Citar la norma (Ley 1743 de 2014, Acuerdo PCSJA21-11731) con enlace a la fuente en cada guía |
 | Fechas de actualización | Implementado en artículos | Indicar la fecha de la última publicación procesada en la landing |
 | Metodología | No existe | §5.2 (P1) |
-| Hallazgo ≠ derecho comprobado | Presente en la landing; añadido en la home | Mantenerlo en cada guía |
-| Independencia del Estado | Presente (footer, landing, home) | — |
+| Hallazgo ≠ derecho comprobado | Presente en la landing | Mantenerlo en cada guía y en Nosotros |
+| Independencia del Estado | Presente (footer, landing) | — |
 | Política de datos / términos | Borradores publicados | Redactar con asesoría jurídica (P0) |
 | Datos de la empresa | NIT, teléfono, dirección = «-» | Completar en el admin (Perfil de la empresa) |
 
