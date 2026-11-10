@@ -11,12 +11,10 @@ missing the field a chart groups by goes to "Sin dato", never dropped.
 
 from __future__ import annotations
 
-import re
 from collections.abc import Iterable
 from dataclasses import dataclass
 
 from django.conf import settings
-from unidecode import unidecode
 
 from .party_search import Deposit
 
@@ -77,25 +75,6 @@ DANE_DEPARTMENTS = {
     "99": "Vichada",
 }
 
-# Court specialty from the court office's published name, first match wins.
-# The source has no specialty column; the name always states it, in many
-# abbreviations ("Juz 004 Civil Municipal", "012 CVL MPAL IBAGUE",
-# "JUZ 001 PROMIS MUNICIPAL", "Juz 002 Adtivo Oral Cucuta"). Family before
-# Promiscuous ("Promiscuo de Familia" is a family court), and Promiscuous
-# before Criminal ("Promiscuo ... con función de garantías" is not a
-# criminal court). General accounts and service centers ("Cuenta judicial
-# seccional", "Centro de servicios") state none and fall to "Sin dato".
-SPECIALTY_RULES = [
-    ("Familia", re.compile(r"FAMILIA|\bFLIA\b")),
-    ("Promiscuo", re.compile(r"PROMI|PROMSC|\bPROM\b|\bPCUO\b|MULTIPLE|MIXTO")),
-    ("Penal", re.compile(r"PENA|\bPEN\b|ADOLESC|GARANT|CONOCIMIENTO|EJEC\.? ?MED")),
-    ("Laboral", re.compile(r"LABOR|\bLAB\b")),
-    ("Administrativo", re.compile(r"\bADM|ADTV|ADTI|CONTENC")),
-    ("Civil", re.compile(r"CIVIL|\bCIV|\bCVL\b|PEQ")),
-    ("Cobro coactivo", re.compile(r"COACTIV")),
-]
-
-
 @dataclass(frozen=True)
 class Bar:
     label: str
@@ -138,16 +117,6 @@ def department(court_account: str | None) -> str:
     if not court_account or not court_account.isdigit() or len(court_account) < 5:
         return NO_DATA
     return DANE_DEPARTMENTS.get(court_account[:2], NO_DATA)
-
-
-def specialty(court_office: str | None) -> str:
-    if not court_office:
-        return NO_DATA
-    normalized = unidecode(court_office).upper()
-    for label, pattern in SPECIALTY_RULES:
-        if pattern.search(normalized):
-            return label
-    return NO_DATA
 
 
 def amount_range(amount_cop: int) -> str:
@@ -205,14 +174,14 @@ def by_amount_range(deposits: list[Deposit]) -> Chart:
     )
 
 
-def _ranked(totals: dict[str, tuple[int, int]], top: int | None = None) -> list[Bar]:
+def _ranked(totals: dict[str, tuple[int, int]], top: int) -> list[Bar]:
     """Bars by amount, largest first; past `top`, the rest fold into
     "Otros". "Sin dato" is never ranked or folded — it always closes the
     list, so missing data stays visible on its own."""
     no_data = totals.pop(NO_DATA, None)
     ranked = sorted(totals.items(), key=lambda item: (-item[1][1], -item[1][0], item[0]))
     bars = [Bar(label, count, amount) for label, (count, amount) in ranked]
-    if top is not None and len(bars) > top:
+    if len(bars) > top:
         rest = bars[top:]
         bars = bars[:top] + [
             Bar(OTHERS, sum(bar.count for bar in rest), sum(bar.amount_cop for bar in rest))
@@ -231,18 +200,6 @@ def by_department(deposits: list[Deposit]) -> Chart:
         measure="amount",
         orientation="horizontal",
         bars=_ranked(totals, top=TOP_DEPARTMENTS),
-    )
-
-
-def by_specialty(deposits: list[Deposit]) -> Chart:
-    totals = _totals(deposits, lambda d: specialty(d.court_office))
-    return Chart(
-        slug="specialty",
-        dimension="Especialidad",
-        title="Por especialidad del despacho",
-        measure="amount",
-        orientation="horizontal",
-        bars=_ranked(totals),
     )
 
 
@@ -301,14 +258,13 @@ def current_publication_charts(
         *([comparison] if comparison else []),
         by_department(current_deposits),
         by_amount_range(current_deposits),
-        by_specialty(current_deposits),
     ]
 
 
 def history_charts(
     deposits: list[Deposit], periods: list[str], current_period: str | None
 ) -> list[Chart] | None:
-    """The four charts, or None below `min_findings()` deposits — the
+    """The history's charts, or None below `min_findings()` deposits — the
     caller then renders no chart section at all."""
     if len(deposits) < min_findings():
         return None
@@ -316,5 +272,4 @@ def history_charts(
         by_period(deposits, periods, current_period),
         by_amount_range(deposits),
         by_department(deposits),
-        by_specialty(deposits),
     ]

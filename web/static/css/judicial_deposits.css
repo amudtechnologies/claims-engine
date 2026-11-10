@@ -99,7 +99,7 @@
 .jd-vslot:hover .jd-tip { display: block; }
 .jd-vslot:hover .jd-vbar { filter: brightness(0.92); }
 
-/* Horizontal bars (amount range, department, specialty) */
+/* Horizontal bars (previous publication, amount range, department) */
 .jd-hplot { display: grid; grid-template-columns: minmax(6.5em, max-content) 1fr auto; column-gap: 10px; row-gap: 6px; align-items: center; }
 .jd-hrow { display: contents; }
 .jd-hlabel { font-size: 0.78rem; color: var(--ink-soft); overflow-wrap: anywhere; }

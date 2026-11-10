@@ -362,15 +362,15 @@ class DetailPageTests(TestCase):
             "Evolución por publicación",
             "Distribución por rango de valor",
             "Por departamento",
-            "Por especialidad del despacho",
         ):
             self.assertContains(response, title)
+        self.assertNotContains(response, "especialidad")
         self.assertContains(response, "Aparece en 1 de 4 publicaciones")
         # Collapsed by default, like the landing's FAQ: nothing renders open.
         self.assertContains(response, '<details class="jd-chart jd-chart--vertical">')
-        # 4 in the history + 4 compact ones for the last publication it appears
+        # 3 in the history + 3 compact ones for the last publication it appears
         # in (2025-1: it isn't in the latest one).
-        self.assertEqual(response.content.decode().count('<details class="jd-chart '), 8)
+        self.assertEqual(response.content.decode().count('<details class="jd-chart '), 6)
         self.assertNotContains(response, "<details open")
         self.assertNotContains(response, 'class="jd-chart jd-chart--vertical" open')
         self.assertContains(response, "Ver datos")
@@ -405,12 +405,11 @@ class DetailPageTests(TestCase):
         )
         self.assertContains(response, "No aparecía en 2025-2")
         self.assertContains(response, 'id="jd-chart-current-amount-range-title"')
-        self.assertContains(response, 'id="jd-chart-current-specialty-title"')
         self.assertNotContains(response, "jd-charts--compact is-muted")
         self.assertNotContains(response, "Juzgado 7")
         # Every chart totals the block: 10 · $ 10.045 (the comparison too,
         # since the party wasn't in the previous publication).
-        self.assertEqual(html.count("Total 10 · $ 10.045"), 4)
+        self.assertEqual(html.count("Total 10 · $ 10.045"), 3)
         # Role cards for the latest publication only (the history adds 1.000.000).
         self.assertLess(html.index("10 hallazgos · $ 10.045"), compact)
 
@@ -446,7 +445,7 @@ class InsightsTests(TestCase):
     def test_every_chart_adds_up_to_the_history_totals(self):
         deposits = self._deposits()
         charts = insights.history_charts(deposits, PERIODS, "2026-2")
-        self.assertEqual(len(charts), 4)
+        self.assertEqual(len(charts), 3)
         for chart in charts:
             self._assert_partition(chart, deposits)
 
@@ -475,23 +474,16 @@ class InsightsTests(TestCase):
         no_data = chart.bars[-1]
         self.assertEqual((no_data.count, no_data.amount_cop), (3, 155_500_000))
 
-    def test_specialty_groups_missing_and_unstated_as_no_data(self):
-        chart = insights.by_specialty(self._deposits())
-        totals = {bar.label: bar.count for bar in chart.bars}
-        self.assertEqual(totals, {"Civil": 12, "Laboral": 1, "Sin dato": 2})
-        self.assertEqual(chart.bars[-1].label, "Sin dato")
-
     def test_current_publication_charts_reuse_the_history_aggregations(self):
         deposits = self._deposits()
         current = [d for d in deposits if d.period == "2025-1"]
         charts = insights.current_publication_charts(deposits, PERIODS, "2025-1")
         self.assertEqual(
             [chart.slug for chart in charts],
-            ["previous-period", "department", "amount-range", "specialty"],
+            ["previous-period", "department", "amount-range"],
         )
         self.assertEqual(charts[1], insights.by_department(current))
         self.assertEqual(charts[2], insights.by_amount_range(current))
-        self.assertEqual(charts[3], insights.by_specialty(current))
         for chart in charts[1:]:
             self._assert_partition(chart, current)
         # The threshold counts the latest publication, not the whole history.
@@ -523,21 +515,11 @@ class InsightsTests(TestCase):
             [bar.label for bar in chart.bars], ["< $1M", "$1M–$10M", "$10M–$100M", "≥ $100M"]
         )
 
-    def test_department_and_specialty_classifiers(self):
+    def test_department_classifier(self):
         self.assertEqual(insights.department("110012041004"), "Bogotá D.C.")
         self.assertEqual(insights.department("760012051005"), "Valle del Cauca")
         self.assertEqual(insights.department("460012051005"), "Sin dato")
         self.assertEqual(insights.department(None), "Sin dato")
-        for name, expected in [
-            ("730014003012 -  012 CVL MPAL IBAGUE", "Civil"),
-            ("Juz 004 Circuito Familia Manizales", "Familia"),
-            ("Juz 003 Ejec Penas Med Segur Bquilla", "Penal"),
-            ("056314089001 JUZ 001 PCUO MPAL CON GTIAS SABANETA", "Promiscuo"),
-            ("760012050001-PAGOS CONSIG PRESTA LABORA CALI", "Laboral"),
-            ("540013331002-Juz 002 Adtivo Oral Cucuta", "Administrativo"),
-            ("110012052001 - CUENTA JUDICIAL SECC BOGOTA CUND", "Sin dato"),
-        ]:
-            self.assertEqual(insights.specialty(name), expected, name)
 
     def test_short_cop_and_ticks(self):
         self.assertEqual(cop_short(1_234_567_890), "$1,2 mil M")
@@ -586,8 +568,8 @@ class RealCacheTests(TestCase):
         self.assertContains(response, '<div class="jd-summary-num mono">$ 3.701.871.805</div>')
         self.assertContains(response, "BANCO DE OCCIDENTE</h2>")
         # Every chart's table totals the history.
-        self.assertEqual(html.count('<td class="mono">7.980</td>'), 4)
-        self.assertEqual(html.count('<td class="mono">$ 3.701.871.805</td>'), 4)
+        self.assertEqual(html.count('<td class="mono">7.980</td>'), 3)
+        self.assertEqual(html.count('<td class="mono">$ 3.701.871.805</td>'), 3)
         self.assertContains(response, "· periodo 2026-2")
 
     def test_890903938_current_publication_charts(self):
@@ -604,10 +586,10 @@ class RealCacheTests(TestCase):
         self.assertIn('<div class="jd-summary-num mono">$ 456.144.596</div>', block)
         self.assertIn("jd-charts jd-charts--compact", block)
         # Each compact chart's data-table total is the block total.
-        self.assertEqual(block.count("Total 373 · $ 456.144.596"), 3)
+        self.assertEqual(block.count("Total 373 · $ 456.144.596"), 2)
         # ... plus the comparison chart's 2026-2 row.
-        self.assertEqual(block.count('<td class="mono">373</td>'), 4)
-        self.assertEqual(block.count('<td class="mono">$ 456.144.596</td>'), 4)
+        self.assertEqual(block.count('<td class="mono">373</td>'), 3)
+        self.assertEqual(block.count('<td class="mono">$ 456.144.596</td>'), 3)
         self.assertIn("Frente a 2026-1: valor −26,9 %, depósitos −81,9 %", block)
         self.assertIn("Como demandante", block)
         self.assertIn("Como demandado", block)
