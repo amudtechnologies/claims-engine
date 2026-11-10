@@ -17,9 +17,12 @@ uv run --no-sync python manage.py migrate --noinput
 uv run --no-sync python manage.py sync_core_cache --corpus-stats \
   || echo "startup sync_core_cache failed; NIT search will report unsynced until a background sync succeeds" >&2
 
+# Daily by default: the only radar today publishes twice a year, and an
+# unchanged sync only HEADs each S3 object (no download), so it is cheap
+# whatever the interval. Override with CORE_CACHE_SYNC_INTERVAL_SECONDS.
 (
   while true; do
-    sleep "${CORE_CACHE_SYNC_INTERVAL_SECONDS:-3600}"
+    sleep "${CORE_CACHE_SYNC_INTERVAL_SECONDS:-86400}"
     uv run --no-sync python manage.py sync_core_cache \
       || echo "background sync_core_cache failed" >&2
   done

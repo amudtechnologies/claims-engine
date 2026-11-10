@@ -32,7 +32,7 @@ restriction.
 | `DB_NAME`, `DB_USER`, `DB_PASSWORD` | Postgres connection, required when `DB_HOST` is set | — |
 | `DB_PORT` | Postgres port | `5432` |
 | `CLAIMS_ENGINE_BUCKET` | S3 bucket `sync_core_cache` reads from | `amud-technologies` |
-| `CORE_CACHE_SYNC_INTERVAL_SECONDS` | Background re-sync interval in the container entrypoint | `3600` |
+| `CORE_CACHE_SYNC_INTERVAL_SECONDS` | Background re-sync interval in the container entrypoint | `86400` (daily) |
 | `GUNICORN_WORKERS` | Gunicorn worker count | `2` |
 | `PORT` | Port gunicorn binds | `8000` |
 
@@ -62,6 +62,15 @@ The entrypoint (`web/entrypoint.sh`) runs migrations, does a blocking first
 re-syncs in the background on `CORE_CACHE_SYNC_INTERVAL_SECONDS` alongside
 gunicorn — `core_cache.py` is explicit that this has to stay off the
 request path.
+
+The background re-sync is incremental: it downloads only the objects whose
+S3 ETag changed since the last sync, so an unchanged sync is a few HEAD
+requests (~2 s, nothing downloaded). The landing's corpus statistics
+(`corpus_stats.json`) are computed only by the startup sync
+(`sync_core_cache --corpus-stats`), before gunicorn starts: the aggregation
+peaks at ~440 MB and ran the 1 GB production instance out of memory when the
+background sync did it next to the web workers. After a new publication is
+loaded, the statistics refresh on the next deploy or restart.
 
 ## Deploying to AWS
 
