@@ -1,9 +1,11 @@
+import io
 import tempfile
 from datetime import date
 from pathlib import Path
 from unittest import mock, skipUnless
 
 import duckdb
+from django.core.management import call_command
 from django.test import TestCase, override_settings
 from home.templatetags.home_extras import cop
 
@@ -591,6 +593,23 @@ class CorpusStatsTests(TestCase):
             ).fetchone()
             expected = "Sin dato" if amount is None else insights.amount_range(amount)
             self.assertEqual(label, expected, amount)
+
+
+class SyncCommandTests(TestCase):
+    def _run(self, *args):
+        with (
+            mock.patch.object(core_cache, "sync"),
+            mock.patch.object(corpus_stats, "write_slices", return_value=1) as write_slices,
+        ):
+            call_command("sync_core_cache", *args, stdout=io.StringIO())
+        return write_slices
+
+    def test_hourly_sync_never_computes_statistics(self):
+        # Next to the web workers it ran the 1 GB instance out of memory.
+        self._run().assert_not_called()
+
+    def test_startup_sync_computes_statistics(self):
+        self._run("--corpus-stats").assert_called_once()
 
 
 @skipUnless(core_cache.is_synced(), "local core cache not synced")

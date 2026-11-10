@@ -10,9 +10,22 @@ class Command(BaseCommand):
         "build-identity/enrich-parties), not per request."
     )
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--corpus-stats",
+            action="store_true",
+            help=(
+                "Also recompute the landing's statistics (corpus_stats.json). "
+                "Only the startup sync passes it: the aggregation peaks at ~440 MB, "
+                "and running it from the hourly background sync next to the web "
+                "workers ran the 1 GB production instance out of memory."
+            ),
+        )
+
     def handle(self, *args, **options):
         self.stdout.write(f"syncing to {core_cache.cache_dir()} ...")
         core_cache.sync()
-        # The landing's statistics: computed here, never per request.
-        self.stdout.write(f"corpus statistics: {corpus_stats.write_slices()} groups")
+        if options["corpus_stats"]:
+            # The landing's statistics: computed here, never per request.
+            self.stdout.write(f"corpus statistics: {corpus_stats.write_slices()} groups")
         self.stdout.write(self.style.SUCCESS("done"))

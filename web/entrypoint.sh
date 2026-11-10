@@ -10,7 +10,11 @@ cd "$(dirname "$0")"
 
 uv run --no-sync python manage.py migrate --noinput
 
-uv run --no-sync python manage.py sync_core_cache \
+# --corpus-stats only here, before gunicorn starts: the landing statistics
+# aggregation peaks at ~440 MB and ran the 1 GB instance out of memory when
+# the hourly sync below did it next to the web workers. The data only
+# changes with each semiannual publication, so once per start is enough.
+uv run --no-sync python manage.py sync_core_cache --corpus-stats \
   || echo "startup sync_core_cache failed; NIT search will report unsynced until a background sync succeeds" >&2
 
 (
