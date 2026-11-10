@@ -31,7 +31,7 @@ class LandingTests(TestCase):
         # Structured data matches what the page shows: the service and its trail.
         self.assertContains(response, '"@type": "Service"')
         self.assertContains(response, "BreadcrumbList")
-        self.assertContains(response, "título judicial")
+        self.assertContains(response, "títulos judiciales")
 
     def test_landing_never_aggregates_the_corpus_per_request(self):
         # No precomputed file: no section, and the heavy query never runs.
