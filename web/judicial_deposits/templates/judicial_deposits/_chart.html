@@ -1,6 +1,6 @@
 {% load home_extras jd_charts %}{% chart_layout chart as layout %}
 {# One aggregate chart, plain HTML/CSS: only per-group totals reach the page, never deposits or court names. Collapsed by default, opened with a click like the landing's FAQ (.jd-faq). The plot is one role="img"; the "Ver datos" table is its text equivalent. #}
-<details class="jd-chart jd-chart--{{ chart.orientation }}">
+<details class="jd-chart jd-chart--{{ chart.orientation }}"{% if chart_open %} open{% endif %}>
   <summary class="jd-chart-toggle"><span id="jd-chart-{{ chart_scope|default:"history" }}-{{ chart.slug }}-title" class="jd-chart-title">{{ chart.title }}</span></summary>
   <figure class="jd-chart-figure" aria-labelledby="jd-chart-{{ chart_scope|default:"history" }}-{{ chart.slug }}-title">
   {% if chart.summary %}<p class="jd-chart-summary">{{ chart.summary }}{% if chart.highlighted %} · resaltada la publicación {% if chart.highlighted == latest_period %}vigente {% endif %}({{ chart.highlighted }}){% endif %}</p>{% endif %}

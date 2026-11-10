@@ -1,9 +1,11 @@
 from datetime import date
 from unittest import mock, skipUnless
 
+import duckdb
 from django.test import TestCase, override_settings
+from home.templatetags.home_extras import cop
 
-from . import core_cache, insights, party_search, radar
+from . import core_cache, corpus_stats, insights, party_search, radar
 from .models import ClaimWindow
 from .party_search import Deposit, PartySearchResult
 from .templatetags.jd_charts import axis_ticks, cop_short
@@ -13,8 +15,9 @@ class LandingTests(TestCase):
     def test_landing_renders_without_a_party_search(self):
         response = self.client.get("/depositos-judiciales/")
         self.assertContains(response, '<h1 class="serif jd-title">Depósitos judiciales</h1>')
-        for section_id in ("como-funciona", "por-que-amud", "transparencia", "preguntas"):
+        for section_id in ("como-funciona", "transparencia", "preguntas"):
             self.assertContains(response, f'id="{section_id}"')
+        self.assertNotContains(response, 'id="por-que-amud"')
         self.assertContains(response, 'href="/#buscar" class="btn btn-primary btn-lg"')
         # No search form here: every "Consultar" button goes to the home search.
         self.assertNotContains(response, 'action="/resultados/"')
@@ -27,6 +30,11 @@ class LandingTests(TestCase):
         self.assertContains(response, '"@type": "Service"')
         self.assertContains(response, "BreadcrumbList")
         self.assertContains(response, "título judicial")
+
+    def test_landing_without_cache_has_no_statistics(self):
+        with mock.patch.object(core_cache, "is_synced", return_value=False):
+            response = self.client.get("/depositos-judiciales/")
+        self.assertNotContains(response, 'id="estadisticas"')
 
     def test_legacy_nit_query_redirects_to_detail(self):
         response = self.client.get("/depositos-judiciales/?nit=900123456")
@@ -534,9 +542,65 @@ class InsightsTests(TestCase):
 DANE_SAMPLE = ["05", "08", "11", "13", "15", "17", "18", "19", "20", "23", "25", "99"]
 
 
+class CorpusStatsTests(TestCase):
+    SLICES = [
+        corpus_stats.Slice("2019", "11", "< $1M", 3, 900_000),
+        corpus_stats.Slice("2018", "05", "$1M–$10M", 2, 5_000_000),
+        corpus_stats.Slice("2018", None, "≥ $100M", 1, 200_000_000),
+        corpus_stats.Slice(None, "46", "< $1M", 4, 100_000),
+        corpus_stats.Slice("2019", "11", "Sin dato", 1, 0),
+    ]
+
+    def test_every_chart_partitions_the_corpus(self):
+        charts = corpus_stats.charts(self.SLICES)
+        self.assertEqual(
+            [chart.slug for chart in charts],
+            ["year-count", "year-amount", "department", "amount-range"],
+        )
+        for chart in charts:
+            self.assertEqual((chart.total_count, chart.total_amount_cop), (11, 206_000_000))
+
+    def test_years_ascend_and_missing_data_closes_every_list(self):
+        year_count, year_amount, department, amount_range = corpus_stats.charts(self.SLICES)
+        self.assertEqual([bar.label for bar in year_count.bars], ["2018", "2019", "Sin dato"])
+        self.assertEqual(year_count.bars, year_amount.bars)
+        self.assertEqual((year_count.measure, year_amount.measure), ("count", "amount"))
+        # Unknown DANE code ("46") and no court account both fall to "Sin dato".
+        self.assertEqual(
+            [(bar.label, bar.count) for bar in department.bars],
+            [("Antioquia", 2), ("Bogotá D.C.", 4), ("Sin dato", 5)],
+        )
+        self.assertEqual(
+            [bar.label for bar in amount_range.bars],
+            [label for label, _, _ in insights.AMOUNT_RANGES] + ["Sin dato"],
+        )
+
+    def test_amount_range_sql_matches_python_classifier(self):
+        case, params = corpus_stats._amount_range_sql()
+        con = duckdb.connect()
+        for amount in (-5, 0, 999_999, 1_000_000, 9_999_999, 10_000_000, 100_000_000, 10**12, None):
+            (label,) = con.execute(
+                f"SELECT {case} FROM (SELECT ?::BIGINT AS amount_cop) c", [*params, amount]
+            ).fetchone()
+            expected = "Sin dato" if amount is None else insights.amount_range(amount)
+            self.assertEqual(label, expected, amount)
+
+
 @skipUnless(core_cache.is_synced(), "local core cache not synced")
 class RealCacheTests(TestCase):
-    """Acceptance figures for NIT 890300279 against the real local cache."""
+    """Acceptance figures against the real local cache."""
+
+    def test_landing_statistics_add_up_to_the_corpus_total(self):
+        response = self.client.get("/depositos-judiciales/")
+        html = response.content.decode()
+        self.assertLess(html.index('class="proof-text"'), html.index('id="estadisticas"'))
+        self.assertLess(html.index('id="estadisticas"'), html.index('id="como-funciona"'))
+        self.assertEqual(html.count('<details class="jd-chart jd-chart--'), 4)
+        # Only the first chart starts open; the rest are collapsed.
+        self.assertEqual(html.count('<details class="jd-chart jd-chart--vertical" open>'), 1)
+        self.assertEqual(html.count("open>"), 1)
+        total = cop(party_search.total_claim_amount_cop())
+        self.assertEqual(html.count(f'<td class="mono">{total}</td>'), 4)
 
     def test_890300279_figures(self):
         ClaimWindow.objects.create(

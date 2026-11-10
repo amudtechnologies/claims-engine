@@ -3,7 +3,7 @@ from urllib.parse import quote
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
-from . import core_cache, insights, party_search, radar
+from . import core_cache, corpus_stats, insights, party_search, radar
 
 
 def _service_ld(request) -> dict:
@@ -60,6 +60,7 @@ def index(request):
     context["stats"] = radar.card_stats()
     if core_cache.is_synced():
         context["observation_count"] = party_search.total_observation_count()
+        context["corpus_charts"] = corpus_stats.corpus_charts()
     return render(request, "judicial_deposits/index.html", context)
 
 
