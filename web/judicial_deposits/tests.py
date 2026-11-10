@@ -696,7 +696,8 @@ class RealCacheTests(TestCase):
                 self.assertGreater(corpus_stats.write_slices(), 0)
                 response = self.client.get("/depositos-judiciales/")
         html = response.content.decode()
-        self.assertLess(html.index('class="proof-text"'), html.index('id="estadisticas"'))
+        self.assertNotIn('class="proof"', html)
+        self.assertLess(html.index("Registros encontrados"), html.index('id="estadisticas"'))
         self.assertLess(html.index('id="estadisticas"'), html.index('id="demostracion"'))
         self.assertEqual(html.count('<details class="jd-chart jd-chart--'), 4)
         # Only the first chart starts open; the rest are collapsed.
