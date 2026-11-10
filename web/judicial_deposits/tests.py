@@ -19,9 +19,10 @@ class LandingTests(TestCase):
     def test_landing_renders_without_a_party_search(self):
         response = self.client.get("/depositos-judiciales/")
         self.assertContains(response, '<h1 class="serif jd-title">Depósitos judiciales</h1>')
-        for section_id in ("como-funciona", "transparencia", "preguntas"):
+        for section_id in ("transparencia", "preguntas"):
             self.assertContains(response, f'id="{section_id}"')
         self.assertNotContains(response, 'id="por-que-amud"')
+        self.assertNotContains(response, 'id="como-funciona"')
         self.assertContains(response, 'href="/#buscar" class="btn btn-primary btn-lg"')
         # No search form here: every "Consultar" button goes to the home search.
         self.assertNotContains(response, 'action="/resultados/"')
@@ -595,10 +596,82 @@ class CorpusStatsTests(TestCase):
             self.assertEqual(label, expected, amount)
 
 
+class FakeS3:
+    """Just the calls `core_cache.sync` makes, over an in-memory bucket."""
+
+    def __init__(self, objects):
+        self.objects = objects  # key -> (etag, bytes)
+        self.downloads = []
+
+    def head_object(self, Bucket, Key):
+        return {"ETag": self.objects[Key][0]}
+
+    def get_paginator(self, _name):
+        objects = self.objects
+
+        class Paginator:
+            def paginate(self, Bucket, Prefix):
+                yield {
+                    "Contents": [
+                        {"Key": key, "ETag": etag}
+                        for key, (etag, _) in objects.items()
+                        if key.startswith(Prefix)
+                    ]
+                }
+
+        return Paginator()
+
+    def download_file(self, bucket, key, filename):
+        self.downloads.append(key)
+        Path(filename).write_bytes(self.objects[key][1])
+
+
+class IncrementalSyncTests(TestCase):
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.cache = Path(tmp.name)
+        self.s3 = FakeS3(
+            {
+                core_cache.core_key(table): ('"v1"', table.encode())
+                for table in core_cache.CORE_TABLES
+            }
+            | {core_cache.ENRICHMENT_PREFIX + "batch1.parquet": ('"e1"', b"e1")}
+        )
+
+    def _sync(self):
+        with (
+            override_settings(CORE_CACHE_DIR=self.cache, CLAIMS_ENGINE_BUCKET="bucket"),
+            mock.patch("boto3.client", return_value=self.s3),
+        ):
+            return core_cache.sync()
+
+    def test_unchanged_objects_are_not_downloaded_again(self):
+        self.assertEqual(self._sync(), len(core_cache.CORE_TABLES) + 1)
+        self.s3.downloads.clear()
+        self.assertEqual(self._sync(), 0)
+        self.assertEqual(self.s3.downloads, [])
+
+    def test_only_changed_objects_are_downloaded(self):
+        self._sync()
+        self.s3.downloads.clear()
+        claim_key = core_cache.core_key("claim")
+        self.s3.objects[claim_key] = ('"v2"', b"claim v2")
+        self.assertEqual(self._sync(), 1)
+        self.assertEqual(self.s3.downloads, [claim_key])
+        self.assertEqual((self.cache / "claim.parquet").read_bytes(), b"claim v2")
+
+    def test_removed_enrichment_batch_is_dropped(self):
+        self._sync()
+        del self.s3.objects[core_cache.ENRICHMENT_PREFIX + "batch1.parquet"]
+        self._sync()
+        self.assertEqual(list((self.cache / "enrichment").iterdir()), [])
+
+
 class SyncCommandTests(TestCase):
     def _run(self, *args):
         with (
-            mock.patch.object(core_cache, "sync"),
+            mock.patch.object(core_cache, "sync", return_value=0),
             mock.patch.object(corpus_stats, "write_slices", return_value=1) as write_slices,
         ):
             call_command("sync_core_cache", *args, stdout=io.StringIO())
@@ -624,7 +697,7 @@ class RealCacheTests(TestCase):
                 response = self.client.get("/depositos-judiciales/")
         html = response.content.decode()
         self.assertLess(html.index('class="proof-text"'), html.index('id="estadisticas"'))
-        self.assertLess(html.index('id="estadisticas"'), html.index('id="como-funciona"'))
+        self.assertLess(html.index('id="estadisticas"'), html.index('id="demostracion"'))
         self.assertEqual(html.count('<details class="jd-chart jd-chart--'), 4)
         # Only the first chart starts open; the rest are collapsed.
         self.assertEqual(html.count('<details class="jd-chart jd-chart--vertical" open>'), 1)

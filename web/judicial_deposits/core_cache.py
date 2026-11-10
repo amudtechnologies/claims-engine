@@ -56,9 +56,15 @@ def enrichment_glob() -> str:
     return str(cache_dir() / "enrichment" / "*.parquet")
 
 
-def sync(bucket: str | None = None) -> None:
-    """Downloads every table in `CORE_TABLES` plus all RUES enrichment
-    batches to `settings.CORE_CACHE_DIR`, replacing whatever was there.
+def sync(bucket: str | None = None) -> int:
+    """Brings every table in `CORE_TABLES` plus all RUES enrichment batches
+    in `settings.CORE_CACHE_DIR` up to date with S3, and returns how many
+    objects it actually downloaded.
+
+    Only objects whose S3 ETag changed since the last sync are downloaded
+    (`_sync_object`): the tables change with each publication or pipeline
+    run, not hourly, so most syncs are a handful of HEAD requests instead of
+    re-downloading ~200 MB next to the web workers.
 
     Downloads to a temp file per object and moves it into place last, so a
     search running mid-sync never sees a half-written Parquet file.
@@ -70,8 +76,11 @@ def sync(bucket: str | None = None) -> None:
     enrichment_dir = target_dir / "enrichment"
     enrichment_dir.mkdir(exist_ok=True)
 
+    downloaded = 0
     for table in CORE_TABLES:
-        _download_to(client, bucket, core_key(table), table_path(table))
+        key = core_key(table)
+        etag = client.head_object(Bucket=bucket, Key=key)["ETag"]
+        downloaded += _sync_object(client, bucket, key, table_path(table), etag)
 
     paginator = client.get_paginator("list_objects_v2")
     seen_files = set()
@@ -79,12 +88,32 @@ def sync(bucket: str | None = None) -> None:
         for obj in page.get("Contents", []):
             filename = obj["Key"].rsplit("/", 1)[-1]
             seen_files.add(filename)
-            _download_to(client, bucket, obj["Key"], enrichment_dir / filename)
+            downloaded += _sync_object(
+                client, bucket, obj["Key"], enrichment_dir / filename, obj["ETag"]
+            )
 
     # Drop any locally cached enrichment batch that no longer exists upstream.
     for existing in enrichment_dir.glob("*.parquet"):
         if existing.name not in seen_files:
             existing.unlink()
+            _etag_path(existing).unlink(missing_ok=True)
+    return downloaded
+
+
+def _etag_path(destination: Path) -> Path:
+    return destination.with_name(destination.name + ".etag")
+
+
+def _sync_object(client, bucket: str, key: str, destination: Path, etag: str) -> bool:
+    """Downloads `key` unless the local copy is already the one with `etag`.
+    The ETag is recorded only after the file is in place, so an interrupted
+    download is retried on the next sync."""
+    marker = _etag_path(destination)
+    if destination.exists() and marker.exists() and marker.read_text() == etag:
+        return False
+    _download_to(client, bucket, key, destination)
+    marker.write_text(etag)
+    return True
 
 
 def _download_to(client, bucket: str, key: str, destination: Path) -> None:

@@ -24,7 +24,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.stdout.write(f"syncing to {core_cache.cache_dir()} ...")
-        core_cache.sync()
+        self.stdout.write(f"downloaded {core_cache.sync()} changed objects")
         if options["corpus_stats"]:
             # The landing's statistics: computed here, never per request.
             self.stdout.write(f"corpus statistics: {corpus_stats.write_slices()} groups")
