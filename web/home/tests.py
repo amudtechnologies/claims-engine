@@ -31,8 +31,8 @@ class HomeTests(TestCase):
 
     def test_home_carries_company_concept_and_site_schema(self):
         response = self.client.get("/")
-        for section_id in ("que-hacemos", "como-trabajamos"):
-            self.assertContains(response, f'id="{section_id}"')
+        self.assertNotContains(response, 'id="como-trabajamos"')
+        self.assertNotContains(response, 'id="que-hacemos"')
         self.assertContains(response, '"@type": "WebSite"')
         self.assertContains(response, '"@type": "Organization"')
         self.assertNotContains(response, "One Organization node")  # template comment never leaks
