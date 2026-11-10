@@ -11,19 +11,31 @@ A deposit counts once, in the year of its latest publication — the same
 "latest observation" rule the detail page uses to place a deposit in one
 period. 2017-1 never yields claims (its rows are case actions, not
 deposits; project-context.md §7, Phase 4), so the series starts in 2018.
+
+The aggregation never runs on the request path: it scans every claim and
+observation, which on the production instance (t3.micro, 1 GB) blocked the
+web workers for over a minute. `sync_core_cache` computes it once per sync
+(`write_slices`) into a small JSON next to the Parquet cache; the landing
+only reads that file, and shows no statistics section while it is missing.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+import json
+import os
+import tempfile
+from dataclasses import asdict, dataclass
 from functools import lru_cache
+from pathlib import Path
 
 import duckdb
 
 from . import core_cache, insights
 from .insights import AMOUNT_RANGES, DANE_DEPARTMENTS, NO_DATA, Bar, Chart
 
-_TABLES = ("claim", "observation", "capture", "file", "court")
+# Keeps the once-per-sync aggregation from starving the web workers on a
+# small instance: one thread, a memory cap, spill to disk past it.
+_DUCKDB_CONFIG = {"threads": 1, "memory_limit": "256MB", "preserve_insertion_order": False}
 
 
 @dataclass(frozen=True)
@@ -47,17 +59,24 @@ def _amount_range_sql() -> tuple[str, list[str]]:
     return f"CASE {whens} ELSE ? END", params
 
 
+def stats_path() -> Path:
+    return core_cache.cache_dir() / "corpus_stats.json"
+
+
 def _fetch_slices() -> list[Slice]:
     path = core_cache.table_path
     amount_range, params = _amount_range_sql()
-    rows = duckdb.connect().execute(
+    con = duckdb.connect(config=_DUCKDB_CONFIG)
+    con.execute(f"SET temp_directory = '{core_cache.cache_dir() / 'duckdb_tmp'}'")
+    rows = con.execute(
         f"""
         WITH latest AS (
-            SELECT o.claim_id, f.period
+            -- Periods are 'YYYY-S' strings, so MAX is the latest one.
+            SELECT o.claim_id, MAX(f.period) AS period
             FROM read_parquet('{path('observation')}') o
             JOIN read_parquet('{path('capture')}') USING (capture_id)
             JOIN read_parquet('{path('file')}') f USING (file_id)
-            QUALIFY ROW_NUMBER() OVER (PARTITION BY o.claim_id ORDER BY f.period DESC) = 1
+            GROUP BY o.claim_id
         )
         SELECT
             LEFT(latest.period, 4) AS year,
@@ -78,15 +97,32 @@ def _fetch_slices() -> list[Slice]:
     return [Slice(*row) for row in rows]
 
 
+def write_slices() -> int:
+    """Recomputes the aggregation and replaces `stats_path()` atomically.
+    Called by `sync_core_cache` after the Parquet tables are in place."""
+    rows = _fetch_slices()
+    target = stats_path()
+    with tempfile.NamedTemporaryFile(
+        "w", dir=target.parent, suffix=".json", delete=False, encoding="utf-8"
+    ) as tmp:
+        json.dump([asdict(row) for row in rows], tmp, ensure_ascii=False)
+    os.replace(tmp.name, target)
+    return len(rows)
+
+
 @lru_cache(maxsize=1)
-def _cached_slices(_version: tuple[float, ...]) -> list[Slice]:
-    return _fetch_slices()
+def _read_slices(_mtime: float) -> list[Slice]:
+    with stats_path().open(encoding="utf-8") as handle:
+        return [Slice(**row) for row in json.load(handle)]
 
 
-def slices() -> list[Slice]:
-    """Recomputed only when `sync_core_cache` replaces a table it reads."""
-    version = tuple(core_cache.table_path(table).stat().st_mtime for table in _TABLES)
-    return _cached_slices(version)
+def slices() -> list[Slice] | None:
+    """The precomputed totals, re-read only when a sync replaces the file."""
+    try:
+        mtime = stats_path().stat().st_mtime
+    except FileNotFoundError:
+        return None
+    return _read_slices(mtime)
 
 
 def _totals(rows: list[Slice], key) -> dict[str, tuple[int, int]]:
@@ -151,7 +187,6 @@ def charts(rows: list[Slice]) -> list[Chart]:
 
 
 def corpus_charts() -> list[Chart] | None:
-    """The landing's four charts, or None when the cache isn't synced."""
-    if not core_cache.is_synced():
-        return None
-    return charts(slices())
+    """The landing's four charts, or None until a sync has written them."""
+    rows = slices()
+    return charts(rows) if rows else None

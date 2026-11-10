@@ -1,4 +1,6 @@
+import tempfile
 from datetime import date
+from pathlib import Path
 from unittest import mock, skipUnless
 
 import duckdb
@@ -31,8 +33,13 @@ class LandingTests(TestCase):
         self.assertContains(response, "BreadcrumbList")
         self.assertContains(response, "título judicial")
 
-    def test_landing_without_cache_has_no_statistics(self):
-        with mock.patch.object(core_cache, "is_synced", return_value=False):
+    def test_landing_never_aggregates_the_corpus_per_request(self):
+        # No precomputed file: no section, and the heavy query never runs.
+        with (
+            tempfile.TemporaryDirectory() as tmp,
+            mock.patch.object(corpus_stats, "stats_path", return_value=Path(tmp) / "none.json"),
+            mock.patch.object(corpus_stats, "_fetch_slices", side_effect=AssertionError),
+        ):
             response = self.client.get("/depositos-judiciales/")
         self.assertNotContains(response, 'id="estadisticas"')
 
@@ -591,7 +598,11 @@ class RealCacheTests(TestCase):
     """Acceptance figures against the real local cache."""
 
     def test_landing_statistics_add_up_to_the_corpus_total(self):
-        response = self.client.get("/depositos-judiciales/")
+        with tempfile.TemporaryDirectory() as tmp:
+            stats_file = Path(tmp) / "corpus_stats.json"
+            with mock.patch.object(corpus_stats, "stats_path", return_value=stats_file):
+                self.assertGreater(corpus_stats.write_slices(), 0)
+                response = self.client.get("/depositos-judiciales/")
         html = response.content.decode()
         self.assertLess(html.index('class="proof-text"'), html.index('id="estadisticas"'))
         self.assertLess(html.index('id="estadisticas"'), html.index('id="como-funciona"'))
