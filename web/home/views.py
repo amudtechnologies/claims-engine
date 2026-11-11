@@ -35,9 +35,8 @@ def index(request):
         # queries, so the two don't compete for the same terms.
         "page_title": "Dinero, acreencias y activos sin reclamar a su nombre — Amud Technologies",
         "page_description": (
-            "Identificamos dinero, acreencias y activos que podrían ser suyos o "
-            "de su empresa, a partir de fuentes oficiales de Colombia. Consulte "
-            "con su NIT o cédula."
+            "Monitoreamos y analizamos información pública de fuentes oficiales "
+            "en Colombia para identificar dinero y activos sin reclamar."
         ),
         # The "Radares" section (#radares): one card per registered radar.
         # Only active radars are shown — no "En desarrollo" placeholders.

@@ -27,7 +27,12 @@ class HomeTests(TestCase):
     def test_home_renders_search(self):
         response = self.client.get("/")
         self.assertContains(response, 'action="/resultados/"')
-        self.assertContains(response, "Lo&nbsp;detectamos y le ayudamos a recuperarlo.")
+        self.assertContains(
+            response,
+            '<h1>Busque si tiene <span class="accent-word">dinero o activos</span> '
+            "a su favor sin reclamar.</h1>",
+        )
+        self.assertContains(response, "Muchas empresas y personas los tienen y no lo saben.")
 
     def test_home_carries_company_concept_and_site_schema(self):
         response = self.client.get("/")
