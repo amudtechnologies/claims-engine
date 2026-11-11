@@ -89,6 +89,13 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 
 h1, h2, h3 { text-wrap: balance; }
 
+/* Body copy is justified site-wide. Hyphenation (Spanish, from
+   <html lang="es-CO">) keeps justified lines in narrow columns and on phones
+   from opening wide gaps between words. Element selectors on purpose: any
+   component that sets its own text-align (centered blocks, table cells,
+   chart values) keeps it. */
+p, li, dd, blockquote { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+
 .serif { font-family: var(--font-display); }
 .mono {
   font-family: var(--font-body);
