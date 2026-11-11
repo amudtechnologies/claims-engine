@@ -201,7 +201,7 @@ a.radar-card:hover, a.radar-card:focus-visible { background: var(--white); borde
 a.radar-card:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
 .radar-card-action { display: flex; align-items: center; justify-content: space-between; margin: 4px -22px -20px; padding: 14px 22px; font-size: 0.9rem; font-weight: 600; color: var(--teal-ink); background: var(--panel); border-top: 1px solid var(--hair); transition: background 0.15s ease, color 0.15s ease; }
 .radar-card-arrow { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--white); border: 1px solid var(--hair-strong); transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease; }
-a.radar-card:hover .radar-card-action, a.radar-card:focus-visible .radar-card-action { background: var(--teal); color: var(--navy); }
+a.radar-card:hover .radar-card-action, a.radar-card:focus-visible .radar-card-action { background: var(--teal); color: var(--white); }
 a.radar-card:hover .radar-card-arrow, a.radar-card:focus-visible .radar-card-arrow { transform: translateX(3px); border-color: var(--navy); }
 @media (prefers-reduced-motion: reduce) {
   a.radar-card, a.radar-card:hover { transform: none; }
@@ -228,7 +228,6 @@ a.radar-card:hover .radar-card-arrow, a.radar-card:focus-visible .radar-card-arr
 
 .jd-transparency { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 16px 56px; align-items: start; }
 .jd-transparency-body p { margin: 0 0 16px 0; font-size: 1rem; line-height: 1.65; color: var(--ink-soft); max-width: 60ch; }
-.jd-transparency-body .btn-link { margin-top: 4px; }
 .jd-transparency-subtitle { margin: 28px 0 10px 0; font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; color: var(--ink); }
 .jd-transparency-body .jd-transparency-note { margin: 28px 0 0 0; padding-top: 16px; border-top: 1px solid var(--hair); font-size: 0.82rem; line-height: 1.55; color: var(--ink-softer); }
 @media (max-width: 800px) {
@@ -246,7 +245,7 @@ a.radar-card:hover .radar-card-arrow, a.radar-card:focus-visible .radar-card-arr
 .jd-faq details p { margin: 0 0 18px 0; font-size: 0.95rem; line-height: 1.65; color: var(--ink-soft); max-width: 64ch; }
 
 
-.jd-stats-note { margin: 20px 0 0 0; max-width: 78ch; font-size: 0.78rem; line-height: 1.55; color: var(--ink-softer); }
+.jd-stats-note { margin: 20px 0 0 0; max-width: 78ch; font-size: 0.7rem; line-height: 1.5; color: var(--ink-softer); }
 
 /* PRODUCT DEMO — fictitious data, styled after the real results page. */
 .jd-demo-layout { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 32px 56px; align-items: start; }
@@ -300,6 +299,12 @@ a.radar-card:hover .radar-card-arrow, a.radar-card:focus-visible .radar-card-arr
 .jd-demo-detail .jd-block-note { margin-top: 12px; padding-top: 10px; font-size: 0.74rem; }
 @media (max-width: 900px) {
   .jd-demo-layout { grid-template-columns: 1fr; }
+  /* One column: the "Consultar ahora" button moves up, right under the
+     section intro, before "Lo que verá al consultar" and the demo. */
+  .jd-demo-intro { display: flex; flex-direction: column; align-items: flex-start; }
+  .jd-demo-intro > .btn { order: 1; margin-top: 24px; }
+  .jd-demo-intro > .jd-demo-subtitle, .jd-demo-intro > .jd-demo-text { order: 2; }
+  .jd-demo-intro > .jd-demo-text { margin-bottom: 0; }
 }
 @media (max-width: 560px) {
   .jd-demo-head { padding: 18px 16px 16px; }

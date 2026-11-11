@@ -207,8 +207,8 @@ h1, h2, h3 { text-wrap: balance; }
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.btn-primary { background: var(--accent-deep); color: var(--ink); }
-.btn-primary:hover { color: var(--ink); transform: translateY(-1px); box-shadow: var(--shadow-teal); }
+.btn-primary { background: var(--accent-deep); color: var(--white); }
+.btn-primary:hover { color: var(--white); transform: translateY(-1px); box-shadow: var(--shadow-teal); }
 .btn-ghost { color: var(--on-navy); border-color: var(--hair-on-navy); background: rgba(255, 255, 255, 0.04); }
 .btn-ghost:hover { color: var(--on-navy); border-color: var(--teal); transform: translateY(-1px); }
 .btn-secondary { color: var(--ink); background: var(--surface); border-color: var(--hair-strong); }
@@ -364,7 +364,7 @@ a.radar-list-item:hover::after {
 
 /* TAG (shared: claim-window status — radar page panels + results table) */
 .jd-tag { display: inline-flex; align-items: center; flex: none; padding: 3px 10px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.02em; text-transform: none; border-radius: 999px; }
-.jd-tag--open { color: var(--ink); background: var(--teal); }
+.jd-tag--open { color: var(--white); background: var(--teal); }
 .jd-tag--closed { color: var(--ink-softer); background: var(--mist); }
 .jd-tag--pending { color: var(--ink-soft); background: transparent; border: 1px solid var(--gold); }
 

@@ -14,7 +14,7 @@
     {% breadcrumbs crumbs %}
     <div class="eyebrow mono"><span class="dot"></span>Radar activo</div>
     <h1 class="serif jd-title">Depósitos judiciales</h1>
-    <p class="lede">Un depósito judicial es una suma de dinero consignada en el Banco Agrario, o en la entidad bancaria correspondiente, a órdenes de un despacho judicial, como parte de un proceso. Estos recursos deben entregarse a quien tenga derecho a ellos y, si no son reclamados dentro de los plazos y condiciones establecidos por la ley, pueden prescribir a favor de la Nación.</p>
+    <p class="lede">Un depósito judicial es una suma de dinero consignada en el Banco Agrario, u otra entidad bancaria autorizada, a órdenes de un despacho judicial dentro de un proceso. Estos recursos deben entregarse a quien tenga derecho a ellos; si no se reclaman dentro de los plazos legales, prescriben a favor de la Nación.</p>
 
     {% include "judicial_deposits/_legal_facts.html" %}
 
@@ -29,7 +29,7 @@
         <div class="stat jd-stat-wide"><div class="stat-num mono js-counter" data-target="{{ observation_count }}">{{ observation_count|es_co_number }}</div><div class="stat-label">Registros encontrados</div></div>
         {% endif %}
       </div>
-      <p class="jd-stats-note">Las cifras corresponden al acumulado de publicaciones de <strong>depósitos judiciales susceptibles de prescripción</strong> desde 2017. Los valores identificados no representan necesariamente dinero disponible para reclamar ni implican que pertenezcan a quien realiza la consulta. El número de partes se calcula a partir de identificaciones distintas, por lo que una misma persona o empresa puede aparecer más de una vez.</p>
+      <p class="jd-stats-note">Las cifras corresponden al acumulado de <strong>depósitos judiciales publicados como susceptibles de prescripción</strong> desde 2017. Los valores identificados no representan necesariamente dinero disponible para reclamar ni implican que pertenezca a quien realiza la consulta.</p>
     </div>
     {% endif %}
   </div>
@@ -51,7 +51,7 @@
 <section class="jd-section jd-section--panel" id="demostracion">
   <div class="wrap jd-demo-layout">
     <div class="jd-demo-intro">
-      <div class="eyebrow mono"><span class="dot"></span>Consulte si tiene depósitos judiciales</div>
+      <div class="eyebrow mono"><span class="dot"></span>Consulta</div>
       <h2 class="serif jd-section-title">¿Hay depósitos judiciales a su nombre?</h2>
       <p class="jd-section-lede">Consulte con su NIT o cédula y descubra si existen depósitos judiciales que podrían pertenecerle.</p>
       <h3 class="jd-demo-subtitle">Lo que verá al consultar</h3>
@@ -64,7 +64,7 @@
     <div class="jd-demo">
       <div class="jd-demo-bar">
         <span class="jd-demo-dots" aria-hidden="true"><span></span><span></span><span></span></span>
-        <span class="jd-demo-badge mono">Demostración · Datos ficticios</span>
+        <span class="jd-demo-badge mono">Demostración</span>
       </div>
       <div class="jd-demo-view">
         <div class="jd-demo-head">
@@ -96,7 +96,7 @@
     <div class="jd-demo">
       <div class="jd-demo-bar">
         <span class="jd-demo-dots" aria-hidden="true"><span></span><span></span><span></span></span>
-        <span class="jd-demo-badge mono">Demostración · Datos ficticios</span>
+        <span class="jd-demo-badge mono">Demostración</span>
       </div>
       <div class="jd-demo-view">
         <div class="jd-demo-body jd-demo-detail">
@@ -151,13 +151,11 @@
       <h2 class="serif jd-section-title">Transparencia ante todo</h2>
     </div>
     <div class="jd-transparency-body">
-      <p>Creemos que el acceso a la información debe ser transparente. Los datos sobre depósitos judiciales que presentamos provienen de las publicaciones procesales y de los listados de depósitos susceptibles de prescripción publicados por la Rama Judicial en sus canales oficiales.</p>
-      <p>Cualquier persona puede consultar estos listados y, si tiene derecho sobre un depósito, adelantar directamente su reclamación ante el juzgado correspondiente, sin necesidad de contratar nuestros servicios ni los de terceros.</p>
-      <h3 class="jd-transparency-subtitle">Entonces, ¿qué hacemos en Amud Technologies?</h3>
-      <p>Nos encargamos del trabajo que implica encontrar y aprovechar esas oportunidades: recopilamos, identificamos y organizamos la información, relacionamos los depósitos con las partes y los procesos judiciales, investigamos cada caso y, cuando se requiere, le ayudamos con la preparación de documentos y la gestión de la reclamación.</p>
-      <p>Porque encontrar la información es solo el comienzo. Nuestro valor está en convertir datos dispersos en oportunidades concretas y facilitar el camino para hacerlas efectivas.</p>
-      <a href="https://www.ramajudicial.gov.co/" class="btn-link" target="_blank" rel="noopener">Ir al sitio de la Rama Judicial</a>
-      <p class="jd-transparency-note">Amud Technologies es una empresa privada e independiente. No está afiliada a la Rama Judicial ni a ninguna entidad del Estado.</p>
+      <p>Creemos que el acceso a la información debe ser transparente. Por eso queremos que sepa que cualquier persona o empresa puede consultar la información sobre depósitos judiciales y reclamarlos directamente ante las autoridades correspondientes, sin necesidad de contratar nuestros servicios ni los de terceros.</p>
+      <h3 class="jd-transparency-subtitle">¿Qué hacemos en Amud Technologies?</h3>
+      <p>Convertimos información dispersa en oportunidades concretas. Identificamos posibles derechos, relacionamos la información con personas, empresas y procesos, investigamos cada caso y, cuando se requiere, facilitamos la preparación de documentos y la gestión de la reclamación.</p>
+      <p>Nuestro valor no está en el acceso exclusivo a la información, sino en el trabajo necesario para identificar, verificar y hacer efectivos esos derechos.</p>
+      <p class="jd-transparency-note">Amud Technologies es una empresa privada e independiente. No pertenece al Estado ni a ninguna entidad pública.</p>
     </div>
   </div>
 </section>
@@ -168,57 +166,40 @@
     <h2 class="serif jd-section-title">Lo que probablemente se está preguntando</h2>
     <div class="jd-faq">
       <details>
-        <summary>¿La consulta tiene algún costo?</summary>
-        <p>No. La consulta con su NIT o cédula es gratuita, no requiere registro y no solicitamos datos de contacto. Verá un resumen de los resultados asociados a ese número: cantidad de depósitos, valor publicado, despachos judiciales relacionados y estado del plazo para reclamar.</p>
-      </details>
-      <details>
-        <summary>¿Cómo encontraron depósitos relacionados con mi identificación?</summary>
-        <p>Utilizamos tecnología de búsqueda y análisis de datos para procesar información pública relacionada con depósitos judiciales. A través de estos procesos identificamos registros asociados a diferentes números de identificación y organizamos la información para facilitar la consulta y evaluación de posibles oportunidades.</p>
-      </details>
-      <details>
         <summary>¿Qué son los depósitos judiciales?</summary>
-        <p>Son sumas de dinero que, por orden de una autoridad judicial o competente, se consignan a órdenes de un despacho judicial o entidad autorizada, generalmente a través del Banco Agrario de Colombia, mientras se determina su destino dentro del proceso correspondiente.</p>
-        <p>Pueden originarse en embargos, consignaciones, garantías, remates y otras actuaciones judiciales. También se conocen comúnmente como títulos judiciales.</p>
+        <p>Son sumas de dinero consignadas a órdenes de un despacho judicial, generalmente en el Banco Agrario de Colombia, mientras se define su destino dentro de un proceso. Pueden originarse en embargos, consignaciones, garantías, remates y otras actuaciones judiciales. También se conocen como títulos judiciales.</p>
       </details>
       <details>
         <summary>¿Por qué hay depósitos judiciales sin reclamar?</summary>
-        <p>Un depósito judicial puede permanecer sin reclamar por diferentes razones: desconocimiento de su existencia, falta de información sobre el proceso, cambios en los datos de los beneficiarios, procesos antiguos o dificultades para identificar a quién corresponde el dinero.</p>
-        <p>En muchos casos, las personas o empresas que podrían tener derecho sobre estos recursos simplemente no saben que existen.</p>
+        <p>Por desconocimiento de su existencia, falta de información sobre el proceso, cambios en los datos de los beneficiarios, procesos antiguos o dificultad para identificar a quién corresponde el dinero. En muchos casos, las personas o empresas con derecho sobre estos recursos simplemente no saben que existen.</p>
       </details>
       <details>
         <summary>¿De dónde proviene la información?</summary>
-        <p>Trabajamos con información de carácter público proveniente de fuentes oficiales relacionadas con la actividad judicial en Colombia. Esta información es recopilada, procesada y estructurada por Amud Technologies para facilitar su consulta, análisis e identificación de posibles oportunidades económicas.</p>
+        <p>Trabajamos con información pública de fuentes oficiales relacionadas con la actividad judicial en Colombia. La procesamos y estructuramos con tecnología propia para facilitar su consulta y análisis.</p>
       </details>
       <details>
         <summary>¿Amud Technologies es una entidad del Estado?</summary>
-        <p>No. Amud Technologies es una empresa privada e independiente. No somos una entidad gubernamental, no representamos a la Rama Judicial ni al Banco Agrario y no tenemos autoridad para ordenar la entrega de depósitos judiciales.</p>
-        <p>Nuestra actividad consiste en utilizar tecnología e inteligencia de datos para identificar oportunidades relacionadas con recursos que podrían tener beneficiarios.</p>
+        <p>No. Somos una empresa privada e independiente. No representamos a la Rama Judicial ni al Banco Agrario, y no tenemos autoridad para ordenar la entrega de depósitos judiciales.</p>
       </details>
       <details>
-        <summary>¿Puedo reclamar mi dinero directamente y sin intermediarios?</summary>
-        <p>Sí. Tiene derecho a adelantar directamente el trámite de reclamación ante el juzgado competente, sin contratar nuestros servicios ni los de ningún tercero.</p>
-        <p>Amud Technologies no es un requisito para reclamar sus depósitos judiciales. Nuestra propuesta de valor consiste en ahorrarle el trabajo de búsqueda, identificación, análisis y acompañamiento en el proceso.</p>
+        <summary>¿La consulta tiene algún costo?</summary>
+        <p>No. La consulta con su NIT o cédula es gratuita y no requiere registro.</p>
       </details>
       <details>
         <summary>¿Encontrar un depósito significa que puedo reclamarlo?</summary>
-        <p>No necesariamente. Que su identificación aparezca relacionada con un depósito judicial no significa que usted sea su beneficiario ni que tenga derecho a reclamarlo.</p>
-        <p>Para determinar quién tiene derecho sobre los recursos, es necesario revisar el proceso judicial, el origen del depósito y las decisiones de la autoridad competente.</p>
-        <p>Por eso, los resultados de Amud Technologies representan posibles oportunidades que deben verificarse antes de iniciar cualquier reclamación.</p>
+        <p>No necesariamente. Que su identificación aparezca relacionada con un depósito no significa que usted sea su beneficiario. Para determinarlo es necesario revisar el proceso judicial, el origen del depósito y las decisiones de la autoridad competente. Por eso, cada resultado debe verificarse antes de iniciar cualquier reclamación.</p>
       </details>
       <details>
-        <summary>¿Cuánto cobra Amud Technologies?</summary>
-        <p>El costo depende del servicio contratado y del alcance del trabajo requerido.</p>
-        <p>Antes de iniciar cualquier gestión, le informaremos claramente las condiciones comerciales, los servicios incluidos y los honorarios correspondientes. No tendrá que asumir compromisos económicos sin conocer previamente las condiciones del servicio.</p>
+        <summary>¿Puedo reclamar mi dinero directamente y sin intermediarios?</summary>
+        <p>Sí. Tiene derecho a adelantar directamente la reclamación ante el juzgado competente, sin contratar nuestros servicios ni los de terceros. Nuestro servicio le ahorra el trabajo de búsqueda, análisis, documentación y acompañamiento.</p>
+      </details>
+      <details>
+        <summary>¿Necesito un abogado para reclamar?</summary>
+        <p>No necesariamente. Depende de las circunstancias del proceso y de los requisitos de la autoridad competente. En algunos casos el beneficiario puede presentar la solicitud directamente; en otros puede ser necesario acreditar representación, sucesión u otras condiciones jurídicas.</p>
       </details>
       <details>
         <summary>¿Cuánto tiempo tarda recuperar un depósito judicial?</summary>
-        <p>Depende de factores como la antigüedad del depósito, la disponibilidad de los expedientes, la identificación del beneficiario y los procedimientos del juzgado competente.</p>
-        <p>Amud Technologies puede facilitar las actividades de búsqueda, documentación y preparación, pero los tiempos de respuesta y la decisión de entregar los recursos dependen exclusivamente de las autoridades correspondientes.</p>
-      </details>
-      <details>
-        <summary>¿Necesito contratar un abogado para reclamar?</summary>
-        <p>No necesariamente. La necesidad de representación legal depende de las circunstancias particulares del proceso y de los requisitos establecidos por la autoridad competente.</p>
-        <p>En algunos casos, el beneficiario puede realizar directamente la solicitud. En otros, puede ser necesario acreditar representación, sucesión u otras condiciones jurídicas.</p>
+        <p>Depende de la antigüedad del depósito, la disponibilidad del expediente, la identificación del beneficiario y los procedimientos del juzgado. Nosotros agilizamos la búsqueda, la documentación y la preparación, pero los tiempos y la decisión de entrega dependen exclusivamente de la autoridad competente.</p>
       </details>
     </div>
   </div>

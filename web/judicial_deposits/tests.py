@@ -28,7 +28,8 @@ class LandingTests(TestCase):
         self.assertNotContains(response, 'action="/resultados/"')
         self.assertNotContains(response, 'href="#consultar"')
         # The product demo is always labelled as fictitious data.
-        self.assertContains(response, "Demostración · Datos ficticios")
+        self.assertContains(response, '<span class="jd-demo-badge mono">Demostración</span>')
+        self.assertContains(response, 'aria-label="Demostración de resultados con datos ficticios"')
         self.assertNotContains(response, "pequeña comisión")
         self.assertNotContains(response, "RESULTADO DE SU CONSULTA")
         # Structured data matches what the page shows: the service and its trail.
