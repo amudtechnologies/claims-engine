@@ -158,11 +158,17 @@ class ResultsTests(TestCase):
             'Hasta el 17/11/2026 '
             '<span class="results-deadline-left">(quedan 6 días hábiles)</span>',
         )
-        self.assertContains(response, "jd-tag--open\">Reclamable<")
+        self.assertContains(response, "jd-tag--open\">Plazo abierto<")
+        self.assertContains(response, "Publicados como susceptibles de prescripción")
         self.assertNotContains(response, "Activo")
         self.assertContains(response, 'aria-label="Ver detalle de Depósitos judiciales"')
         self.assertNotContains(response, "Otros radares")
-        self.assertContains(response, "Valores tomados de datos públicos de la Rama Judicial")
+        self.assertContains(
+            response,
+            "«En plazo de reclamo» significa que la publicación sigue dentro de los 20 días "
+            "hábiles para reclamar ante el juzgado. No confirma que el dinero le corresponda "
+            "ni que aún no haya sido entregado.",
+        )
         self.assertContains(response, 'content="noindex,nofollow"')
         # A per-query page: no nav item is active.
         self.assertNotContains(response, 'class="is-active"')
@@ -171,9 +177,9 @@ class ResultsTests(TestCase):
     def test_results_without_open_window_show_nothing_current(self):
         response = self._render_results(self._match(claim_status="no_reclamable"))
         self.assertContains(response, "7.980 · $ 3.701.871.805")
-        self.assertContains(response, "Nada vigente")
+        self.assertContains(response, "Ninguno en plazo")
         self.assertNotContains(response, "jd-tag--open")
-        self.assertNotContains(response, "días hábiles")
+        self.assertNotContains(response, "results-deadline")
 
     def test_results_without_any_match_show_empty_state(self):
         response = self._render_results(None)

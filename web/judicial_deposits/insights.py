@@ -94,6 +94,9 @@ class Chart:
     orientation: str  # "vertical" | "horizontal"
     bars: list[Bar]
     summary: str = ""
+    # False when summing the bars means nothing — the comparison chart's two
+    # bars are separate publications, set side by side to be compared.
+    has_total: bool = True
 
     @property
     def highlighted(self) -> str | None:
@@ -204,10 +207,12 @@ def by_department(deposits: list[Deposit]) -> Chart:
 
 
 def _change(current: int, previous: int) -> str:
-    """Signed percent change in es-CO ("+12,3 %", "−45,7 %")."""
+    """Signed percent change in es-CO ("+12,3 %", "−45,7 %"), with a
+    no-break space before "%" so a narrow screen never wraps the sign
+    away from its number."""
     change = (current - previous) / previous * 100
     sign = "+" if change >= 0 else "−"
-    return f"{sign}{abs(change):.1f}".replace(".", ",") + " %"
+    return f"{sign}{abs(change):.1f}".replace(".", ",") + "\u00a0%"
 
 
 def by_previous_period(
@@ -227,8 +232,10 @@ def by_previous_period(
     previous, current = by_label[previous_period], by_label[current_period]
     if previous.count:
         summary = (
-            f"Frente a {previous_period}: valor {_change(current.amount_cop, previous.amount_cop)}"
-            f", depósitos {_change(current.count, previous.count)}"
+            # No-break spaces keep each "label change" pair on one line.
+            f"Frente a {previous_period}: "
+            f"valor\u00a0{_change(current.amount_cop, previous.amount_cop)}, "
+            f"depósitos\u00a0{_change(current.count, previous.count)}"
         )
     else:
         summary = f"No aparecía en {previous_period}"
@@ -240,6 +247,7 @@ def by_previous_period(
         orientation="horizontal",
         bars=[previous, current],
         summary=summary,
+        has_total=False,
     )
 
 
@@ -270,6 +278,6 @@ def history_charts(
         return None
     return [
         by_period(deposits, periods, current_period),
-        by_amount_range(deposits),
         by_department(deposits),
+        by_amount_range(deposits),
     ]

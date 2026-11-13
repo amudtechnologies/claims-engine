@@ -234,8 +234,36 @@ class SourceDeclaredNameTests(TestCase):
             )
             self.assertEqual(result.source_declared_name, "BANCO DE OCCIDENTE")
 
+    def test_name_written_twice_counts_as_the_single_spelling(self):
+        # 2023-2 states names like this; the doubled form must not win the vote.
+        names = ["BANCO FINANDINA SA BANCO FINANDINA SA"] * 3 + ["BANCO FINANDINA SA"]
+        names += ["BANCO FINANDINA X"] * 2
+        result = PartySearchResult(
+            document_number="860051894",
+            party_name=None,
+            document_type=None,
+            rues_active=None,
+            deposits=[_deposit("2023-2", i, name=name) for i, name in enumerate(names)],
+        )
+        self.assertEqual(result.source_declared_name, "BANCO FINANDINA SA")
+
+    def test_collapse_doubled_leaves_other_names_alone(self):
+        self.assertEqual(party_search._collapse_doubled("FINANDINA FINANDINA"), "FINANDINA")
+        self.assertEqual(party_search._collapse_doubled("BANCO DE BOGOTA"), "BANCO DE BOGOTA")
+        self.assertEqual(party_search._collapse_doubled("SA SA BANCO"), "SA SA BANCO")
+
 
 DETAIL_URL = "/depositos-judiciales/resultado/?nit=890300279"
+NBSP = "\u00a0"
+
+
+def _comparison(period, value, count):
+    """A comparison chart summary; no-break spaces keep "valor +12,3 %" whole."""
+    return f"Frente a {period}: valor{NBSP}{value}{NBSP}%, depósitos{NBSP}{count}{NBSP}%"
+OPEN_WINDOW_NOTE = (
+    "Que la publicación siga en plazo de reclamo no confirma que el dinero le "
+    "corresponda ni que aún no haya sido entregado."
+)
 PERIODS = ["2017-1", "2025-1", "2025-2", "2026-2"]
 
 
@@ -289,10 +317,13 @@ class DetailPageTests(TestCase):
         response = self._request()
         html = response.content.decode()
         self.assertLess(html.index("Última publicación · 2026-2"), html.index("Histórico completo"))
-        self.assertContains(response, "Hasta el 17/11/2026 · quedan 6 días hábiles")
-        self.assertContains(response, 'jd-tag--open">Reclamable<')
+        self.assertContains(
+            response, "Plazo de reclamo hasta el 17/11/2026 · quedan 6 días hábiles"
+        )
+        self.assertContains(response, 'jd-tag--open">Plazo abierto<')
         self.assertNotContains(response, "is-absent")
-        self.assertContains(response, "Aún está a tiempo hasta el 17/11/2026.")
+        self.assertContains(response, OPEN_WINDOW_NOTE)
+        self.assertContains(response, "DEPÓSITOS JUDICIALES SUSCEPTIBLES DE PRESCRIPCIÓN")
         # Informational only: no collection/verification request, no sales copy.
         for commercial in (
             "Quiero recuperarlo",
@@ -314,8 +345,10 @@ class DetailPageTests(TestCase):
     def test_expired_state(self):
         response = self._request(today=date(2026, 11, 18))
         self.assertContains(response, 'jd-tag--closed">Plazo vencido<')
-        self.assertContains(response, "El plazo para reclamarlos venció el 17/11/2026.")
+        self.assertContains(response, "Plazo de reclamo vencido el 17/11/2026")
         self.assertNotContains(response, "días hábiles")
+        # The "no confirma" caveat is about an open window only.
+        self.assertNotContains(response, OPEN_WINDOW_NOTE)
 
     def test_absent_from_latest_publication_state(self):
         response = self._request(today=date(2026, 11, 18), latest="2027-1")
@@ -331,7 +364,7 @@ class DetailPageTests(TestCase):
         self.assertIn('jd-tag--closed">Plazo vencido<', last_block)
         self.assertIn('<div class="jd-summary-num mono">2</div>', last_block)
         self.assertIn('<div class="jd-summary-num mono">$ 500</div>', last_block)
-        self.assertIn("El plazo para reclamarlos venció el 17/11/2026.", last_block)
+        self.assertIn("Plazo de reclamo vencido el 17/11/2026", last_block)
         self.assertIn("Como demandante", last_block)
 
     def test_last_appearance_charts_and_wording(self):
@@ -346,9 +379,9 @@ class DetailPageTests(TestCase):
         ]
         self.assertIn("jd-charts jd-charts--compact is-muted", last_block)
         self.assertIn('id="jd-chart-last-previous-period-title"', last_block)
-        self.assertIn("Frente a 2025-2: valor +0,4 %, depósitos +100,0 %", last_block)
+        self.assertIn(_comparison("2025-2", "+0,4", "+100,0"), last_block)
         # 2026-2 is highlighted there, but it isn't the current publication.
-        self.assertIn("resaltada la publicación (2026-2)", last_block)
+        self.assertIn("Resaltada la publicación (2026-2)", last_block)
         self.assertNotIn("(vigente)", last_block)
 
     def test_present_in_latest_publication_has_no_last_appearance_block(self):
@@ -416,7 +449,7 @@ class DetailPageTests(TestCase):
         response = self._request()
         html = response.content.decode()
         compact = html.index("jd-charts jd-charts--compact")
-        self.assertLess(html.index("Aún está a tiempo hasta el 17/11/2026."), compact)
+        self.assertLess(html.index(OPEN_WINDOW_NOTE), compact)
         self.assertLess(compact, html.index("Histórico completo"))
         self.assertLess(
             html.index('id="jd-chart-current-previous-period-title"'),
@@ -426,11 +459,11 @@ class DetailPageTests(TestCase):
         self.assertContains(response, 'id="jd-chart-current-amount-range-title"')
         self.assertNotContains(response, "jd-charts--compact is-muted")
         self.assertNotContains(response, "Juzgado 7")
-        # Every chart totals the block: 10 · $ 10.045 (the comparison too,
-        # since the party wasn't in the previous publication).
-        self.assertEqual(html.count("Total 10 · $ 10.045"), 3)
+        # Department and amount range total the block: 10 · $ 10.045. The
+        # comparison sets two publications side by side, so it has no total.
+        self.assertEqual(html.count("Total 10 · $ 10.045"), 2)
         # Role cards for the latest publication only (the history adds 1.000.000).
-        self.assertLess(html.index("10 hallazgos · $ 10.045"), compact)
+        self.assertLess(html.index("10 depósitos · $ 10.045"), compact)
 
     def test_current_publication_charts_muted_once_expired(self):
         self._current_with_findings(10)
@@ -467,6 +500,20 @@ class InsightsTests(TestCase):
         self.assertEqual(len(charts), 3)
         for chart in charts:
             self._assert_partition(chart, deposits)
+
+    def test_history_and_current_charts_share_one_order(self):
+        deposits = self._deposits()
+        history = [c.slug for c in insights.history_charts(deposits, PERIODS, "2026-2")]
+        current_charts = insights.current_publication_charts(deposits, PERIODS, "2025-1")
+        current = [c.slug for c in current_charts]
+        # Time first, then department, then amount range — in both blocks.
+        self.assertEqual(history, ["period", "department", "amount-range"])
+        self.assertEqual(current, ["previous-period", "department", "amount-range"])
+
+    def test_comparison_chart_has_no_total(self):
+        chart = insights.by_previous_period(self._deposits(), PERIODS, "2026-2")
+        self.assertFalse(chart.has_total)
+        self.assertTrue(insights.by_department(self._deposits()).has_total)
 
     def test_period_chart_keeps_empty_publications(self):
         chart = insights.by_period(self._deposits(), PERIODS, "2026-2")
@@ -519,7 +566,7 @@ class InsightsTests(TestCase):
             [(bar.label, bar.count, bar.amount_cop, bar.highlight) for bar in chart.bars],
             [("2025-2", 4, 4_000, False), ("2026-2", 2, 3_000, True)],
         )
-        self.assertEqual(chart.summary, "Frente a 2025-2: valor −25,0 %, depósitos −50,0 %")
+        self.assertEqual(chart.summary, _comparison("2025-2", "−25,0", "−50,0"))
         absent = insights.by_previous_period(deposits[4:], PERIODS, "2026-2")
         self.assertEqual(absent.summary, "No aparecía en 2025-2")
         self.assertEqual(absent.bars[0].count, 0)
@@ -690,6 +737,13 @@ class SyncCommandTests(TestCase):
 class RealCacheTests(TestCase):
     """Acceptance figures against the real local cache."""
 
+    def test_published_periods_skip_publications_without_deposits(self):
+        # 2017-1 is in core/file but excluded from claim identity: listing it
+        # would show every party a false zero in the per-publication chart.
+        periods = party_search.published_periods()
+        self.assertNotIn("2017-1", periods)
+        self.assertEqual(periods[0], "2018-1")
+
     def test_landing_statistics_add_up_to_the_corpus_total(self):
         with tempfile.TemporaryDirectory() as tmp:
             stats_file = Path(tmp) / "corpus_stats.json"
@@ -732,7 +786,9 @@ class RealCacheTests(TestCase):
         self.assertContains(response, '<div class="jd-summary-num mono">320</div>')
         self.assertContains(response, '<div class="jd-summary-num mono">$ 232.457.445</div>')
         # The same 6 business days as /resultados/.
-        self.assertContains(response, "Hasta el 17/11/2026 · quedan 6 días hábiles")
+        self.assertContains(
+            response, "Plazo de reclamo hasta el 17/11/2026 · quedan 6 días hábiles"
+        )
         self.assertContains(response, '<div class="jd-summary-num mono">7.980</div>')
         self.assertContains(response, '<div class="jd-summary-num mono">$ 3.701.871.805</div>')
         self.assertContains(response, "BANCO DE OCCIDENTE</h2>")
@@ -759,6 +815,6 @@ class RealCacheTests(TestCase):
         # ... plus the comparison chart's 2026-2 row.
         self.assertEqual(block.count('<td class="mono">373</td>'), 3)
         self.assertEqual(block.count('<td class="mono">$ 456.144.596</td>'), 3)
-        self.assertIn("Frente a 2026-1: valor −26,9 %, depósitos −81,9 %", block)
+        self.assertIn(_comparison("2026-1", "−26,9", "−81,9"), block)
         self.assertIn("Como demandante", block)
         self.assertIn("Como demandado", block)

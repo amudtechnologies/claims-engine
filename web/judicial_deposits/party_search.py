@@ -120,7 +120,9 @@ class PartySearchResult:
             return None
         latest = max(d.period for d in named)
         spellings = Counter(
-            " ".join(d.source_declared_name.split()) for d in named if d.period == latest
+            _collapse_doubled(" ".join(d.source_declared_name.split()))
+            for d in named
+            if d.period == latest
         )
         return min(spellings, key=lambda name: (-spellings[name], name))
 
@@ -147,6 +149,21 @@ class PartySearchResult:
             rues_active=self.rues_active,
             deposits=deposits,
         )
+
+
+def _collapse_doubled(name: str) -> str:
+    """"BANCO FINANDINA SA BANCO FINANDINA SA" -> "BANCO FINANDINA SA".
+
+    Some publications (2023-2 is the worst) state a party's name with the
+    whole phrase written twice — apparently two name fields both filled and
+    concatenated. Display-only: the stored source-declared value is
+    untouched; this just stops the doubled spelling from winning the
+    most-frequent-spelling vote and reaching the page as the party's name."""
+    words = name.split(" ")
+    half = len(words) // 2
+    if len(words) % 2 == 0 and half and words[:half] == words[half:]:
+        return " ".join(words[:half])
+    return name
 
 
 def claim_window(period: str | None) -> ClaimWindow | None:
@@ -277,16 +294,23 @@ def latest_published_period() -> str | None:
 
 
 def published_periods() -> list[str]:
-    """Every semester of the expiring-deposits publication, oldest first —
-    the x-axis of the per-publication chart, including the periods a given
-    party doesn't appear in."""
+    """Every semester of the expiring-deposits publication that contributes
+    deposits, oldest first — the x-axis of the per-publication chart,
+    including the periods a given party doesn't appear in.
+
+    Only periods with at least one `observation`: 2017-1 is in `core/file`
+    but excluded from claim identity (its rows are case actions, not
+    deposits — project-context.md §7, Phase 4), so no party can ever appear
+    in it. Listing it would show every party a false zero there."""
     con = _connect()
     rows = con.execute(
         f"""
-        SELECT DISTINCT period
-        FROM read_parquet('{core_cache.table_path('file')}')
-        WHERE source = ? AND period IS NOT NULL
-        ORDER BY period
+        SELECT DISTINCT f.period
+        FROM read_parquet('{core_cache.table_path('observation')}') o
+        JOIN read_parquet('{core_cache.table_path('capture')}') cap USING (capture_id)
+        JOIN read_parquet('{core_cache.table_path('file')}') f USING (file_id)
+        WHERE f.source = ? AND f.period IS NOT NULL
+        ORDER BY f.period
         """,
         [SOURCE_EXPIRING_DEPOSITS],
     ).fetchall()

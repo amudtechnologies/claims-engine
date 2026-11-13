@@ -3,9 +3,9 @@
 <details class="jd-chart jd-chart--{{ chart.orientation }}"{% if chart_open %} open{% endif %}>
   <summary class="jd-chart-toggle"><span id="jd-chart-{{ chart_scope|default:"history" }}-{{ chart.slug }}-title" class="jd-chart-title">{{ chart.title }}</span></summary>
   <figure class="jd-chart-figure" aria-labelledby="jd-chart-{{ chart_scope|default:"history" }}-{{ chart.slug }}-title">
-  {% if chart.summary %}<p class="jd-chart-summary">{{ chart.summary }}{% if chart.highlighted %} · resaltada la publicación {% if chart.highlighted == latest_period %}vigente {% endif %}({{ chart.highlighted }}){% endif %}</p>{% endif %}
+  {% if chart.summary %}<p class="jd-chart-summary">{{ chart.summary }}{% if chart.highlighted %}<span class="jd-chart-summary-note">Resaltada la publicación {% if chart.highlighted == latest_period %}vigente {% endif %}({{ chart.highlighted }})</span>{% endif %}</p>{% endif %}
 
-  <div class="jd-chart-plot" role="img" aria-label="{{ chart.title }}: gráfico de barras por {{ chart.dimension|lower }}, según {{ layout.measure_label }}. Total {{ layout.total_label }}. Los valores de cada barra están en la tabla «Ver datos».">
+  <div class="jd-chart-plot" role="img" aria-label="{{ chart.title }}: gráfico de barras por {{ chart.dimension|lower }}, según {{ layout.measure_label }}.{% if chart.has_total %} Total {{ layout.total_label }}.{% endif %} Los valores de cada barra están en la tabla «Ver datos».">
     {% if chart.orientation == "vertical" %}
       <div class="jd-vplot">
         <div class="jd-vaxis" aria-hidden="true">
@@ -52,9 +52,11 @@
           <tr><th scope="row">{{ bar.label }}{% if bar.highlight and bar.label == latest_period %} (vigente){% endif %}</th><td class="mono">{{ bar.count|es_co_number }}</td><td class="mono">{{ bar.amount_cop|cop }}</td></tr>
         {% endfor %}
       </tbody>
+      {% if chart.has_total %}
       <tfoot>
         <tr><th scope="row">Total</th><td class="mono">{{ chart.total_count|es_co_number }}</td><td class="mono">{{ chart.total_amount_cop|cop }}</td></tr>
       </tfoot>
+      {% endif %}
     </table>
   </details>
 </figure>

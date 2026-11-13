@@ -46,6 +46,7 @@
 .jd-back a:hover { color: var(--accent-text); }
 
 .jd-block { margin-bottom: 24px; padding: 22px 24px; background: var(--ground); border: 1px solid var(--hair); border-radius: var(--r-md); }
+.jd-panel-title { flex-wrap: wrap; }
 .jd-block-title { margin: 0; font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; }
 .jd-block--current { background: rgba(32, 182, 165, 0.08); border-color: rgba(32, 182, 165, 0.45); border-left: 4px solid var(--teal); }
 .jd-block--current .jd-panel-title { color: var(--accent-text); }
@@ -75,7 +76,8 @@
 .jd-chart-toggle:hover .jd-chart-title { color: var(--accent-text); }
 .jd-chart-title { font-size: 0.92rem; font-weight: 600; color: var(--ink); }
 .jd-chart-figure { margin: 0; padding: 0 0 18px 0; }
-.jd-chart-summary { margin: 0 0 14px 0; font-size: 0.8rem; color: var(--ink-softer); }
+.jd-chart-summary { margin: 0 0 14px 0; font-size: 0.8rem; line-height: 1.5; color: var(--ink-softer); }
+.jd-chart-summary-note { display: block; margin-top: 2px; }
 .jd-chart-plot { position: relative; }
 
 .jd-tip {
@@ -269,6 +271,7 @@ a.radar-card:hover .radar-card-arrow, a.radar-card:focus-visible .radar-card-arr
 .jd-demo-head-cell, .jd-demo-wide { grid-column: 1 / -1; }
 .jd-demo-head-cell { flex-direction: row; align-items: baseline; justify-content: space-between; gap: 12px; }
 .jd-demo-radar { font-weight: 600; text-decoration: underline; text-decoration-color: var(--hair-strong); text-underline-offset: 3px; }
+.jd-demo-scope { display: block; margin-top: 3px; font-size: 0.72rem; line-height: 1.4; color: var(--ink-softer); }
 .jd-demo-label { font-size: 0.66rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-softer); }
 .jd-demo-claimable { font-weight: 600; color: var(--accent-text); }
 .jd-demo-deadline { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; font-variant-numeric: tabular-nums; }
