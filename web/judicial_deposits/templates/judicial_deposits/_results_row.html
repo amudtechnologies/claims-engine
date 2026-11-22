@@ -5,7 +5,12 @@
     <a href="{{ match.detail_url }}">{{ spec.name }}</a>
     <span class="results-radar-scope">Publicados como susceptibles de prescripción</span>
   </td>
-  <td class="mono" data-label="Histórico">{{ match.finding_count|es_co_number }} · {{ match.total_amount_cop|cop }}</td>
+  {% if match.extra.first_appearance and claimable %}
+    {# Same figures as the next column: say what's new instead of repeating them. #}
+    <td data-label="Histórico"><span class="jd-tag jd-tag--first">Primera vez</span></td>
+  {% else %}
+    <td class="mono" data-label="Histórico">{{ match.finding_count|es_co_number }} · {{ match.total_amount_cop|cop }}{% if match.extra.first_appearance %} <span class="jd-tag jd-tag--first">Primera vez</span>{% endif %}</td>
+  {% endif %}
   {% if claimable %}
     <td class="mono results-claimable" data-label="En plazo de reclamo">{{ claimable.count|es_co_number }} · {{ claimable.amount_cop|cop }}</td>
     <td data-label="Plazo">
@@ -23,6 +28,6 @@
   </td>
 </tr>
 <tr class="results-row-note">
-  <td colspan="5">«En plazo de reclamo» significa que la publicación sigue dentro de los 20 días hábiles para reclamar ante el juzgado. No confirma que el dinero le corresponda ni que aún no haya sido entregado.</td>
+  <td colspan="5">«En plazo de reclamo» significa que la publicación sigue dentro del plazo para reclamar ante el juzgado. No confirma que el dinero le corresponda ni que aún no haya sido entregado.</td>
 </tr>
 {% endwith %}

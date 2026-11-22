@@ -1,12 +1,14 @@
-"""Aggregate charts for the detail page's "Histórico completo" block.
+"""Aggregate charts for the detail page's "Publicaciones anteriores" block
+(and the compact ones of the latest publication's block).
 
 Every aggregation happens here, server-side, over one party's deposits; the
 template and the browser only ever receive the per-group totals in `Chart`
-— never individual deposits, and never a court office's name (the per-court
-detail is part of the paid service). Each chart is a full partition of the
-deposits it was given: every deposit lands in exactly one bar, so each
-chart's counts and amounts add up to the historical totals. A deposit
-missing the field a chart groups by goes to "Sin dato", never dropped.
+— never individual deposits, and never a court office's name (only the
+deposit preview's one readable row names a court — see preview.py, D29).
+Each chart is a full partition of the deposits it was given: every deposit
+lands in exactly one bar, so each chart's counts and amounts add up to the
+block's totals. A deposit missing the field a chart groups by goes to
+"Sin dato", never dropped.
 """
 
 from __future__ import annotations

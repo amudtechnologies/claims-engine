@@ -366,6 +366,7 @@ a.radar-list-item:hover::after {
 .jd-tag { display: inline-flex; align-items: center; flex: none; padding: 3px 10px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.02em; text-transform: none; border-radius: 999px; }
 .jd-tag--open { color: var(--white); background: var(--teal); }
 .jd-tag--closed { color: var(--ink-softer); background: var(--mist); }
+.jd-tag--first { color: #7a5a24; background: #f5ecdc; }
 .jd-tag--pending { color: var(--ink-soft); background: transparent; border: 1px solid var(--gold); }
 
 /* RADARS INDEX (home #radares section) */

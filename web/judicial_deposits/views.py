@@ -1,9 +1,25 @@
-from urllib.parse import quote
+import dataclasses
+from urllib.parse import quote, urlencode
 
+from django.conf import settings
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
-from . import core_cache, corpus_stats, insights, party_search, radar
+from . import core_cache, corpus_stats, history, insights, party_search, preview, radar
+
+# How the WhatsApp message names the number, by `party.document_type`.
+_DOCUMENT_REFERENCE = {"legal_entity": "el NIT", "natural_person": "la cédula"}
+
+
+def _whatsapp_url(party_result) -> str:
+    """wa.me link with a message that already names the number consulted,
+    so whoever answers knows the case without asking."""
+    reference = _DOCUMENT_REFERENCE.get(party_result.document_type, "el número")
+    message = (
+        f"Hola, consulté {reference} {party_result.document_number} en Amud "
+        "Technologies y quiero más detalles sobre los depósitos judiciales encontrados."
+    )
+    return f"https://wa.me/{settings.CONTACT_WHATSAPP_NUMBER}?text={quote(message)}"
 
 
 def _service_ld(request) -> dict:
@@ -67,8 +83,9 @@ def index(request):
 def detail(request):
     """This radar's detail for one document number: the latest publication
     (or, when absent from it, the last one it appears in), then the full
-    history with its aggregate charts. Informational only — no collection
-    or verification request (commercial work is out of scope for now)."""
+    history with its aggregate charts. While the latest publication's claim
+    window is open, a masked preview of its deposits ends in a WhatsApp
+    "Contactar" link (no form, nothing stored)."""
     raw_document_number = request.GET.get("nit", "").strip()
     if not raw_document_number:
         return redirect("judicial_deposits:index")
@@ -94,6 +111,10 @@ def detail(request):
 
     current = party_search.current_publication(party_result, latest_period)
     context["current"] = current
+    context["first_appearance"] = party_search.is_first_appearance(party_result, latest_period)
+    if current and current.claimable:
+        context["deposit_preview"] = preview.build_preview(current.summary.deposits)
+        context["whatsapp_url"] = _whatsapp_url(party_result)
     periods = party_search.published_periods()
     context["current_charts"] = (
         insights.current_publication_charts(party_result.deposits, periods, latest_period)
@@ -108,6 +129,74 @@ def detail(request):
         context["last_appearance_charts"] = insights.current_publication_charts(
             party_result.deposits, periods, last_appearance.period
         )
-    context["charts"] = insights.history_charts(party_result.deposits, periods, latest_period)
+    _add_history(request, context, party_result, periods, latest_period)
 
     return render(request, "judicial_deposits/detail.html", context)
+
+
+# `pub` value that keeps every publication closed (overrides the default).
+CLOSED = "ninguna"
+
+
+def _add_history(request, context, party_result, periods, latest_period) -> None:
+    """The "Publicaciones anteriores" block: every publication except the
+    latest one (its deposits are the block above), its charts, and the
+    paginated per-publication list driven by the query string (history.py)."""
+    previous = [d for d in party_result.deposits if d.period != latest_period]
+    context["history_summary"] = dataclasses.replace(party_result, deposits=previous)
+    context["charts"] = insights.history_charts(
+        previous, [p for p in periods if p != latest_period], None
+    )
+    history_periods = sorted({d.period for d in previous if d.period})
+    context["history_period_count"] = len(history_periods)
+    context["history_first_period"] = history_periods[0] if history_periods else None
+
+    groups = history.publication_groups(previous)
+    # The most recent publication opens by default. Closing it sends
+    # pub=ninguna, which matches no publication, so nothing reopens.
+    opened = request.GET.get("pub") if "pub" in request.GET else (
+        groups[0].period if groups else None
+    )
+    if not any(group.period == opened for group in groups):
+        opened = None
+    opened_index = next((i for i, g in enumerate(groups) if g.period == opened), 0)
+    show_all = request.GET.get("todas") == "1" or opened_index >= history.VISIBLE_PUBLICATIONS
+
+    base = {"nit": party_result.document_number}
+
+    def url(**params) -> str:
+        merged = {**base, **({"todas": "1"} if show_all else {}), **params}
+        merged = {key: value for key, value in merged.items() if value not in (None, "")}
+        return f"{reverse('judicial_deposits:detail')}?{urlencode(merged)}#jd-publicaciones"
+
+    visible = groups if show_all else groups[: history.VISIBLE_PUBLICATIONS]
+    context["publication_rows"] = [
+        {
+            "group": group,
+            "open": group.period == opened,
+            "url": url(pub=CLOSED if group.period == opened else group.period),
+        }
+        for group in visible
+    ]
+    context["publication_count"] = len(groups)
+    context["hidden_publications"] = len(groups) - len(visible)
+    context["hidden_publications_range"] = (
+        f"{groups[-1].period} a {groups[len(visible)].period}" if len(groups) > len(visible) else ""
+    )
+    context["show_all_url"] = url(todas="1")
+    if opened:
+        try:
+            page = int(request.GET.get("page", "1"))
+        except ValueError:
+            page = 1
+        rows, info = history.publication_page(previous, opened, page)
+        context["history_rows"] = rows
+        context["history_page"] = info
+        context["page_links"] = [
+            {"number": number, "url": url(pub=opened, page=number) if number else None}
+            for number in info.links
+        ]
+        context["prev_page_url"] = url(pub=opened, page=info.page - 1) if info.page > 1 else None
+        context["next_page_url"] = (
+            url(pub=opened, page=info.page + 1) if info.page < info.pages else None
+        )

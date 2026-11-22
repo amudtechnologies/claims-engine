@@ -16,10 +16,11 @@ def search(raw_document_number: str) -> RadarMatch | None:
     # Same figures as the detail page's "Última publicación" panel (both come
     # from `party_search.current_publication`): claimable only when the party
     # is in the corpus-wide latest publication and its window is still open.
-    current = party_search.current_publication(
+    current = party_search.current_publication(result, party_search.latest_published_period())
+    claim_status = current.status if current else None
+    first_appearance = party_search.is_first_appearance(
         result, party_search.latest_published_period()
     )
-    claim_status = current.status if current else None
     claimable = None
     if current and current.claimable:
         claimable = {
@@ -38,7 +39,11 @@ def search(raw_document_number: str) -> RadarMatch | None:
         finding_count=result.deposit_count,
         total_amount_cop=result.total_amount_cop,
         detail_url=f"{detail_url}?nit={quote(result.document_number)}",
-        extra={"claim_status": claim_status, "claimable": claimable},
+        extra={
+            "claim_status": claim_status,
+            "claimable": claimable,
+            "first_appearance": first_appearance,
+        },
     )
 
 

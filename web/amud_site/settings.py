@@ -249,6 +249,10 @@ STORAGES = {
 CLAIMS_ENGINE_BUCKET = os.environ.get('CLAIMS_ENGINE_BUCKET', 'amud-technologies')
 CORE_CACHE_DIR = BASE_DIR / 'var' / 'core_cache'
 
+# WhatsApp number (country code + number, digits only) behind the detail
+# page's "Contactar" button.
+CONTACT_WHATSAPP_NUMBER = os.environ.get('CONTACT_WHATSAPP_NUMBER', '573054381677')
+
 
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration

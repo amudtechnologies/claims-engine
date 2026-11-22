@@ -1,32 +1,136 @@
 {% load home_extras %}
+{# Every publication except the latest (that one is the block above). `summary` holds only those deposits; the per-publication list and its one open page come from history.py via the view. #}
 <section class="jd-block jd-block--history" aria-labelledby="jd-history-title">
   <div class="jd-panel-title">
-    <h3 id="jd-history-title" class="jd-block-title">Histórico completo (Todos los periodos)</h3>
+    <h3 id="jd-history-title" class="jd-block-title">Publicaciones anteriores</h3>
   </div>
 
-  <div class="jd-party-summary">
-    <div class="jd-summary-item">
-      <div class="jd-summary-num mono">{{ summary.deposit_count|es_co_number }}</div>
-      <div class="jd-summary-label">Depósitos encontrados</div>
-    </div>
-    <div class="jd-summary-item">
-      <div class="jd-summary-num mono">{{ summary.total_amount_cop|cop }}</div>
-      <div class="jd-summary-label">Valor total publicado</div>
-    </div>
-  </div>
+  {% if first_appearance %}
+    {# Only in the latest publication: nothing earlier to show. #}
+    <p class="jd-history-first">Primera vez: {% if summary.document_type == "natural_person" %}esta cédula{% elif summary.document_type == "legal_entity" %}este NIT{% else %}este número{% endif %} no aparece en ninguna publicación anterior.</p>
+  {% else %}
+    {% if history_period_count %}
+      <p class="jd-history-lead">Aparece en {{ history_period_count|es_co_number }} publicaci{{ history_period_count|pluralize:"ón,ones" }} anterior{{ history_period_count|pluralize:"es" }}{% if history_period_count > 1 %}, desde {{ history_first_period }}{% endif %}.</p>
+    {% endif %}
 
-  {% include "judicial_deposits/_role_cards.html" %}
-
-  {% if charts %}
-    <div class="jd-charts">
-      {% for chart in charts %}{% include "judicial_deposits/_chart.html" %}{% endfor %}
+    <div class="jd-party-summary">
+      <div class="jd-summary-item">
+        <div class="jd-summary-num mono">{{ summary.deposit_count|es_co_number }}</div>
+        <div class="jd-summary-label">Depósitos encontrados</div>
+      </div>
+      <div class="jd-summary-item">
+        <div class="jd-summary-num mono">{{ summary.total_amount_cop|cop }}</div>
+        <div class="jd-summary-label">Valor total publicado</div>
+      </div>
     </div>
+
+    {% include "judicial_deposits/_role_cards.html" %}
+
+    <div class="jd-pubs" id="jd-publicaciones">
+      <div class="jd-pubs-head">
+        <div>
+          <h4 class="jd-pubs-title">Depósitos por publicación</h4>
+          <p class="jd-pubs-hint">Abra una publicación para ver sus depósitos.</p>
+        </div>
+        <span class="jd-pubs-count">{{ publication_count|es_co_number }} publicaci{{ publication_count|pluralize:"ón,ones" }} · {{ summary.deposit_count|es_co_number }} depósito{{ summary.deposit_count|pluralize }}</span>
+      </div>
+
+      {% if publication_rows %}
+        <div class="jd-pubs-table-wrap">
+          <table class="jd-pubs-table">
+            <thead>
+              <tr>
+                <th scope="col">Publicación</th>
+                <th scope="col">Plazo</th>
+                <th scope="col" class="num">Depósitos</th>
+                <th scope="col" class="num">Juzgados</th>
+                <th scope="col" class="num">Valor</th>
+                <th scope="col"><span class="visually-hidden">Abrir</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in publication_rows %}
+                <tr class="jd-pub{% if row.open %} is-open{% endif %}">
+                  <td class="jd-pub-period"><a href="{{ row.url }}" aria-expanded="{% if row.open %}true{% else %}false{% endif %}">{{ row.group.period }}</a></td>
+                  <td class="jd-pub-deadline">{% if row.group.closes_on %}<span class="jd-tag jd-tag--closed">Vencido el {{ row.group.closes_on|date:"d/m/Y" }}</span>{% else %}—{% endif %}</td>
+                  <td class="mono num" data-label="Depósitos">{{ row.group.deposit_count|es_co_number }}</td>
+                  <td class="mono num" data-label="Juzgados">{{ row.group.court_count|es_co_number }}</td>
+                  <td class="mono num jd-pub-amount" data-label="Valor">{{ row.group.amount_cop|cop }}</td>
+                  <td class="jd-pub-toggle"><a href="{{ row.url }}" aria-label="{% if row.open %}Cerrar{% else %}Abrir{% endif %} {{ row.group.period }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{% if row.open %}M6 15l6-6 6 6{% else %}M6 9l6 6 6-6{% endif %}"/></svg></a></td>
+                </tr>
+                {% if row.open %}
+                  <tr class="jd-pub-detail">
+                    <td colspan="6">
+                      <div class="jd-pub-detail-inner">
+                        <div class="jd-pubs-table-wrap">
+                          <table class="jd-pub-deposits">
+                            <thead>
+                              <tr>
+                                <th scope="col">Juzgado</th>
+                                <th scope="col">Ciudad</th>
+                                <th scope="col">N.º de depósito</th>
+                                <th scope="col">Cuenta judicial</th>
+                                <th scope="col">Constituido</th>
+                                <th scope="col">Rol</th>
+                                <th scope="col" class="num">Valor</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {% for deposit in history_rows %}
+                                <tr>
+                                  <td class="jd-more-court">{{ deposit.court }}</td>
+                                  <td>{{ deposit.city }}</td>
+                                  <td class="mono">{{ deposit.deposit_no }}</td>
+                                  <td class="mono">{{ deposit.court_account }}</td>
+                                  <td class="mono">{{ deposit.constituted_on }}</td>
+                                  <td>{{ deposit.role }}</td>
+                                  <td class="mono num jd-pub-amount">{{ deposit.amount_cop|cop }}</td>
+                                </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                        </div>
+                        <div class="jd-pager">
+                          <span class="jd-pager-status">Mostrando {{ history_page.start|es_co_number }}–{{ history_page.end|es_co_number }} de {{ history_page.total|es_co_number }} · ordenados por valor</span>
+                          {% if history_page.pages > 1 %}
+                            <nav class="jd-pager-links" aria-label="Páginas de {{ row.group.period }}">
+                              {% if prev_page_url %}<a class="jd-pg" href="{{ prev_page_url }}" aria-label="Página anterior">‹</a>{% else %}<span class="jd-pg is-disabled" aria-hidden="true">‹</span>{% endif %}
+                              {% for link in page_links %}
+                                {% if link.number is None %}<span class="jd-pg-gap" aria-hidden="true">…</span>
+                                {% elif link.number == history_page.page %}<span class="jd-pg is-current" aria-current="page">{{ link.number }}</span>
+                                {% else %}<a class="jd-pg" href="{{ link.url }}">{{ link.number }}</a>{% endif %}
+                              {% endfor %}
+                              {% if next_page_url %}<a class="jd-pg" href="{{ next_page_url }}" aria-label="Página siguiente">›</a>{% else %}<span class="jd-pg is-disabled" aria-hidden="true">›</span>{% endif %}
+                            </nav>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                {% endif %}
+              {% endfor %}
+              {% if hidden_publications %}
+                <tr class="jd-pub-more">
+                  <td colspan="6"><a href="{{ show_all_url }}">Ver {{ hidden_publications|es_co_number }} publicaci{{ hidden_publications|pluralize:"ón,ones" }} más ({{ hidden_publications_range }})</a></td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      {% endif %}
+    </div>
+
+    {% if charts %}
+      <div class="jd-charts">
+        {% for chart in charts %}{% include "judicial_deposits/_chart.html" %}{% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="jd-panel-footnote">
+      <span>{{ summary.court_office_count|es_co_number }} juzgado{{ summary.court_office_count|pluralize }} o despacho{{ summary.court_office_count|pluralize }} judicial{{ summary.court_office_count|pluralize:"es" }}</span>
+      {% if summary.last_period %}<span>Última publicación anterior en la que aparece: {{ summary.last_period }}</span>{% endif %}
+    </div>
+
+    <p class="jd-block-note">No podemos confirmar si estos depósitos se reclamaron dentro del plazo de su publicación.</p>
   {% endif %}
-
-  <div class="jd-panel-footnote">
-    <span>{{ summary.court_office_count|es_co_number }} juzgado{{ summary.court_office_count|pluralize }} o despacho{{ summary.court_office_count|pluralize }} judicial{{ summary.court_office_count|pluralize:"es" }}</span>
-    <span>Última publicación en la que aparece: {{ summary.last_period }}</span>
-  </div>
-
-  <p class="jd-block-note">No podemos confirmar si estos depósitos se reclamaron dentro del plazo de su publicación.</p>
 </section>

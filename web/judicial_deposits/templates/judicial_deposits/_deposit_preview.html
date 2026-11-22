@@ -1,0 +1,74 @@
+{% load home_extras %}
+{# The open-window deposit preview (judicial_deposits/preview.py): one readable row, faded placeholder rows, then the WhatsApp contact. Every masked value arrives masked from the server. static/js/deposit_preview.js closes the table behind "Ver más detalles"; without it the table stays open and the toggle stays hidden. #}
+<div class="jd-more" data-jd-more>
+  <div class="jd-more-bar">
+    <span class="jd-more-lead">
+      <span class="jd-more-icon" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/></svg></span>
+      <span class="jd-more-text">
+        <strong>¿Desea más detalles?</strong>
+        <span>Vea la información de cada depósito encontrado.</span>
+      </span>
+    </span>
+    <span class="jd-more-actions">
+      <button type="button" class="jd-more-toggle" aria-expanded="true" aria-controls="jd-more-body" data-jd-more-toggle hidden>
+        <span class="jd-more-open">Ver más detalles</span>
+        <span class="jd-more-close">Ocultar detalles</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <a class="jd-more-wa" href="{{ whatsapp_url }}" target="_blank" rel="noopener">
+        {% include "judicial_deposits/_whatsapp_icon.html" %}
+        <span>Contactar</span>
+      </a>
+    </span>
+  </div>
+
+  <div class="jd-more-body" id="jd-more-body" data-jd-more-body>
+    <div class="jd-more-table-wrap">
+      <table class="jd-more-table">
+        <thead>
+          <tr>
+            <th scope="col">Juzgado</th>
+            <th scope="col">Ciudad</th>
+            <th scope="col">N.º de depósito</th>
+            <th scope="col">Cuenta judicial</th>
+            <th scope="col">Constituido</th>
+            <th scope="col" class="num">Valor</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="jd-more-court">{{ preview.visible.court }}</td>
+            <td>{{ preview.visible.city }}</td>
+            <td class="mono">{{ preview.visible.deposit_no }}</td>
+            <td class="mono">{{ preview.visible.court_account }}</td>
+            <td class="mono">{{ preview.visible.constituted_on }}</td>
+            <td class="mono num jd-more-amount">{{ preview.visible.amount }}</td>
+          </tr>
+          {% for row in preview.faded %}
+            <tr class="jd-more-faded jd-more-faded--{{ forloop.counter }}" aria-hidden="true">
+              <td class="jd-more-court">{{ row.court }}</td>
+              <td>{{ row.city }}</td>
+              <td class="mono">{{ row.deposit_no }}</td>
+              <td class="mono">{{ row.court_account }}</td>
+              <td class="mono">{{ row.constituted_on }}</td>
+              <td class="mono num jd-more-amount">{{ row.amount }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="jd-more-cta">
+      {% if preview.remaining_count %}
+        <strong>{{ preview.remaining_count|es_co_number }} depósito{{ preview.remaining_count|pluralize }} más por <span class="jd-more-sum">{{ preview.remaining_amount_cop|cop }}</span></strong>
+        <p>Contáctenos para ver el detalle completo de todos sus depósitos y gestionar su reclamación.</p>
+      {% else %}
+        <p>Contáctenos para ver el detalle completo de su depósito y gestionar su reclamación.</p>
+      {% endif %}
+      <a class="btn jd-more-contact" href="{{ whatsapp_url }}" target="_blank" rel="noopener">
+        {% include "judicial_deposits/_whatsapp_icon.html" %}
+        <span>Contactar</span>
+      </a>
+    </div>
+  </div>
+</div>

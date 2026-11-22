@@ -41,7 +41,7 @@
         <h1 class="serif">Resultados de su consulta</h1>
       {% endif %}
       <p class="results-meta">
-        {{ identity.document_type|document_number_label }} {{ identity.document_number }}{% if identity.document_type %} · {{ identity.document_type|document_type_label }}{% endif %}{% if identity.rues_active is not None %} · {% if identity.rues_active %}Activa en el registro mercantil (RUES){% else %}Inactiva en el registro mercantil (RUES){% endif %}{% endif %}
+        {{ identity.document_type|document_number_label }} {{ identity.document_number }}{% if identity.document_type %} · {{ identity.document_type|document_type_label }}{% endif %}
         <br>Consulta realizada el {{ searched_at|date:"j \d\e F \d\e Y" }}
       </p>
       {% if not identity.party_name and not identity.source_declared_name %}

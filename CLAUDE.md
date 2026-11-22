@@ -8,8 +8,10 @@ Full background, legal context, glossary and decision log: @docs/project-context
 
 ## Current phase
 
-Storage and enrichment only. Commercial exploitation is explicitly out of scope —
-do not build outreach, scoring-for-sales, or contact workflows yet.
+Storage and enrichment, plus one narrow conversion surface on the web (D29).
+Outreach (contacting anyone first), scoring-for-sales and lead forms remain out
+of scope — don't build them, or any other commercial call to action, without an
+explicit decision recorded in `docs/project-context.md`'s decision log.
 
 Exception: `web/` (see below) includes a document-number search — a search bar
 in the home hero, submitting to a consolidated `/resultados/` page — rather than
@@ -32,6 +34,14 @@ from a local Parquet cache (`judicial_deposits/core_cache.py`, synced from S3 by
 live S3: `core/` Parquet isn't partitioned by `party_id`, so a filtered read
 against the real bucket range-scans most of the file over HTTP (15-50s per
 query, measured); the same query against a local copy is sub-100ms.
+
+The one approved call to action (D29): while the latest publication's claim
+window is open, the radar detail page closes its current-publication block with
+a masked deposit preview (`judicial_deposits/preview.py`) — one readable row,
+up to three faded rows that reach the browser already masked, never the
+counterparty — ending in a single «Contactar» link to WhatsApp
+(`settings.CONTACT_WHATSAPP_NUMBER`). No form, nothing stored: the visitor
+starts the conversation. `/resultados/` has no such button.
 
 Phases 0–4 (profiling → canonical model → ingestion → identity → lifecycle) are
 done. Phase 5 (external enrichment) is in progress. Phase 6 (role inference) is
@@ -165,7 +175,8 @@ Adding a radar means adding an app and registering it; the shell is not edited.
   info-only landing page (what it is, aggregate stats);
   `/depositos-judiciales/resultado/?nit=` is its detail page for one document
   number. `party_search.py`/`core_cache.py` query `core/*` via the local Parquet
-  cache; `radar.py` is its registration.
+  cache; `preview.py` builds the detail page's masked deposit preview (D29);
+  `radar.py` is its registration.
 - `cms` — editorial pages, articles ("Aprenda", `/guias/`), footer, sitemap.
 
 Code (apps, views, templates, static files, variables, URL names) is named in

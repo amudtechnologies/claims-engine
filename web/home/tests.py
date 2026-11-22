@@ -1,3 +1,4 @@
+import dataclasses
 from datetime import date
 from unittest import mock
 
@@ -124,7 +125,7 @@ class ResultsTests(TestCase):
         with mock.patch.dict(radars._REGISTRY, {spec.slug: patched}, clear=True):
             return self.client.get("/resultados/?nit=890300279")
 
-    def _match(self, claimable=None, claim_status="reclamable"):
+    def _match(self, claimable=None, claim_status="reclamable", first_appearance=False):
         return radars.RadarMatch(
             document_number="890300279",
             party_name="ACME SAS",
@@ -134,7 +135,11 @@ class ResultsTests(TestCase):
             finding_count=7980,
             total_amount_cop=3_701_871_805,
             detail_url="/depositos-judiciales/resultado/?nit=890300279",
-            extra={"claim_status": claim_status, "claimable": claimable},
+            extra={
+                "claim_status": claim_status,
+                "claimable": claimable,
+                "first_appearance": first_appearance,
+            },
         )
 
     def test_results_render_each_radars_own_row(self):
@@ -150,6 +155,7 @@ class ResultsTests(TestCase):
         response = self._render_results(self._match(claimable))
         self.assertContains(response, "ACME SAS")
         self.assertContains(response, "NIT 890300279")
+        self.assertNotContains(response, "registro mercantil")
         # Historical and claimable-now figures are separate columns.
         self.assertContains(response, "7.980 · $ 3.701.871.805")
         self.assertContains(response, "320 · $ 232.457.445")
@@ -165,14 +171,49 @@ class ResultsTests(TestCase):
         self.assertNotContains(response, "Otros radares")
         self.assertContains(
             response,
-            "«En plazo de reclamo» significa que la publicación sigue dentro de los 20 días "
-            "hábiles para reclamar ante el juzgado. No confirma que el dinero le corresponda "
-            "ni que aún no haya sido entregado.",
+            "«En plazo de reclamo» significa que la publicación sigue dentro del plazo para "
+            "reclamar ante el juzgado. No confirma que el dinero le corresponda ni que aún no "
+            "haya sido entregado.",
         )
         self.assertContains(response, 'content="noindex,nofollow"')
         # A per-query page: no nav item is active.
         self.assertNotContains(response, 'class="is-active"')
         self.assertNotContains(response, "Qué puede hacer ahora")
+
+    def test_first_appearance_replaces_repeated_history(self):
+        claimable = {
+            "count": 4,
+            "amount_cop": 141_653_377,
+            "closes_on": date(2026, 12, 31),
+            "business_days_left": 27,
+        }
+        match = dataclasses.replace(
+            self._match(claimable, first_appearance=True),
+            finding_count=4,
+            total_amount_cop=141_653_377,
+        )
+        response = self._render_results(match)
+        html = response.content.decode()
+        self.assertContains(response, 'jd-tag--first">Primera vez<')
+        # The figures show once, in "En plazo de reclamo", not twice.
+        self.assertEqual(html.count("4 · $ 141.653.377"), 1)
+
+    def test_first_appearance_keeps_figures_once_the_window_closes(self):
+        match = self._match(claim_status="no_reclamable", first_appearance=True)
+        response = self._render_results(match)
+        self.assertContains(response, "7.980 · $ 3.701.871.805")
+        self.assertContains(response, 'jd-tag--first">Primera vez<')
+
+    def test_returning_party_shows_history_figures(self):
+        claimable = {
+            "count": 320,
+            "amount_cop": 232_457_445,
+            "closes_on": date(2026, 11, 17),
+            "business_days_left": 6,
+        }
+        response = self._render_results(self._match(claimable))
+        self.assertNotContains(response, "Primera vez")
+        self.assertContains(response, "7.980 · $ 3.701.871.805")
 
     def test_results_without_open_window_show_nothing_current(self):
         response = self._render_results(self._match(claim_status="no_reclamable"))

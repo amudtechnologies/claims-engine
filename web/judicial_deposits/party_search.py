@@ -48,6 +48,10 @@ class Deposit:
     # `core/court.court_account`, the court's Banco Agrario account — its
     # first five digits are the DANE code of the court's municipality.
     court_account: str | None = None
+    # `core/claim.deposit_no` and `core/court.city` — only the detail page's
+    # deposit preview reads them (judicial_deposits/preview.py), masked.
+    deposit_no: str | None = None
+    city: str | None = None
 
 
 @dataclass(frozen=True)
@@ -250,6 +254,16 @@ def publication(result: PartySearchResult, period: str | None) -> CurrentPublica
     )
 
 
+def is_first_appearance(result: PartySearchResult, latest_period: str | None) -> bool:
+    """Every deposit comes from the latest publication: the party has never
+    appeared before, so its history would only repeat the current figures.
+    A deposit with no known period disqualifies it — "primera vez" must be
+    certain. Shared by /resultados/ and the detail page."""
+    return bool(result.deposits) and all(
+        deposit.period == latest_period for deposit in result.deposits
+    )
+
+
 def current_publication(
     result: PartySearchResult, latest_period: str | None
 ) -> CurrentPublication | None:
@@ -405,7 +419,7 @@ def _fetch_deposits(con: duckdb.DuckDBPyConnection, party_id: str) -> list[Depos
         f"""
         WITH party_claims AS (
             SELECT cp.claim_id, cp.procedural_role, cp.attributes, c.court_id,
-                   c.amount_cop, c.origin_date
+                   c.amount_cop, c.origin_date, c.deposit_no
             FROM read_parquet('{core_cache.table_path('claim_party')}') cp
             JOIN read_parquet('{core_cache.table_path('claim')}') c USING (claim_id)
             WHERE cp.party_id = ?
@@ -438,7 +452,9 @@ def _fetch_deposits(con: duckdb.DuckDBPyConnection, party_id: str) -> list[Depos
             party_claims.procedural_role,
             claim_periods.period,
             claim_periods.source,
-            party_claims.attributes
+            party_claims.attributes,
+            party_claims.deposit_no,
+            courts.city
         FROM party_claims
         LEFT JOIN claim_periods USING (claim_id)
         LEFT JOIN court_names USING (court_id)
@@ -457,6 +473,8 @@ def _fetch_deposits(con: duckdb.DuckDBPyConnection, party_id: str) -> list[Depos
             period=period,
             source=source,
             source_declared_name=json.loads(attributes)["name"] if attributes else None,
+            deposit_no=deposit_no,
+            city=city,
         )
         for (
             claim_id,
@@ -468,6 +486,8 @@ def _fetch_deposits(con: duckdb.DuckDBPyConnection, party_id: str) -> list[Depos
             period,
             source,
             attributes,
+            deposit_no,
+            city,
         ) in rows
     ]
 

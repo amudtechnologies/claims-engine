@@ -1,7 +1,7 @@
 # Claims engine — project context
 
 Background, definitions and decision log. Referenced from `CLAUDE.md`.
-Last updated: 2026-08-22.
+Last updated: 2026-11-22.
 
 ---
 
@@ -149,13 +149,32 @@ deposits; we verify which ones are yours," never "this money is yours."
 ### Scope
 
 - **D01.** Current focus is storage and enrichment. Commercial exploitation is
-  deferred.
+  deferred. *(Narrowed by D29, 2026-11-22 — one inbound call to action on the
+  web.)*
 - **D02.** Everything is stored, but initial work targets **legal entities**, both as
   plaintiff and as defendant.
 - **D03.** Only case types and court offices where it is near-certain the plaintiff is
   the creditor are considered. *(Weakest decision in this list — see §8.1.)*
 - **D04.** The 2017–2025 history is not a prospect list — that money has prescribed —
   but **ground truth** for market sizing, measuring claim rates, and calibrating rules.
+- **D29.** (2026-11-22) First commercial surface, deliberately narrow. While the
+  latest publication's claim window is open, the radar detail page shows a
+  deposit preview — the largest deposit's row readable (court, city, date,
+  amount; deposit number and judicial account masked to their first digits),
+  up to three more rows faded out — and a single «Contactar» link to WhatsApp
+  whose message names the number consulted. Why: the money is in executing
+  the claim (verification, reconstructing the case, filing), not in exclusive
+  access to public data — the site's own transparency copy says so — and a
+  visible row both proves the finding is real and gives a reason to talk.
+  Constraints: faded rows are masked **server-side** (`preview.py`), never
+  real values hidden by CSS; the counterparty is never shown; no form and
+  nothing stored — the visitor starts the conversation, so this stays inbound
+  and compatible with D24's self-lookup pattern (no outbound contact). Not
+  approved: a «Reclamar» button on `/resultados/`, lead forms, fee copy.
+  Open: whether a court can locate a deposit by the party's ID alone — if it
+  needs the deposit number, masking it conditions the right to claim on
+  contacting AMUD; revisit with counsel. Also open: who answers WhatsApp and
+  how fast while a window is running.
 
 ### Architecture
 

@@ -24,6 +24,9 @@
 
 {% include "judicial_deposits/_role_cards.html" with summary=pub.summary %}
 
+{# The open-window call to action: after the figures, before the optional charts. Only the latest publication's block gets it (the view sets deposit_preview for it alone). #}
+{% if chart_scope == "current" and deposit_preview %}{% include "judicial_deposits/_deposit_preview.html" with preview=deposit_preview %}{% endif %}
+
 {% if pub_charts %}
   <div class="jd-charts jd-charts--compact{% if not pub.claimable %} is-muted{% endif %}">
     {% for chart in pub_charts %}{% include "judicial_deposits/_chart.html" %}{% endfor %}
