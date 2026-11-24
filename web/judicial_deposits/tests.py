@@ -1,3 +1,4 @@
+import dataclasses
 import io
 import tempfile
 from datetime import date
@@ -366,14 +367,26 @@ class DetailPageTests(TestCase):
         )
         self.assertContains(
             response,
-            "Contáctenos para ver el detalle completo de todos sus depósitos y gestionar su "
-            "reclamación.",
+            "Contáctenos para ver el detalle completo de estos depósitos y verificar si le "
+            "corresponde reclamarlos.",
         )
         # "Contactar" next to "Ver más detalles", and again under the table.
         self.assertContains(response, 'href="https://wa.me/573054381677?text=', count=2)
         self.assertContains(response, "data-jd-more-toggle")
         self.assertContains(response, "deposit_preview.js")
         self.assertContains(response, "consult%C3%A9%20el%20NIT%20890300279")
+
+    def test_defendant_only_gets_ownership_note(self):
+        note = "Que aparezca como demandado no significa que el dinero sea de la otra parte"
+        self._with_preview_deposits()
+        self.assertNotContains(self._request(), note)
+        self.result = dataclasses.replace(
+            self.result,
+            deposits=[
+                dataclasses.replace(d, procedural_role="defendant") for d in self.result.deposits
+            ],
+        )
+        self.assertContains(self._request(), note)
 
     def test_closed_window_has_no_preview(self):
         self._with_preview_deposits()
@@ -402,25 +415,30 @@ class DetailPageTests(TestCase):
         deposits += [deposit("2025-1", 500, city="PEREIRA", role="defendant")]
         self.result = _result(deposits)
 
-    def test_previous_publications_list_and_paging(self):
+    def test_previous_publications_list_and_sample(self):
         self._with_long_history()
         html = self._request().content.decode()
         history_html = html[html.index("Publicaciones anteriores") :]
-        self.assertIn("Aparece en 2 publicaciones anteriores, desde 2025-1.", history_html)
+        self.assertNotIn("publicaciones anteriores, desde", history_html)
         # Totals leave out the latest publication.
         self.assertIn('<div class="jd-summary-num mono">24</div>', history_html)
-        # The most recent previous publication opens by default, page 1.
+        # The most recent previous publication opens by default: its five
+        # largest deposits and how many (and how much) are left.
         self.assertIn(">2025-2</a>", history_html)
-        self.assertIn("Mostrando 1–10 de 23 · ordenados por valor", history_html)
+        self.assertEqual(history_html.count("Demandante</td>"), 5)
+        self.assertIn("18 depósitos más por $ 180.153 <span", history_html)
+        self.assertIn("· Contáctenos para ver el histórico completo", history_html)
+        self.assertIn('<span class="jd-pub-shown">5 de 23</span>', history_html)
+        # Only two previous publications: nothing hidden, so no "Contactar".
+        self.assertNotIn("https://wa.me/", history_html)
+        self.assertNotIn("Mostrando", history_html)
         self.assertIn("pub=ninguna", history_html)
         # Closing it keeps everything closed.
         html = self._request(url=DETAIL_URL + "&pub=ninguna").content.decode()
         self.assertIn(">2025-2</a>", html)
         self.assertNotIn("jd-pub-deposits", html)
 
-        html = self._request(url=DETAIL_URL + "&pub=2025-2&page=3").content.decode()
-        self.assertIn("Mostrando 21–23 de 23 · ordenados por valor", html)
-        self.assertIn('aria-current="page">3<', html)
+        html = self._request(url=DETAIL_URL + "&pub=2025-2").content.decode()
         self.assertIn("Bogotá D.C.", html)
         self.assertIn("40010••••••••••", html)
         self.assertIn("1100••••••••", html)
@@ -454,7 +472,10 @@ class DetailPageTests(TestCase):
             html.index("Última publicación · 2026-2"), html.index("Publicaciones anteriores")
         )
         self.assertContains(
-            response, "Plazo de reclamo hasta el 17/11/2026 · quedan 6 días hábiles"
+            response,
+            "Plazo de reclamo hasta el <strong>17/11/2026</strong>"
+            '<span class="jd-deadline-sep"> · </span>'
+            '<span class="jd-deadline-left">quedan 6 días hábiles</span>',
         )
         self.assertContains(response, 'jd-tag--open">Plazo abierto<')
         self.assertNotContains(response, "is-absent")
@@ -529,7 +550,7 @@ class DetailPageTests(TestCase):
         response = self._request()
         self.assertContains(response, '<meta name="robots" content="noindex,nofollow">')
         self.assertContains(response, 'href="/resultados/?nit=890300279">&larr; Volver al resumen')
-        self.assertContains(response, 'class="btn btn-secondary">Nueva consulta')
+        self.assertContains(response, 'class="btn btn-primary jd-again-btn">Nueva consulta')
         self.assertContains(response, 'class="masthead"')
         # The "Fuente: … · periodo" line was removed from this page on purpose.
         self.assertNotContains(response, "· periodo 2026-2")
@@ -936,12 +957,15 @@ class RealCacheTests(TestCase):
         self.assertContains(response, '<div class="jd-summary-num mono">$ 232.457.445</div>')
         # The same 6 business days as /resultados/.
         self.assertContains(
-            response, "Plazo de reclamo hasta el 17/11/2026 · quedan 6 días hábiles"
+            response,
+            "Plazo de reclamo hasta el <strong>17/11/2026</strong>"
+            '<span class="jd-deadline-sep"> · </span>'
+            '<span class="jd-deadline-left">quedan 6 días hábiles</span>',
         )
         # "Publicaciones anteriores" leaves out the latest publication's 320.
         self.assertContains(response, '<div class="jd-summary-num mono">7.660</div>')
         self.assertContains(response, '<div class="jd-summary-num mono">$ 3.469.414.360</div>')
-        self.assertContains(response, "Aparece en 16 publicaciones anteriores, desde 2018-1.")
+        self.assertNotContains(response, "publicaciones anteriores, desde")
         self.assertContains(response, "BANCO DE OCCIDENTE</h2>")
         # Every chart's table totals the history.
         self.assertEqual(html.count('<td class="mono">7.660</td>'), 3)
@@ -1004,18 +1028,12 @@ class PreviewTests(TestCase):
 
 
 class HistoryListTests(TestCase):
-    def test_pager_links_collapse_with_gaps(self):
-        self.assertEqual(history._pager_links(1, 19), [1, 2, None, 19])
-        self.assertEqual(history._pager_links(10, 19), [1, None, 9, 10, 11, None, 19])
-        self.assertEqual(history._pager_links(1, 1), [1])
-
-    def test_page_is_clamped(self):
+    def test_publication_sample_is_the_five_largest(self):
         deposits = [_deposit("2025-1", amount) for amount in range(1, 26)]
-        rows, info = history.publication_page(deposits, "2025-1", 99)
-        self.assertEqual((info.page, info.pages, info.start, info.end), (3, 3, 21, 25))
-        self.assertEqual(len(rows), 5)
-        rows, info = history.publication_page(deposits, "2025-1", 1)
-        self.assertEqual(rows[0].amount_cop, 25)
+        sample = history.publication_sample(deposits, "2025-1")
+        self.assertEqual([row.amount_cop for row in sample], [25, 24, 23, 22, 21])
+        small = history.publication_sample(deposits[:2], "2025-1")
+        self.assertEqual(len(small), 2)
 
     def test_city_display_name(self):
         for raw in ("Bogota", "BOGOTA", "Bogotá, D.C.", "Bogotá D.C"):

@@ -56,12 +56,25 @@
 .jd-block--current.is-absent { background: rgba(197, 164, 109, 0.14); border-color: rgba(197, 164, 109, 0.55); border-left-color: var(--gold); }
 .jd-block--current.is-absent .jd-panel-title { color: #6e5320; }
 .jd-block--current .jd-summary-num { font-size: 1.9rem; }
-.jd-deadline { margin: -6px 0 20px 0; font-size: 1.02rem; font-weight: 600; color: var(--ink); }
-.jd-deadline--closed { color: var(--ink-softer); font-weight: 500; }
+/* A neutral pill under the status tag: green stays on "Plazo abierto", the
+   deadline reads as the plain fact, with the date in bold. */
+.jd-deadline { width: fit-content; margin: -6px 0 20px 0; padding: 5px 12px; border: 1px solid var(--hair-strong); border-radius: 8px; background: var(--white); color: var(--ink-soft); font-size: 0.8rem; font-weight: 500; line-height: 1.4; }
+.jd-deadline strong { color: var(--ink); font-weight: 700; }
+.jd-deadline--closed { background: var(--mist); border-color: transparent; }
 .jd-absent { margin: 0; font-size: 1rem; font-weight: 600; color: var(--ink-soft); }
 
 .jd-block-note { margin: 16px 0 0 0; padding-top: 14px; border-top: 1px dashed var(--hair-strong); font-size: 0.8rem; line-height: 1.55; color: var(--ink-softer); }
-.jd-detail-actions { margin: 8px 0 24px 0; }
+/* Closing banner of the detail page: a full-width light band, set apart from
+   the navy footer right below it. */
+.jd-again { background: #e3f5f2; border-top: 1px solid #a9ddd5; color: var(--ink); padding: 56px 0; }
+.jd-again-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 40px; }
+.jd-again-title { margin: 0 0 6px; font-size: clamp(1.4rem, 3vw, 1.9rem); color: var(--navy); }
+.jd-again-text p { margin: 0; color: var(--ink-soft); }
+.jd-again-btn { padding: 14px 28px; }
+@media (max-width: 640px) {
+  .jd-again { padding: 40px 0; }
+  .jd-again-btn { width: 100%; justify-content: center; }
+}
 .jd-source { margin: 0; padding-top: 16px; border-top: 1px solid var(--hair); font-size: 0.8rem; line-height: 1.55; color: var(--ink-softer); }
 .jd-source a { color: var(--ink-soft); text-decoration: underline; text-decoration-color: var(--hair-strong); text-underline-offset: 3px; }
 
@@ -170,6 +183,11 @@
 .fact-num { font-weight: 700; color: var(--ink); flex: none; }
 
 @media (max-width: 640px) {
+  /* Two lines on purpose instead of a wrap that strands "·" and starts the
+     second line with a lowercase "quedan". */
+  .jd-deadline-sep { display: none; }
+  .jd-deadline-left { display: block; }
+  .jd-deadline-left::first-letter { text-transform: uppercase; }
   .fact-item { flex-basis: 100%; }
   .fact-item:nth-child(-n+3) { border-top: 1px solid var(--hair); }
   .fact-item:first-child { border-top: none; }
@@ -291,7 +309,7 @@ a.radar-card:hover .radar-card-arrow, a.radar-card:focus-visible .radar-card-arr
 .jd-demo-detail .jd-block { margin-bottom: 14px; padding: 16px 18px; }
 .jd-demo-detail .jd-block:last-child { margin-bottom: 0; }
 .jd-demo-detail .jd-panel-title { font-size: 0.7rem; margin-bottom: 12px; }
-.jd-demo-detail .jd-deadline { margin: -4px 0 14px 0; font-size: 0.88rem; }
+.jd-demo-detail .jd-deadline { margin: -4px 0 14px 0; font-size: 0.76rem; }
 .jd-demo-detail .jd-party-summary { gap: 20px; margin-bottom: 14px; }
 .jd-demo-detail .jd-summary-num, .jd-demo-detail .jd-block--current .jd-summary-num { font-size: 1.2rem; white-space: nowrap; }
 .jd-demo-detail .jd-summary-label { font-size: 0.74rem; }
@@ -329,10 +347,11 @@ a.radar-card:hover .radar-card-arrow, a.radar-card:focus-visible .radar-card-arr
 .jd-more-text { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .jd-more-text strong { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; line-height: 1.3; color: var(--white); }
 .jd-more-text span { font-size: 0.95rem; color: var(--on-navy-soft); }
-.jd-more-toggle { display: inline-flex; align-items: center; gap: 8px; padding: 14px 24px; border: none; border-radius: 10px; background: var(--teal); color: var(--white); font: inherit; font-weight: 800; font-size: 1rem; white-space: nowrap; cursor: pointer; }
+.jd-more-note { flex: 1 1 100%; margin: 0; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.12); font-size: 0.88rem; color: var(--on-navy-soft); }
+.jd-more-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-sizing: border-box; min-height: 50px; padding: 0 24px; border: none; border-radius: 10px; background: var(--teal); color: var(--white); font: inherit; font-weight: 800; font-size: 1rem; white-space: nowrap; cursor: pointer; }
 .jd-more-toggle[hidden] { display: none; }
 .jd-more-toggle:hover { background: var(--teal-ink); }
-.jd-more-wa { display: inline-flex; align-items: center; gap: 8px; padding: 13px 22px; border: 1.5px solid rgba(255, 255, 255, 0.55); border-radius: 10px; color: var(--white); font-weight: 700; font-size: 1rem; white-space: nowrap; text-decoration: none; }
+.jd-more-wa { display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-sizing: border-box; min-height: 50px; padding: 0 22px; border: 1.5px solid rgba(255, 255, 255, 0.55); border-radius: 10px; color: var(--white); font-weight: 700; font-size: 1rem; white-space: nowrap; text-decoration: none; }
 .jd-more-wa:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--white); color: var(--white); }
 .jd-more-toggle:focus-visible, .jd-more-wa:focus-visible { outline: 2px solid var(--white); outline-offset: 2px; }
 .jd-more-toggle svg { transition: transform 0.15s ease; }
@@ -350,6 +369,7 @@ a.radar-card:hover .radar-card-arrow, a.radar-card:focus-visible .radar-card-arr
 .jd-more-table .num { text-align: right; }
 .jd-more-table .mono { white-space: nowrap; font-variant-numeric: tabular-nums; }
 .jd-more-court, .jd-more-amount { font-weight: 600; }
+.jd-more-amount { white-space: nowrap; }
 .jd-more-faded { user-select: none; pointer-events: none; }
 .jd-more-faded--1 { opacity: 0.35; filter: blur(2px); }
 .jd-more-faded--2 { opacity: 0.2; filter: blur(2.5px); }
@@ -363,13 +383,11 @@ a.radar-card:hover .radar-card-arrow, a.radar-card:focus-visible .radar-card-arr
 
 /* PUBLICACIONES ANTERIORES — per-publication list (history.py): one summary
    row per publication; the open one shows a page of ten deposits. */
-.jd-history-lead { margin: 0 0 14px; font-weight: 600; color: var(--ink); }
 /* Its own card, right under the figures: the list is the block's main content. */
 .jd-pubs { margin: 22px 0; padding: 22px 22px 18px; display: flex; flex-direction: column; gap: 14px; background: var(--surface); border: 1px solid var(--hair); border-top: 4px solid var(--teal-ink); border-radius: 14px; box-shadow: 0 10px 28px rgba(16, 31, 53, 0.08); scroll-margin-top: 90px; }
 .jd-pubs-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 10px 16px; }
 .jd-pubs-title { margin: 0; font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; line-height: 1.3; color: var(--ink); }
 .jd-pubs-hint { margin: 2px 0 0; font-size: 0.95rem; color: var(--ink-soft); }
-.jd-pubs-count { padding: 5px 12px; border-radius: 999px; background: #eef8f6; color: var(--teal-ink); font-size: 0.82rem; font-weight: 700; white-space: nowrap; }
 
 .jd-pubs-table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--hair); border-radius: var(--r-md); }
 .jd-pubs-table, .jd-pub-deposits { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
@@ -381,7 +399,7 @@ a.radar-card:hover .radar-card-arrow, a.radar-card:focus-visible .radar-card-arr
 .jd-pubs-table .mono, .jd-pub-deposits .mono { white-space: nowrap; font-variant-numeric: tabular-nums; }
 .jd-pub-period a { font-weight: 700; color: var(--ink); text-decoration: none; }
 .jd-pub-period a:hover { color: var(--accent-text); text-decoration: underline; }
-.jd-pub-amount { font-weight: 600; }
+.jd-pub-amount { font-weight: 600; white-space: nowrap; }
 .jd-pub-toggle { width: 44px; text-align: right; }
 .jd-pub-toggle a { display: inline-flex; padding: 6px; border-radius: 6px; color: var(--accent-text); }
 .jd-pub-toggle a:hover { background: var(--ground); }
@@ -389,25 +407,47 @@ a.radar-card:hover .radar-card-arrow, a.radar-card:focus-visible .radar-card-arr
 .jd-pub-detail > td { padding: 0 14px 16px; background: #eef8f6; }
 .jd-pub-detail-inner { display: flex; flex-direction: column; gap: 12px; }
 .jd-pub-deposits tr:last-child td { border-bottom: none; }
-.jd-pub-more td { text-align: center; border-bottom: none; }
-.jd-pub-more a { font-weight: 600; font-size: 0.9rem; }
+.jd-pub-more td { border-bottom: none; padding-top: 14px; }
 
-.jd-pager { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; }
-.jd-pager-status { font-size: 0.82rem; color: var(--ink-soft); }
-.jd-pager-links { display: flex; align-items: center; gap: 6px; }
-.jd-pg { display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; padding: 0 8px; border-radius: 8px; border: 1px solid var(--hair-strong); background: var(--surface); font-size: 0.85rem; font-weight: 600; color: var(--ink); text-decoration: none; }
-a.jd-pg:hover { border-color: var(--teal-ink); color: var(--teal-ink); }
-.jd-pg.is-current { background: var(--teal-ink); border-color: var(--teal-ink); color: var(--white); }
-.jd-pg.is-disabled { opacity: 0.4; }
-.jd-pg-gap { color: var(--ink-softer); padding: 0 2px; }
+/* The publication list fades the same way towards its own "Contactar";
+   an opened publication is always shown at full strength. */
+.jd-pub--2:not(.is-open) > td { opacity: 0.8; }
+.jd-pub--3:not(.is-open) > td { opacity: 0.6; }
+.jd-pub--4:not(.is-open) > td { opacity: 0.42; }
+.jd-pub--5:not(.is-open) > td { opacity: 0.26; }
+/* An opened publication's five deposits fade out row by row. Opacity only: these
+   are real, readable rows (masked server-side where needed), not hidden ones. */
+.jd-pub-row--2 td { opacity: 0.5; }
+.jd-pub-row--3 td { opacity: 0.25; }
+.jd-pub-row--4 td { opacity: 0.12; }
+.jd-pub-row--5 td { opacity: 0.06; }
+.jd-pub-foot { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+.jd-pub-shown { margin-left: auto; font-size: 0.78rem; color: var(--ink-softer); white-space: nowrap; }
+.jd-pub-rest { margin: 0; padding: 0 4px; font-size: 0.88rem; font-weight: 600; color: var(--ink); }
+.jd-pub-rest-note { font-weight: 400; color: var(--ink-soft); }
+.jd-pub-cta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; padding: 2px 4px; }
+.jd-pub-cta p { margin: 0; font-size: 0.85rem; color: var(--ink-soft); }
+.jd-pub-cta-rest { color: var(--ink); font-weight: 600; }
+.jd-pub-contact { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid var(--teal-ink); border-radius: 8px; color: var(--teal-ink); font-size: 0.85rem; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.jd-pub-contact svg { width: 15px; height: 15px; }
+.jd-pub-contact:hover { background: var(--teal-ink); color: var(--white); }
+/* The end of the list: the older publications are only reachable through
+   "Contactar", so this one stands out (tinted box, filled button). */
+.jd-pub-cta--more { padding: 16px 18px; border: 1px solid #a9ddd5; border-radius: var(--r-md); background: #eef8f6; }
+.jd-pub-cta--more p { font-size: 0.95rem; color: var(--ink); }
+.jd-pub-cta--more .jd-pub-cta-rest { font-weight: 700; }
+.jd-pub-cta--more .jd-pub-contact { padding: 9px 16px; font-size: 0.9rem; background: var(--teal-ink); color: var(--white); }
+.jd-pub-cta--more .jd-pub-contact:hover { background: var(--navy); border-color: var(--navy); }
 
 @media (max-width: 640px) {
   /* The publication list becomes stacked cards; only the open publication's
      deposit table scrolls sideways, inside its own box, so the counts, the
-     pager and "Ver N publicaciones más" stay on screen. */
+     contacts stay on screen. */
   .jd-pubs > .jd-pubs-table-wrap { overflow: visible; }
   .jd-pubs { padding: 18px 12px 14px; }
   .jd-more-bar { padding: 20px 18px; }
+  /* Stacked full width, same size: two buttons of different widths read as misaligned. */
+  .jd-more-actions { width: 100%; flex-direction: column; align-items: stretch; }
   .jd-pubs-table { display: block; width: 100%; min-width: 0; }
   .jd-pub-detail-inner, .jd-pub-detail-inner > .jd-pubs-table-wrap { max-width: 100%; min-width: 0; }
   .jd-pubs-table > thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }

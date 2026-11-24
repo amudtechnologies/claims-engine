@@ -20,6 +20,10 @@
         <span>Contactar</span>
       </a>
     </span>
+    {% if not pub.summary.plaintiff_count and pub.summary.defendant_count %}
+      {# Only as defendant: don't let "demandado" read as "this is what I owe" (project-context.md §3, structural ambiguity). #}
+      <p class="jd-more-note">Que aparezca como demandado no significa que el dinero sea de la otra parte: puede corresponderle a usted, por ejemplo si se levantó un embargo o sobró dinero de un remate.</p>
+    {% endif %}
   </div>
 
   <div class="jd-more-body" id="jd-more-body" data-jd-more-body>
@@ -27,31 +31,31 @@
       <table class="jd-more-table">
         <thead>
           <tr>
+            <th scope="col">Valor</th>
             <th scope="col">Juzgado</th>
             <th scope="col">Ciudad</th>
             <th scope="col">N.º de depósito</th>
             <th scope="col">Cuenta judicial</th>
             <th scope="col">Constituido</th>
-            <th scope="col" class="num">Valor</th>
           </tr>
         </thead>
         <tbody>
           <tr>
+            <td class="mono jd-more-amount">{{ preview.visible.amount }}</td>
             <td class="jd-more-court">{{ preview.visible.court }}</td>
             <td>{{ preview.visible.city }}</td>
             <td class="mono">{{ preview.visible.deposit_no }}</td>
             <td class="mono">{{ preview.visible.court_account }}</td>
             <td class="mono">{{ preview.visible.constituted_on }}</td>
-            <td class="mono num jd-more-amount">{{ preview.visible.amount }}</td>
           </tr>
           {% for row in preview.faded %}
             <tr class="jd-more-faded jd-more-faded--{{ forloop.counter }}" aria-hidden="true">
+              <td class="mono jd-more-amount">{{ row.amount }}</td>
               <td class="jd-more-court">{{ row.court }}</td>
               <td>{{ row.city }}</td>
               <td class="mono">{{ row.deposit_no }}</td>
               <td class="mono">{{ row.court_account }}</td>
               <td class="mono">{{ row.constituted_on }}</td>
-              <td class="mono num jd-more-amount">{{ row.amount }}</td>
             </tr>
           {% endfor %}
         </tbody>
@@ -61,9 +65,9 @@
     <div class="jd-more-cta">
       {% if preview.remaining_count %}
         <strong>{{ preview.remaining_count|es_co_number }} depósito{{ preview.remaining_count|pluralize }} más por <span class="jd-more-sum">{{ preview.remaining_amount_cop|cop }}</span></strong>
-        <p>Contáctenos para ver el detalle completo de todos sus depósitos y gestionar su reclamación.</p>
+        <p>Contáctenos para ver el detalle completo de estos depósitos y verificar si le corresponde reclamarlos.</p>
       {% else %}
-        <p>Contáctenos para ver el detalle completo de su depósito y gestionar su reclamación.</p>
+        <p>Contáctenos para ver el detalle completo de este depósito y verificar si le corresponde reclamarlo.</p>
       {% endif %}
       <a class="btn jd-more-contact" href="{{ whatsapp_url }}" target="_blank" rel="noopener">
         {% include "judicial_deposits/_whatsapp_icon.html" %}

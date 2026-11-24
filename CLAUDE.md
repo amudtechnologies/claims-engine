@@ -40,7 +40,9 @@ window is open, the radar detail page closes its current-publication block with
 a masked deposit preview (`judicial_deposits/preview.py`) — one readable row,
 up to three faded rows that reach the browser already masked, never the
 counterparty — ending in a single «Contactar» link to WhatsApp
-(`settings.CONTACT_WHATSAPP_NUMBER`). No form, nothing stored: the visitor
+(`settings.CONTACT_WHATSAPP_NUMBER`). The history lists the five most
+recent previous publications (each opened one shows its five largest
+deposits, masked the same way) and ends in the same «Contactar» for the rest. No form, nothing stored: the visitor
 starts the conversation. `/resultados/` has no such button.
 
 Phases 0–4 (profiling → canonical model → ingestion → identity → lifecycle) are

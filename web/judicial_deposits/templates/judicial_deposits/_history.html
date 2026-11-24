@@ -9,10 +9,6 @@
     {# Only in the latest publication: nothing earlier to show. #}
     <p class="jd-history-first">Primera vez: {% if summary.document_type == "natural_person" %}esta cédula{% elif summary.document_type == "legal_entity" %}este NIT{% else %}este número{% endif %} no aparece en ninguna publicación anterior.</p>
   {% else %}
-    {% if history_period_count %}
-      <p class="jd-history-lead">Aparece en {{ history_period_count|es_co_number }} publicaci{{ history_period_count|pluralize:"ón,ones" }} anterior{{ history_period_count|pluralize:"es" }}{% if history_period_count > 1 %}, desde {{ history_first_period }}{% endif %}.</p>
-    {% endif %}
-
     <div class="jd-party-summary">
       <div class="jd-summary-item">
         <div class="jd-summary-num mono">{{ summary.deposit_count|es_co_number }}</div>
@@ -32,7 +28,6 @@
           <h4 class="jd-pubs-title">Depósitos por publicación</h4>
           <p class="jd-pubs-hint">Abra una publicación para ver sus depósitos.</p>
         </div>
-        <span class="jd-pubs-count">{{ publication_count|es_co_number }} publicaci{{ publication_count|pluralize:"ón,ones" }} · {{ summary.deposit_count|es_co_number }} depósito{{ summary.deposit_count|pluralize }}</span>
       </div>
 
       {% if publication_rows %}
@@ -50,7 +45,7 @@
             </thead>
             <tbody>
               {% for row in publication_rows %}
-                <tr class="jd-pub{% if row.open %} is-open{% endif %}">
+                <tr class="jd-pub jd-pub--{{ forloop.counter }}{% if row.open %} is-open{% endif %}">
                   <td class="jd-pub-period"><a href="{{ row.url }}" aria-expanded="{% if row.open %}true{% else %}false{% endif %}">{{ row.group.period }}</a></td>
                   <td class="jd-pub-deadline">{% if row.group.closes_on %}<span class="jd-tag jd-tag--closed">Vencido el {{ row.group.closes_on|date:"d/m/Y" }}</span>{% else %}—{% endif %}</td>
                   <td class="mono num" data-label="Depósitos">{{ row.group.deposit_count|es_co_number }}</td>
@@ -66,43 +61,35 @@
                           <table class="jd-pub-deposits">
                             <thead>
                               <tr>
+                                <th scope="col">Valor</th>
                                 <th scope="col">Juzgado</th>
                                 <th scope="col">Ciudad</th>
                                 <th scope="col">N.º de depósito</th>
                                 <th scope="col">Cuenta judicial</th>
                                 <th scope="col">Constituido</th>
                                 <th scope="col">Rol</th>
-                                <th scope="col" class="num">Valor</th>
                               </tr>
                             </thead>
                             <tbody>
                               {% for deposit in history_rows %}
-                                <tr>
+                                <tr class="jd-pub-row--{{ forloop.counter }}">
+                                  <td class="mono jd-pub-amount">{{ deposit.amount_cop|cop }}</td>
                                   <td class="jd-more-court">{{ deposit.court }}</td>
                                   <td>{{ deposit.city }}</td>
                                   <td class="mono">{{ deposit.deposit_no }}</td>
                                   <td class="mono">{{ deposit.court_account }}</td>
                                   <td class="mono">{{ deposit.constituted_on }}</td>
                                   <td>{{ deposit.role }}</td>
-                                  <td class="mono num jd-pub-amount">{{ deposit.amount_cop|cop }}</td>
                                 </tr>
                               {% endfor %}
                             </tbody>
                           </table>
                         </div>
-                        <div class="jd-pager">
-                          <span class="jd-pager-status">Mostrando {{ history_page.start|es_co_number }}–{{ history_page.end|es_co_number }} de {{ history_page.total|es_co_number }} · ordenados por valor</span>
-                          {% if history_page.pages > 1 %}
-                            <nav class="jd-pager-links" aria-label="Páginas de {{ row.group.period }}">
-                              {% if prev_page_url %}<a class="jd-pg" href="{{ prev_page_url }}" aria-label="Página anterior">‹</a>{% else %}<span class="jd-pg is-disabled" aria-hidden="true">‹</span>{% endif %}
-                              {% for link in page_links %}
-                                {% if link.number is None %}<span class="jd-pg-gap" aria-hidden="true">…</span>
-                                {% elif link.number == history_page.page %}<span class="jd-pg is-current" aria-current="page">{{ link.number }}</span>
-                                {% else %}<a class="jd-pg" href="{{ link.url }}">{{ link.number }}</a>{% endif %}
-                              {% endfor %}
-                              {% if next_page_url %}<a class="jd-pg" href="{{ next_page_url }}" aria-label="Página siguiente">›</a>{% else %}<span class="jd-pg is-disabled" aria-hidden="true">›</span>{% endif %}
-                            </nav>
+                        <div class="jd-pub-foot">
+                          {% if history_remaining_count %}
+                            <p class="jd-pub-rest">{{ history_remaining_count|es_co_number }} depósito{{ history_remaining_count|pluralize }} más por {{ history_remaining_amount|cop }} <span class="jd-pub-rest-note">· Contáctenos para ver el histórico completo</span></p>
                           {% endif %}
+                          <span class="jd-pub-shown">{{ history_rows|length }} de {{ history_total|es_co_number }}</span>
                         </div>
                       </div>
                     </td>
@@ -111,7 +98,15 @@
               {% endfor %}
               {% if hidden_publications %}
                 <tr class="jd-pub-more">
-                  <td colspan="6"><a href="{{ show_all_url }}">Ver {{ hidden_publications|es_co_number }} publicaci{{ hidden_publications|pluralize:"ón,ones" }} más ({{ hidden_publications_range }})</a></td>
+                  <td colspan="6">
+                    <div class="jd-pub-cta jd-pub-cta--more">
+                      <p><span class="jd-pub-cta-rest">{{ hidden_publications|es_co_number }} publicaci{{ hidden_publications|pluralize:"ón,ones" }} más</span> · ¿Desea ver el histórico completo?</p>
+                      <a class="jd-pub-contact" href="{{ whatsapp_url }}" target="_blank" rel="noopener">
+                        {% include "judicial_deposits/_whatsapp_icon.html" %}
+                        <span>Contactar</span>
+                      </a>
+                    </div>
+                  </td>
                 </tr>
               {% endif %}
             </tbody>

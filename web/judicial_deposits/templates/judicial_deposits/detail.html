@@ -44,8 +44,16 @@
     {% else %}
       <p><strong>No encontramos depósitos judiciales</strong> para este número. Eso no descarta que existan. Solo indica que no aparecen en las publicaciones revisadas hasta ahora.</p>
     {% endif %}
+  </div>
+</section>
 
-    <p class="jd-detail-actions"><a href="{% url 'home:index' %}#buscar" class="btn btn-secondary">Nueva consulta</a></p>
+<section class="jd-again" aria-labelledby="jd-again-title">
+  <div class="wrap jd-again-inner">
+    <div class="jd-again-text">
+      <h2 id="jd-again-title" class="jd-again-title">¿Desea consultar otro número?</h2>
+      <p>Busque otro NIT o cédula en las publicaciones de depósitos judiciales.</p>
+    </div>
+    <a href="{% url 'home:index' %}#buscar" class="btn btn-primary jd-again-btn">Nueva consulta</a>
   </div>
 </section>
 {% endblock %}

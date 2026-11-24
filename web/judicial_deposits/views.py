@@ -114,7 +114,8 @@ def detail(request):
     context["first_appearance"] = party_search.is_first_appearance(party_result, latest_period)
     if current and current.claimable:
         context["deposit_preview"] = preview.build_preview(current.summary.deposits)
-        context["whatsapp_url"] = _whatsapp_url(party_result)
+    # Also behind the history list's "Contactar" (D29).
+    context["whatsapp_url"] = _whatsapp_url(party_result)
     periods = party_search.published_periods()
     context["current_charts"] = (
         insights.current_publication_charts(party_result.deposits, periods, latest_period)
@@ -141,35 +142,30 @@ CLOSED = "ninguna"
 def _add_history(request, context, party_result, periods, latest_period) -> None:
     """The "Publicaciones anteriores" block: every publication except the
     latest one (its deposits are the block above), its charts, and the
-    paginated per-publication list driven by the query string (history.py)."""
+    per-publication list (five deposits each) driven by the query string (history.py)."""
     previous = [d for d in party_result.deposits if d.period != latest_period]
     context["history_summary"] = dataclasses.replace(party_result, deposits=previous)
     context["charts"] = insights.history_charts(
         previous, [p for p in periods if p != latest_period], None
     )
-    history_periods = sorted({d.period for d in previous if d.period})
-    context["history_period_count"] = len(history_periods)
-    context["history_first_period"] = history_periods[0] if history_periods else None
 
     groups = history.publication_groups(previous)
+    # Only the most recent publications are listed; the older ones are a
+    # count behind "Contactar" (D29).
+    visible = groups[: history.VISIBLE_PUBLICATIONS]
+    hidden = groups[len(visible) :]
     # The most recent publication opens by default. Closing it sends
     # pub=ninguna, which matches no publication, so nothing reopens.
     opened = request.GET.get("pub") if "pub" in request.GET else (
-        groups[0].period if groups else None
+        visible[0].period if visible else None
     )
-    if not any(group.period == opened for group in groups):
+    if not any(group.period == opened for group in visible):
         opened = None
-    opened_index = next((i for i, g in enumerate(groups) if g.period == opened), 0)
-    show_all = request.GET.get("todas") == "1" or opened_index >= history.VISIBLE_PUBLICATIONS
-
-    base = {"nit": party_result.document_number}
 
     def url(**params) -> str:
-        merged = {**base, **({"todas": "1"} if show_all else {}), **params}
-        merged = {key: value for key, value in merged.items() if value not in (None, "")}
-        return f"{reverse('judicial_deposits:detail')}?{urlencode(merged)}#jd-publicaciones"
+        query = urlencode({"nit": party_result.document_number, **params})
+        return f"{reverse('judicial_deposits:detail')}?{query}#jd-publicaciones"
 
-    visible = groups if show_all else groups[: history.VISIBLE_PUBLICATIONS]
     context["publication_rows"] = [
         {
             "group": group,
@@ -178,25 +174,11 @@ def _add_history(request, context, party_result, periods, latest_period) -> None
         }
         for group in visible
     ]
-    context["publication_count"] = len(groups)
-    context["hidden_publications"] = len(groups) - len(visible)
-    context["hidden_publications_range"] = (
-        f"{groups[-1].period} a {groups[len(visible)].period}" if len(groups) > len(visible) else ""
-    )
-    context["show_all_url"] = url(todas="1")
+    context["hidden_publications"] = len(hidden)
     if opened:
-        try:
-            page = int(request.GET.get("page", "1"))
-        except ValueError:
-            page = 1
-        rows, info = history.publication_page(previous, opened, page)
+        rows = history.publication_sample(previous, opened)
+        group = next(group for group in visible if group.period == opened)
         context["history_rows"] = rows
-        context["history_page"] = info
-        context["page_links"] = [
-            {"number": number, "url": url(pub=opened, page=number) if number else None}
-            for number in info.links
-        ]
-        context["prev_page_url"] = url(pub=opened, page=info.page - 1) if info.page > 1 else None
-        context["next_page_url"] = (
-            url(pub=opened, page=info.page + 1) if info.page < info.pages else None
-        )
+        context["history_total"] = group.deposit_count
+        context["history_remaining_count"] = group.deposit_count - len(rows)
+        context["history_remaining_amount"] = group.amount_cop - sum(r.amount_cop for r in rows)

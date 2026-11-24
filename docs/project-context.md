@@ -175,6 +175,13 @@ deposits; we verify which ones are yours," never "this money is yours."
   needs the deposit number, masking it conditions the right to claim on
   contacting AMUD; revisit with counsel. Also open: who answers WhatsApp and
   how fast while a window is running.
+  *(Extended 2026-11-23:* the "Publicaciones anteriores" list on the same
+  page lists only the five most recent previous publications (fading out);
+  an opened one shows only its five largest deposits (fading out, masked the
+  same way). The older publications are a count followed by the same
+  «Contactar» link — shown whatever the window state, since those
+  publications' windows have closed. Same constraints: no form, nothing
+  stored.)
 
 ### Architecture
 

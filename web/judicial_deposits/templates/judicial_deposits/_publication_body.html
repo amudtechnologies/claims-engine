@@ -1,9 +1,9 @@
 {% load home_extras %}
 {# One publication's slice for this party (`pub`, a party_search.CurrentPublication): deadline, figures, note, role cards and the compact charts (`pub_charts`, ids under `chart_scope`). #}
 {% if pub.claimable %}
-  <p class="jd-deadline mono">Plazo de reclamo hasta el {{ pub.window.closes_on|date:"d/m/Y" }} · queda{{ pub.business_days_left|pluralize:",n" }} {{ pub.business_days_left }} día{{ pub.business_days_left|pluralize }} hábil{{ pub.business_days_left|pluralize:"es" }}</p>
+  <p class="jd-deadline">Plazo de reclamo hasta el <strong>{{ pub.window.closes_on|date:"d/m/Y" }}</strong><span class="jd-deadline-sep"> · </span><span class="jd-deadline-left">queda{{ pub.business_days_left|pluralize:",n" }} {{ pub.business_days_left }} día{{ pub.business_days_left|pluralize }} hábil{{ pub.business_days_left|pluralize:"es" }}</span></p>
 {% elif pub.window %}
-  <p class="jd-deadline jd-deadline--closed mono">Plazo de reclamo vencido el {{ pub.window.closes_on|date:"d/m/Y" }}</p>
+  <p class="jd-deadline jd-deadline--closed">Plazo de reclamo vencido el {{ pub.window.closes_on|date:"d/m/Y" }}</p>
 {% endif %}
 
 <div class="jd-party-summary">
