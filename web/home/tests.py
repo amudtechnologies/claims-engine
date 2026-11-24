@@ -232,3 +232,26 @@ class ResultsTests(TestCase):
         self.assertContains(response, "Nueva consulta")
         self.assertContains(response, "Avisarme si aparezco en un próximo listado")
         self.assertNotContains(response, "Otros radares")
+
+
+class PartyDisplayNameTests(TestCase):
+    def test_natural_person_keeps_two_letters_per_word(self):
+        from .templatetags.home_extras import party_display_name
+
+        self.assertEqual(
+            party_display_name("JUAN  PÉREZ GÓMEZ", "natural_person"), "JU••• PÉ••• GÓ•••"
+        )
+
+    def test_other_parties_are_shown_as_is(self):
+        from .templatetags.home_extras import party_display_name
+
+        self.assertEqual(party_display_name("BANCO X S.A.", "legal_entity"), "BANCO X S.A.")
+        self.assertEqual(party_display_name("BANCO X S.A.", None), "BANCO X S.A.")
+        self.assertEqual(party_display_name(None, "natural_person"), "")
+
+    def test_cop_for_type_masks_natural_persons_only(self):
+        from .templatetags.home_extras import cop_for_type
+
+        self.assertEqual(cop_for_type(36_161_788, "natural_person"), "$ 36.•••.•••")
+        self.assertEqual(cop_for_type(36_161_788, "legal_entity"), "$ 36.161.788")
+        self.assertEqual(cop_for_type(36_161_788, None), "$ 36.161.788")

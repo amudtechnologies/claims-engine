@@ -15,13 +15,15 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date
 
+from home.templatetags.home_extras import cop
+
 from . import party_search, preview
 from .party_search import Deposit
 
 # Deposits listed per opened publication.
 SAMPLE_SIZE = 5
 # Publications listed; older ones only as a count behind "Contactar".
-VISIBLE_PUBLICATIONS = 5
+VISIBLE_PUBLICATIONS = 3
 
 ROLE_LABELS = {"plaintiff": "Demandante", "defendant": "Demandado"}
 
@@ -43,6 +45,9 @@ class HistoryRow:
     court_account: str
     constituted_on: str
     role: str
+    # Shown: formatted, or masked on a natural person's page.
+    amount: str
+    # Only for sums, never rendered.
     amount_cop: int
 
 
@@ -69,20 +74,33 @@ def publication_groups(deposits: list[Deposit]) -> list[PublicationGroup]:
     return groups
 
 
-def publication_sample(deposits: list[Deposit], period: str) -> list[HistoryRow]:
-    """A publication's SAMPLE_SIZE largest deposits, masked."""
+def publication_sample(
+    deposits: list[Deposit], period: str, masked: bool = False
+) -> list[HistoryRow]:
+    """A publication's SAMPLE_SIZE largest deposits, masked. `masked` (a
+    natural person's page) cuts court, city and amount to two characters
+    and masks the role."""
     members = sorted(
         (d for d in deposits if d.period == period),
         key=lambda d: (-d.amount_cop, d.constituted_on or date.max, d.claim_id),
     )
     return [
         HistoryRow(
-            court=preview.court_display_name(d.court_office),
-            city=preview.city_display_name(d.city),
+            court=(
+                preview.mask_text(preview.court_display_name(d.court_office))
+                if masked
+                else preview.court_display_name(d.court_office)
+            ),
+            city=(
+                preview.mask_text(preview.city_display_name(d.city))
+                if masked
+                else preview.city_display_name(d.city)
+            ),
             deposit_no=preview.mask_digits(d.deposit_no, preview.DEPOSIT_NO_VISIBLE),
             court_account=preview.mask_digits(d.court_account, preview.COURT_ACCOUNT_VISIBLE),
             constituted_on=preview.mask_date(d.constituted_on),
-            role=ROLE_LABELS.get(d.procedural_role, "—"),
+            role=preview.MASK * 10 if masked else ROLE_LABELS.get(d.procedural_role, "—"),
+            amount=preview.mask_amount(d.amount_cop) if masked else cop(d.amount_cop),
             amount_cop=d.amount_cop,
         )
         for d in members[:SAMPLE_SIZE]

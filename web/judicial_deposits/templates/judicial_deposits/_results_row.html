@@ -9,10 +9,10 @@
     {# Same figures as the next column: say what's new instead of repeating them. #}
     <td data-label="Histórico"><span class="jd-tag jd-tag--first">Primera vez</span></td>
   {% else %}
-    <td class="mono" data-label="Histórico">{{ match.finding_count|es_co_number }} · {{ match.total_amount_cop|cop }}{% if match.extra.first_appearance %} <span class="jd-tag jd-tag--first">Primera vez</span>{% endif %}</td>
+    <td class="mono" data-label="Histórico">{{ match.finding_count|es_co_number }} · {{ match.total_amount_cop|cop_for_type:match.document_type }}{% if match.extra.first_appearance %} <span class="jd-tag jd-tag--first">Primera vez</span>{% endif %}</td>
   {% endif %}
   {% if claimable %}
-    <td class="mono results-claimable" data-label="En plazo de reclamo">{{ claimable.count|es_co_number }} · {{ claimable.amount_cop|cop }}</td>
+    <td class="mono results-claimable" data-label="En plazo de reclamo">{{ claimable.count|es_co_number }} · {{ claimable.amount_cop|cop_for_type:match.document_type }}</td>
     <td data-label="Plazo">
       <span class="results-deadline">
         <span>Hasta el {{ claimable.closes_on|date:"d/m/Y" }} <span class="results-deadline-left">(queda{{ claimable.business_days_left|pluralize:",n" }} {{ claimable.business_days_left }} día{{ claimable.business_days_left|pluralize }} hábil{{ claimable.business_days_left|pluralize:"es" }})</span></span>

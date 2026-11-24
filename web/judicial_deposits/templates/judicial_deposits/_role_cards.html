@@ -3,10 +3,10 @@
   <div class="jd-role-grid">
     <div class="jd-role-card">
       <div class="jd-role-label">Como demandante <span class="jd-role-hint">quien inició el proceso</span></div>
-      <div class="jd-role-nums mono">{{ summary.plaintiff_count|es_co_number }} depósito{{ summary.plaintiff_count|pluralize }} · {{ summary.plaintiff_amount_cop|cop }}</div>
+      <div class="jd-role-nums mono">{{ summary.plaintiff_count|es_co_number }} depósito{{ summary.plaintiff_count|pluralize }} · {{ summary.plaintiff_amount_cop|cop_for:mask_amounts }}</div>
     </div>
     <div class="jd-role-card">
       <div class="jd-role-label">Como demandado <span class="jd-role-hint">contra quien se inició el proceso</span></div>
-      <div class="jd-role-nums mono">{{ summary.defendant_count|es_co_number }} depósito{{ summary.defendant_count|pluralize }} · {{ summary.defendant_amount_cop|cop }}</div>
+      <div class="jd-role-nums mono">{{ summary.defendant_count|es_co_number }} depósito{{ summary.defendant_count|pluralize }} · {{ summary.defendant_amount_cop|cop_for:mask_amounts }}</div>
     </div>
   </div>

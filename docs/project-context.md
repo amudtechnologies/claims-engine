@@ -176,12 +176,20 @@ deposits; we verify which ones are yours," never "this money is yours."
   contacting AMUD; revisit with counsel. Also open: who answers WhatsApp and
   how fast while a window is running.
   *(Extended 2026-11-23:* the "Publicaciones anteriores" list on the same
-  page lists only the five most recent previous publications (fading out);
+  page lists only the three most recent previous publications (fading out);
   an opened one shows only its five largest deposits (fading out, masked the
   same way). The older publications are a count followed by the same
   «Contactar» link — shown whatever the window state, since those
   publications' windows have closed. Same constraints: no form, nothing
   stored.)
+  *(Extended 2026-11-24, natural persons:* on `/resultados/` and the detail
+  page, a party RUES classifies as `natural_person` gets its name cut to two
+  letters per word («JU••• PÉ•••»), every amount cut to its first two digits
+  («$ 36.•••.•••») and every deposit-table cell masked (court and city to two
+  letters), all server-side. A legal entity with a single current deposit gets
+  that row's court and city masked too (its amount stays). Unclassified parties
+  are not masked: most companies are still unclassified. Charts still show
+  amounts.)
 
 ### Architecture
 

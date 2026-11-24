@@ -15,7 +15,7 @@
         <div class="jd-summary-label">Depósitos encontrados</div>
       </div>
       <div class="jd-summary-item">
-        <div class="jd-summary-num mono">{{ summary.total_amount_cop|cop }}</div>
+        <div class="jd-summary-num mono">{{ summary.total_amount_cop|cop_for:mask_amounts }}</div>
         <div class="jd-summary-label">Valor total publicado</div>
       </div>
     </div>
@@ -50,7 +50,7 @@
                   <td class="jd-pub-deadline">{% if row.group.closes_on %}<span class="jd-tag jd-tag--closed">Vencido el {{ row.group.closes_on|date:"d/m/Y" }}</span>{% else %}—{% endif %}</td>
                   <td class="mono num" data-label="Depósitos">{{ row.group.deposit_count|es_co_number }}</td>
                   <td class="mono num" data-label="Juzgados">{{ row.group.court_count|es_co_number }}</td>
-                  <td class="mono num jd-pub-amount" data-label="Valor">{{ row.group.amount_cop|cop }}</td>
+                  <td class="mono num jd-pub-amount" data-label="Valor">{{ row.group.amount_cop|cop_for:mask_amounts }}</td>
                   <td class="jd-pub-toggle"><a href="{{ row.url }}" aria-label="{% if row.open %}Cerrar{% else %}Abrir{% endif %} {{ row.group.period }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{% if row.open %}M6 15l6-6 6 6{% else %}M6 9l6 6 6-6{% endif %}"/></svg></a></td>
                 </tr>
                 {% if row.open %}
@@ -73,7 +73,7 @@
                             <tbody>
                               {% for deposit in history_rows %}
                                 <tr class="jd-pub-row--{{ forloop.counter }}">
-                                  <td class="mono jd-pub-amount">{{ deposit.amount_cop|cop }}</td>
+                                  <td class="mono jd-pub-amount">{{ deposit.amount }}</td>
                                   <td class="jd-more-court">{{ deposit.court }}</td>
                                   <td>{{ deposit.city }}</td>
                                   <td class="mono">{{ deposit.deposit_no }}</td>
@@ -87,7 +87,7 @@
                         </div>
                         <div class="jd-pub-foot">
                           {% if history_remaining_count %}
-                            <p class="jd-pub-rest">{{ history_remaining_count|es_co_number }} depósito{{ history_remaining_count|pluralize }} más por {{ history_remaining_amount|cop }} <span class="jd-pub-rest-note">· Contáctenos para ver el histórico completo</span></p>
+                            <p class="jd-pub-rest">{{ history_remaining_count|es_co_number }} depósito{{ history_remaining_count|pluralize }} más por {{ history_remaining_amount|cop_for:mask_amounts }} <span class="jd-pub-rest-note">· Contáctenos para ver el histórico completo</span></p>
                           {% endif %}
                           <span class="jd-pub-shown">{{ history_rows|length }} de {{ history_total|es_co_number }}</span>
                         </div>
@@ -96,11 +96,15 @@
                   </tr>
                 {% endif %}
               {% endfor %}
-              {% if hidden_publications %}
+              {# Always closes the list: with older publications left out it names how many; without, the contact still offers the full detail of what is listed. #}
                 <tr class="jd-pub-more">
                   <td colspan="6">
                     <div class="jd-pub-cta jd-pub-cta--more">
-                      <p><span class="jd-pub-cta-rest">{{ hidden_publications|es_co_number }} publicaci{{ hidden_publications|pluralize:"ón,ones" }} más</span> · ¿Desea ver el histórico completo?</p>
+                      {% if hidden_publications %}
+                        <p><span class="jd-pub-cta-rest">{{ hidden_publications|es_co_number }} publicaci{{ hidden_publications|pluralize:"ón,ones" }} más</span> · ¿Desea ver el histórico completo?</p>
+                      {% else %}
+                        <p>¿Desea ver el detalle completo de estos depósitos?</p>
+                      {% endif %}
                       <a class="jd-pub-contact" href="{{ whatsapp_url }}" target="_blank" rel="noopener">
                         {% include "judicial_deposits/_whatsapp_icon.html" %}
                         <span>Contactar</span>
@@ -108,7 +112,6 @@
                     </div>
                   </td>
                 </tr>
-              {% endif %}
             </tbody>
           </table>
         </div>

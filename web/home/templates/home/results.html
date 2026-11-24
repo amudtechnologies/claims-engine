@@ -34,9 +34,9 @@
   <section class="results-head">
     <div class="wrap">
       {% if identity.party_name %}
-        <h1 class="serif">Resultados para {{ identity.party_name }}</h1>
+        <h1 class="serif">Resultados para {{ identity.party_name|party_display_name:identity.document_type }}</h1>
       {% elif identity.source_declared_name %}
-        <h1 class="serif">Resultados para {{ identity.source_declared_name }}</h1>
+        <h1 class="serif">Resultados para {{ identity.source_declared_name|party_display_name:identity.document_type }}</h1>
       {% else %}
         <h1 class="serif">Resultados de su consulta</h1>
       {% endif %}
@@ -44,12 +44,6 @@
         {{ identity.document_type|document_number_label }} {{ identity.document_number }}{% if identity.document_type %} · {{ identity.document_type|document_type_label }}{% endif %}
         <br>Consulta realizada el {{ searched_at|date:"j \d\e F \d\e Y" }}
       </p>
-      {% if not identity.party_name and not identity.source_declared_name %}
-        <p class="results-privacy-note">Aún no tenemos el nombre asociado a este número. El resultado se basa en el número que publica la fuente oficial.</p>
-      {% endif %}
-      {% if identity.document_type == "natural_person" %}
-        <p class="results-privacy-note">Esta consulta sirve para revisar su propia información o la de la empresa que representa. No la use para consultar a otras personas sin su autorización.</p>
-      {% endif %}
     </div>
   </section>
 

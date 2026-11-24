@@ -108,12 +108,16 @@ def detail(request):
     context["party_result"] = party_result
     if not party_result:
         return render(request, "judicial_deposits/detail.html", context)
+    # A natural person's amounts show only their first two digits.
+    context["mask_amounts"] = _is_natural_person(party_result)
 
     current = party_search.current_publication(party_result, latest_period)
     context["current"] = current
     context["first_appearance"] = party_search.is_first_appearance(party_result, latest_period)
     if current and current.claimable:
-        context["deposit_preview"] = preview.build_preview(current.summary.deposits)
+        context["deposit_preview"] = preview.build_preview(
+            current.summary.deposits, masked=_is_natural_person(party_result)
+        )
     # Also behind the history list's "Contactar" (D29).
     context["whatsapp_url"] = _whatsapp_url(party_result)
     periods = party_search.published_periods()
@@ -133,6 +137,11 @@ def detail(request):
     _add_history(request, context, party_result, periods, latest_period)
 
     return render(request, "judicial_deposits/detail.html", context)
+
+
+def _is_natural_person(party_result) -> bool:
+    """A natural person's page masks every column of its deposit tables."""
+    return party_result.document_type == "natural_person"
 
 
 # `pub` value that keeps every publication closed (overrides the default).
@@ -176,7 +185,9 @@ def _add_history(request, context, party_result, periods, latest_period) -> None
     ]
     context["hidden_publications"] = len(hidden)
     if opened:
-        rows = history.publication_sample(previous, opened)
+        rows = history.publication_sample(
+            previous, opened, masked=_is_natural_person(party_result)
+        )
         group = next(group for group in visible if group.period == opened)
         context["history_rows"] = rows
         context["history_total"] = group.deposit_count

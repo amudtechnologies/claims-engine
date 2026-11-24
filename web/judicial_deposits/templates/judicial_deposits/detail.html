@@ -22,21 +22,15 @@
     <div class="jd-party">
       <div class="eyebrow mono"><span class="dot"></span>DEPÓSITOS JUDICIALES SUSCEPTIBLES DE PRESCRIPCIÓN</div>
       {% if party_result.party_name %}
-        <h2 class="jd-party-name serif">{{ party_result.party_name }}</h2>
+        <h2 class="jd-party-name serif">{{ party_result.party_name|party_display_name:party_result.document_type }}</h2>
       {% elif party_result.source_declared_name %}
-        <h2 class="jd-party-name serif">{{ party_result.source_declared_name }}</h2>
+        <h2 class="jd-party-name serif">{{ party_result.source_declared_name|party_display_name:party_result.document_type }}</h2>
       {% else %}
         <h2 class="jd-party-name serif">Resultados de su consulta</h2>
       {% endif %}
       <p class="jd-party-meta">
         {{ party_result.document_type|document_number_label }} {{ party_result.document_number }}{% if party_result.document_type %} · {{ party_result.document_type|document_type_label }}{% endif %}
       </p>
-      {% if not party_result.party_name and not party_result.source_declared_name %}
-        <p class="jd-party-note">Aún no tenemos el nombre asociado a este número. El resultado se basa en el número que publica la fuente oficial.</p>
-      {% endif %}
-      {% if party_result.document_type == "natural_person" %}
-        <p class="jd-party-note">Esta consulta sirve para revisar su propia información o la de la empresa que representa. No la use para consultar a otras personas sin su autorización.</p>
-      {% endif %}
 
       {% include "judicial_deposits/_current_publication.html" %}
       {% include "judicial_deposits/_history.html" with summary=history_summary %}

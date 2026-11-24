@@ -388,6 +388,25 @@ class DetailPageTests(TestCase):
         )
         self.assertContains(self._request(), note)
 
+    def test_natural_person_tables_are_fully_masked(self):
+        self._with_preview_deposits()
+        self.result = dataclasses.replace(self.result, document_type="natural_person")
+        html = self._request().content.decode()
+        # Total and role figures: two digits in clear.
+        self.assertIn('jd-summary-num mono">$ 69.•••.•••<', html)
+        self.assertIn("3 depósitos · $ 69.•••.•••", html)
+        self.assertNotIn("69.330.801", html)
+        self.assertIn('2 depósitos más por <span class="jd-more-sum">$ 33.•••.•••</span>', html)
+        table = html[html.index('class="jd-more-table"') :]
+        table = table[: table.index("</table>")]
+        for clear in ("Oficina", "Bucaramanga", "36.161.788"):
+            self.assertNotIn(clear, table)
+        self.assertIn("$ 36.•••.•••", table)
+        self.assertIn("Of••••••••••••", table)
+        self.assertIn("Bu••••••••••••", table)
+        self.assertIn("46001••••••••••", table)
+        self.assertIn("••/••/2023", table)
+
     def test_closed_window_has_no_preview(self):
         self._with_preview_deposits()
         response = self._request(today=date(2026, 11, 18))
@@ -429,8 +448,10 @@ class DetailPageTests(TestCase):
         self.assertIn("18 depósitos más por $ 180.153 <span", history_html)
         self.assertIn("· Contáctenos para ver el histórico completo", history_html)
         self.assertIn('<span class="jd-pub-shown">5 de 23</span>', history_html)
-        # Only two previous publications: nothing hidden, so no "Contactar".
-        self.assertNotIn("https://wa.me/", history_html)
+        # Only two previous publications, nothing hidden: the list still ends
+        # in "Contactar".
+        self.assertIn("¿Desea ver el detalle completo de estos depósitos?", history_html)
+        self.assertIn("https://wa.me/", history_html)
         self.assertNotIn("Mostrando", history_html)
         self.assertIn("pub=ninguna", history_html)
         # Closing it keeps everything closed.
@@ -447,6 +468,13 @@ class DetailPageTests(TestCase):
         # Never a full deposit number or judicial account.
         self.assertNotIn("110012041014", html)
         self.assertNotIn("400100005010000", html)
+
+    def test_natural_person_publication_values_are_masked(self):
+        self._with_long_history()
+        self.result = dataclasses.replace(self.result, document_type="natural_person")
+        html = self._request(url=DETAIL_URL + "&pub=ninguna").content.decode()
+        self.assertIn('data-label="Valor">$ 23•.•••<', html)
+        self.assertNotIn("230.253", html.split("jd-pubs-table")[1].split("</table>")[0])
 
     def test_first_appearance_history_is_one_line(self):
         self.result = _result([_deposit("2026-2", 200), _deposit("2026-2", 300)])
@@ -1013,10 +1041,17 @@ class PreviewTests(TestCase):
         )
         self.assertEqual(preview.court_display_name(None), "Despacho sin nombre")
 
-    def test_single_deposit_has_no_faded_rows(self):
-        built = preview.build_preview([self._deposit(500)])
+    def test_single_deposit_has_no_faded_rows_and_is_masked(self):
+        built = preview.build_preview([self._deposit(19_063_828)])
         self.assertEqual(built.faded, [])
         self.assertEqual(built.remaining_count, 0)
+        # The lone row is the whole finding: court and city masked, the
+        # amount kept (a legal entity's); a natural person's amount masked too.
+        self.assertEqual(built.visible.amount, "$ 19.063.828")
+        masked = preview.build_preview([self._deposit(19_063_828)], masked=True)
+        self.assertEqual(masked.visible.amount, "$ 19.•••.•••")
+        self.assertTrue(built.visible.court.endswith("••••"))
+        self.assertTrue(built.visible.city == "—" or built.visible.city.endswith("••••"))
 
     def test_at_most_three_faded_rows(self):
         built = preview.build_preview([self._deposit(amount) for amount in range(1, 7)])
@@ -1034,6 +1069,12 @@ class HistoryListTests(TestCase):
         self.assertEqual([row.amount_cop for row in sample], [25, 24, 23, 22, 21])
         small = history.publication_sample(deposits[:2], "2025-1")
         self.assertEqual(len(small), 2)
+
+    def test_court_code_followed_by_court_number(self):
+        self.assertEqual(
+            preview.court_display_name("410014189005-005 MUN PEQ CAU COM MUL NEIVA"),
+            "005 Mun Peq Cau Com Mul Neiva",
+        )
 
     def test_city_display_name(self):
         for raw in ("Bogota", "BOGOTA", "Bogotá, D.C.", "Bogotá D.C"):

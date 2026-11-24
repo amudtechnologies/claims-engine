@@ -64,7 +64,7 @@
 
     <div class="jd-more-cta">
       {% if preview.remaining_count %}
-        <strong>{{ preview.remaining_count|es_co_number }} depósito{{ preview.remaining_count|pluralize }} más por <span class="jd-more-sum">{{ preview.remaining_amount_cop|cop }}</span></strong>
+        <strong>{{ preview.remaining_count|es_co_number }} depósito{{ preview.remaining_count|pluralize }} más por <span class="jd-more-sum">{{ preview.remaining_amount_cop|cop_for:mask_amounts }}</span></strong>
         <p>Contáctenos para ver el detalle completo de estos depósitos y verificar si le corresponde reclamarlos.</p>
       {% else %}
         <p>Contáctenos para ver el detalle completo de este depósito y verificar si le corresponde reclamarlo.</p>

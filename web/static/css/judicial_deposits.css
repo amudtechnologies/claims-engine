@@ -37,7 +37,6 @@
 
 .jd-panel-footnote { display: flex; gap: 24px; flex-wrap: wrap; font-size: 0.84rem; color: var(--ink-softer); }
 
-.jd-party-note { margin: -8px 0 20px 0; font-size: 0.84rem; color: var(--ink-softer); }
 
 /* DETAIL PAGE — latest publication first (the lead block), then history. */
 .jd-detail { padding-top: clamp(24px, 4vw, 40px); }
@@ -413,8 +412,6 @@ a.radar-card:hover .radar-card-arrow, a.radar-card:focus-visible .radar-card-arr
    an opened publication is always shown at full strength. */
 .jd-pub--2:not(.is-open) > td { opacity: 0.8; }
 .jd-pub--3:not(.is-open) > td { opacity: 0.6; }
-.jd-pub--4:not(.is-open) > td { opacity: 0.42; }
-.jd-pub--5:not(.is-open) > td { opacity: 0.26; }
 /* An opened publication's five deposits fade out row by row. Opacity only: these
    are real, readable rows (masked server-side where needed), not hidden ones. */
 .jd-pub-row--2 td { opacity: 0.5; }
