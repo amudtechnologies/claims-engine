@@ -20,10 +20,6 @@
         <span>Contactar</span>
       </a>
     </span>
-    {% if not pub.summary.plaintiff_count and pub.summary.defendant_count %}
-      {# Only as defendant: don't let "demandado" read as "this is what I owe" (project-context.md §3, structural ambiguity). #}
-      <p class="jd-more-note">Que aparezca como demandado no significa que el dinero sea de la otra parte: puede corresponderle a usted, por ejemplo si se levantó un embargo o sobró dinero de un remate.</p>
-    {% endif %}
   </div>
 
   <div class="jd-more-body" id="jd-more-body" data-jd-more-body>

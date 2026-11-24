@@ -376,18 +376,6 @@ class DetailPageTests(TestCase):
         self.assertContains(response, "deposit_preview.js")
         self.assertContains(response, "consult%C3%A9%20el%20NIT%20890300279")
 
-    def test_defendant_only_gets_ownership_note(self):
-        note = "Que aparezca como demandado no significa que el dinero sea de la otra parte"
-        self._with_preview_deposits()
-        self.assertNotContains(self._request(), note)
-        self.result = dataclasses.replace(
-            self.result,
-            deposits=[
-                dataclasses.replace(d, procedural_role="defendant") for d in self.result.deposits
-            ],
-        )
-        self.assertContains(self._request(), note)
-
     def test_natural_person_tables_are_fully_masked(self):
         self._with_preview_deposits()
         self.result = dataclasses.replace(self.result, document_type="natural_person")
